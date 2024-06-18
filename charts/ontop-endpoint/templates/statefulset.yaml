@@ -1,0 +1,248 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ontop-endpoint.fullname" . }}
+  labels:
+    {{- include "ontop-endpoint.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ontop-endpoint.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ontop-endpoint.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ontop-endpoint.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{.Values.envConfigMapName  | quote}}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          {{- range $name, $mount := .Values.secrets }}
+            - name: "{{ $name }}-volume"
+              mountPath: {{ $mount | quote }}
+          {{- end }}
+            - name: {{ .Values.endpoint.persistence.volumeName }}
+              mountPath: {{ .Values.endpoint.persistence.mountPath }}
+              {{- if .Values.endpoint.persistence.subPath }}
+              subPath: {{ .Values.endpoint.persistence.subPath }}
+              {{- end }}
+            - name: {{ .Values.materializationDb.persistence.volumeName }}
+              mountPath: {{ .Values.materializationDb.persistence.mountPath }}
+              {{- if .Values.materializationDb.persistence.subPath }}
+              subPath: {{ .Values.materializationDb.persistence.subPath }}
+              {{- end }}
+            - name: {{ .Values.materializationConfiguration.persistence.volumeName }}
+              mountPath: {{ .Values.materializationConfiguration.persistence.mountPath }}
+              {{- if .Values.materializationConfiguration.persistence.subPath }}
+              subPath: {{ .Values.materializationConfiguration.persistence.subPath }}
+              {{- end }}
+            - name: {{ .Values.materializationResult.persistence.volumeName }}
+              mountPath: {{ .Values.materializationResult.persistence.mountPath }}
+              {{- if .Values.materializationResult.persistence.subPath }}
+              subPath: {{ .Values.materializationResult.persistence.subPath }}
+              {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- range $name, $mount := .Values.secrets }}
+        - name: "{{$name}}-volume"
+          secret:
+            secretName: {{$name | quote}}
+      {{- end }}
+  {{- if and .Values.endpoint.persistence.enabled .Values.endpoint.persistence.existingClaim }}
+        - name: {{ .Values.endpoint.persistence.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ tpl .Values.endpoint.persistence.existingClaim $ }}
+  {{- else if not .Values.endpoint.persistence.enabled }}
+        - name: {{ .Values.endpoint.persistence.volumeName }}
+          emptyDir: {}
+  {{- end }}
+  {{- if and .Values.materializationDb.persistence.enabled .Values.materializationDb.persistence.existingClaim }}
+        - name: {{ .Values.materializationDb.persistence.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ tpl .Values.materializationDb.persistence.existingClaim $ }}
+  {{- else if not .Values.materializationDb.persistence.enabled }}
+        - name: {{ .Values.materializationDb.persistence.volumeName }}
+          emptyDir: {}
+  {{- end }}
+  {{- if and .Values.materializationConfiguration.persistence.enabled .Values.materializationConfiguration.persistence.existingClaim }}
+        - name: {{ .Values.materializationConfiguration.persistence.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ tpl .Values.materializationConfiguration.persistence.existingClaim $ }}
+  {{- else if not .Values.materializationConfiguration.persistence.enabled }}
+        - name: {{ .Values.materializationConfiguration.persistence.volumeName }}
+          emptyDir: {}
+  {{- end }}
+  {{- if and .Values.materializationResult.persistence.enabled .Values.materializationResult.persistence.existingClaim }}
+        - name: {{ .Values.materializationResult.persistence.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ tpl .Values.materializationResult.persistence.existingClaim $ }}
+  {{- else if not .Values.materializationResult.persistence.enabled }}
+        - name: {{ .Values.materializationResult.persistence.volumeName }}
+          emptyDir: {}
+  {{- end }}
+  {{- if .Values.persistentVolumeClaimRetentionPolicy.enabled }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: {{ .Values.persistentVolumeClaimRetentionPolicy.whenDeleted }}
+    whenScaled: {{ .Values.persistentVolumeClaimRetentionPolicy.whenScaled }}
+  {{- end }}
+  {{- if or
+    (or  (and .Values.endpoint.persistence.enabled (not .Values.endpoint.persistence.existingClaim))
+        (and .Values.materializationDb.persistence.enabled (not .Values.materializationDb.persistence.existingClaim)))
+    (or  (and .Values.materializationConfiguration.persistence.enabled (not .Values.materializationConfiguration.persistence.existingClaim))
+        (and .Values.materializationResult.persistence.enabled (not .Values.materializationResult.persistence.existingClaim)))
+  }}
+  volumeClaimTemplates:
+    {{- if and .Values.endpoint.persistence.enabled (not .Values.endpoint.persistence.existingClaim) }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .Values.endpoint.persistence.volumeName }}
+        {{- if .Values.endpoint.persistence.annotations }}
+        annotations: {{- include "common.tplvalues.render" (dict "value" .Values.endpoint.persistence.annotations "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.endpoint.persistence.labels }}
+        labels: {{- include "common.tplvalues.render" (dict "value" .Values.endpoint.persistence.labels "context" $) | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.endpoint.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.endpoint.persistence.dataSource }}
+        dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.endpoint.persistence.dataSource "context" $) | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.endpoint.persistence.size | quote }}
+        {{- if .Values.endpoint.persistence.selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .Values.endpoint.persistence.selector "context" $) | nindent 10 }}
+        {{- end }}
+        {{- include "common.storage.class" (dict "persistence" .Values.endpoint.persistence "global" .Values.global) | nindent 8 }}
+    {{- end }}
+    {{- if and .Values.materializationDb.persistence.enabled (not .Values.materializationDb.persistence.existingClaim) }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .Values.materializationDb.persistence.volumeName }}
+        {{- if .Values.materializationDb.persistence.annotations }}
+        annotations: {{- include "common.tplvalues.render" (dict "value" .Values.materializationDb.persistence.annotations "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.materializationDb.persistence.labels }}
+        labels: {{- include "common.tplvalues.render" (dict "value" .Values.materializationDb.persistence.labels "context" $) | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.materializationDb.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.materializationDb.persistence.dataSource }}
+        dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.materializationDb.persistence.dataSource "context" $) | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.materializationDb.persistence.size | quote }}
+        {{- if .Values.materializationDb.persistence.selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .Values.materializationDb.persistence.selector "context" $) | nindent 10 }}
+        {{- end }}
+        {{- include "common.storage.class" (dict "persistence" .Values.materializationDb.persistence "global" .Values.global) | nindent 8 }}
+    {{- end }}
+    {{- if and .Values.materializationConfiguration.persistence.enabled (not .Values.materializationConfiguration.persistence.existingClaim) }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .Values.materializationConfiguration.persistence.volumeName }}
+        {{- if .Values.materializationConfiguration.persistence.annotations }}
+        annotations: {{- include "common.tplvalues.render" (dict "value" .Values.materializationConfiguration.persistence.annotations "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.materializationConfiguration.persistence.labels }}
+        labels: {{- include "common.tplvalues.render" (dict "value" .Values.materializationConfiguration.persistence.labels "context" $) | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.materializationConfiguration.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.materializationConfiguration.persistence.dataSource }}
+        dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.materializationConfiguration.persistence.dataSource "context" $) | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.materializationConfiguration.persistence.size | quote }}
+        {{- if .Values.materializationConfiguration.persistence.selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .Values.materializationConfiguration.persistence.selector "context" $) | nindent 10 }}
+        {{- end }}
+        {{- include "common.storage.class" (dict "persistence" .Values.materializationConfiguration.persistence "global" .Values.global) | nindent 8 }}
+    {{- end }}
+    {{- if and .Values.materializationResult.persistence.enabled (not .Values.materializationResult.persistence.existingClaim) }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .Values.materializationResult.persistence.volumeName }}
+        {{- if .Values.materializationResult.persistence.annotations }}
+        annotations: {{- include "common.tplvalues.render" (dict "value" .Values.materializationResult.persistence.annotations "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.materializationResult.persistence.labels }}
+        labels: {{- include "common.tplvalues.render" (dict "value" .Values.materializationResult.persistence.labels "context" $) | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.materializationResult.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.materializationResult.persistence.dataSource }}
+        dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.materializationResult.persistence.dataSource "context" $) | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.materializationResult.persistence.size | quote }}
+        {{- if .Values.materializationResult.persistence.selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .Values.materializationResult.persistence.selector "context" $) | nindent 10 }}
+        {{- end }}
+        {{- include "common.storage.class" (dict "persistence" .Values.materializationResult.persistence "global" .Values.global) | nindent 8 }}
+    {{- end }}
+  {{- end }}

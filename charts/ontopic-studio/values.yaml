@@ -1,0 +1,362 @@
+# Default values for ontopic-studio.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  registry: registry.gitlab.com/ontopic-public/ontopic-helm
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+#imagePullSecrets: [{"name": "regcred"}]
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+persistentVolumeClaimRetentionPolicy:
+  ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment
+  ##
+  enabled: false
+  ## @param persistentVolumeClaimRetentionPolicy.whenScaled Volume retention behavior when the replica count of the Deployment is reduced
+  ##
+  whenScaled: Retain
+  ## @param persistentVolumeClaimRetentionPolicy.whenDeleted Volume retention behavior that applies when the Deployment is deleted
+  ##
+  whenDeleted: Retain
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+services:
+  ##--- Angular frontend
+  angular-frontend:
+    image:
+      repository: studio
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "helm-v2024.1.2"
+
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 4200
+
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 4200
+
+    envConfigMapName: angular-frontend-config
+
+    env:
+      IS_DEMO_VERSION: false
+      HIDE_PROJECTS: false
+      IS_DESKTOP_VERSION: false
+
+
+  ##--- Identity service
+  identity-service:
+    image:
+      repository: identity-service
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "helm-v2024.1.2"
+
+    args:
+      - '--session.enable=true'
+      - '--identity.enable=true'
+
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8080
+
+    envConfigMapName: identity-service-env
+
+    env:
+      ONTOPIC_IDENTITY_SERVICE_DEBUG: false
+      ONTOPIC_IDENTITY_SERVICE_TIMEOUT_IDLE:
+      ONTOPIC_IDENTITY_SERVICE_TIMEOUT_READ:
+      ONTOPIC_IDENTITY_SERVICE_TIMEOUT_WRITE:
+      ONTOPIC_IDENTITY_SERVICE_PROVIDER_OAUTH2:
+      ONTOPIC_IDENTITY_SERVICE_PROVIDER_PASSWORD: password-file
+      ONTOPIC_IDENTITY_SERVICE_AUDIENCE:
+      ONTOPIC_IDENTITY_SERVICE_SCOPES:
+      ONTOPIC_IDENTITY_SERVICE_ROLES:
+      ONTOPIC_IDENTITY_SERVICE_CLAIMS_EMAIL:
+      ONTOPIC_IDENTITY_SERVICE_CLAIMS_GROUP:
+      ONTOPIC_IDENTITY_SERVICE_CLAIMS_ROLE:
+      ONTOPIC_IDENTITY_SERVICE_AZURE_TENANT_ID:
+      ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_ID:
+      ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE: /run/secrets/azure-api-client-secret/azure-api-client-secret
+      ONTOPIC_IDENTITY_SERVICE_OKTA_ISSUER_URL:
+      ONTOPIC_IDENTITY_SERVICE_OKTA_SSWS_TOKEN_FILE: /run/secrets/okta-ssws-token/okta-ssws-token
+      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_HOST:
+      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_REALM:
+      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_APPLICATION:
+      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_USER:
+      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_PASSWORD_FILE: /run/secrets/keycloak-admin-password-file/keycloak-admin-password-file
+      ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE: /run/secrets/password-file-db/password-file-db
+      ONTOPIC_IDENTITY_SERVICE_SESSION_PROMPT:
+      ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE:
+      ONTOPIC_IDENTITY_SERVICE_SESSION_STORE_FILE: /etc/identity-service/data/session.db
+      ONTOPIC_IDENTITY_SERVICE_CLIENT_ID:
+      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
+      ONTOPIC_IDENTITY_SERVICE_COOKIE_PREFIX: _ontopic-studio
+      ONTOPIC_IDENTITY_SERVICE_COOKIE_SECRET_FILE: /run/secrets/cookie-secret/cookie-secret
+      ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE: false
+      ONTOPIC_IDENTITY_SERVICE_COOKIE_HTTPONLY: true
+      ONTOPIC_IDENTITY_SERVICE_COOKIE_SAME_SITE: lax
+      ONTOPIC_IDENTITY_SERVICE_COOKIE_EXPIRATION:
+      ONTOPIC_IDENTITY_SERVICE_COOKIE_REFRESH:
+      ONTOPIC_IDENTITY_SERVICE_PROVIDER_NAME:
+      ONTOPIC_IDENTITY_SERVICE_CUSTOM_TEMPLATE_DIR: /etc/identity-service/templates
+      ONTOPIC_IDENTITY_SERVICE_IDENTITY_REFRESH:
+
+
+    secrets:
+      client-secret: /run/secrets/client-secret
+      cookie-secret: /run/secrets/cookie-secret
+      azure-api-client-secret: /run/secrets/azure-api-client-secret
+      okta-ssws-token: /run/secrets/okta-ssws-token
+      keycloak-admin-password-file: /run/secrets/keycloak-admin-password-file
+      password-file-db: /run/secrets/password-file-db
+
+  ##--- Process server
+  process-server:
+    image:
+      repository: process-server
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "helm-v2024.1.2"
+
+    livenessProbe:
+      httpGet:
+        path: /process-api/healthcheck
+        port: 8666
+
+    readinessProbe:
+      httpGet:
+        path: /process-api/healthcheck
+        port: 8666
+
+    envConfigMapName: process-server-config
+
+    env:
+      store_service_host: localhost
+      store_service_port: 3000
+      license_type: ontopic
+      user_license_file: /run/secrets/user-license/user-license
+
+    secrets:
+      user-license-file: /run/secrets/user-license
+
+  ##--- Store server
+  store-server:
+    image:
+      repository: store-server
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "helm-v2024.1.2"
+
+    livenessProbe:
+      httpGet:
+        path: /internal-store-api/healthcheck
+        port: 3000
+
+    readinessProbe:
+      httpGet:
+        path: /internal-store-api/healthcheck
+        port: 3000
+
+    envConfigMapName: store-server-config
+
+    env:
+      node_env: production
+      db_reset: 'false'
+      db_migrate: 'true'
+      db_seed: 'false'
+      database_host: store-server-db-postgresql.ontopic.svc.cluster.local
+      database_port: 5432
+      database_name: internal
+      database_user: postgres
+      database_password_file: /run/secrets/database-password-file/database-password-file
+      casbin_store_host: store-server-db-postgresql.ontopic.svc.cluster.local
+      casbin_store_port: 5432
+      casbin_store_user: postgres
+      casbin_store_password_file: /run/secrets/database-password-file/database-password-file
+      ontop_endpoint_host: http://ontop-endpoint.ontopic.svc.cluster.local:8080
+      identity_service_name: localhost
+      identity_service_port: 8080
+      ontopic_restore_projects_db: false
+      ontopic_restore_projects_db_file: docs/backups/backupjson.log.gz
+      process_service_host: localhost
+      process_service_port: 8666
+      enable_git_repo: false
+      ontopic_sample_db: false
+      ontopic_sample_db_url: ""
+      ontopic_sample_db_username: ""
+      ontopic_sample_db_password: ""
+      ontopic_sample_db_driver: ""
+      ontopic_enable_authentication: true
+      enable_materialization: false
+      db_client: pg
+
+    volumes:
+      - volumeName: "docs-dir"
+        existingClaim: ""
+        mountPath: /app/docs
+        subPath: ""
+        storageClass: ""
+        accessModes:
+          - ReadWriteOnce
+        size: 8Gi
+        annotations: {}
+        labels: {}
+        selector: {}
+        dataSource: {}
+      - volumeName: "repo-dir"
+        existingClaim: ""
+        mountPath: /app/repo
+        subPath: ""
+        storageClass: ""
+        accessModes:
+          - ReadWriteOnce
+        size: 8Gi
+        annotations: {}
+        labels: {}
+        selector: {}
+        dataSource: {}
+
+    secrets:
+      database-password-file: /run/secrets/database-password-file
+
+  ##--- Web
+  web:
+    image:
+      repository: nginx
+      pullPolicy: Always
+
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "helm-v2024.1.2"
+
+    livenessProbe:
+      httpGet:
+        path: /
+        port: web
+
+    readinessProbe:
+      httpGet:
+        path: /
+        port: web
+
+    service:
+      name: web
+      type: ClusterIP
+      port: 80
+      targetPort: 80
+
+    ingress:
+      enabled: true
+      className: ""
+      annotations: {}
+        # kubernetes.io/ingress.class: nginx
+        # kubernetes.io/tls-acme: "true"
+      hosts:
+        - host: ontopic.local
+          paths:
+            - path: /
+              pathType: Prefix
+      tls: []
+
+    envConfigMapName: web-config
+
+    env:
+      virtual_host: ontopic.local
+      virtual_port: 80
+      ANGULAR_FRONTEND_SERVICE_HOST: localhost
+      ANGULAR_FRONTEND_SERVICE_PORT: 4200
+      IDENTITY_SERVICE_HOST: localhost
+      IDENTITY_SERVICE_PORT: 8080
+      PROCESS_SERVER_SERVICE_HOST: localhost
+      PROCESS_SERVER_SERVICE_PORT: 8666
+      STORE_SERVER_SERVICE_HOST: localhost
+      STORE_SERVER_API_SERVICE_PORT: 3000
+      STORE_SERVER_DOC_SERVICE_PORT: 3001
+      ONTOP_ENDPOINT_SERVICE_HOST: ontop-endpoint.ontopic.svc.cluster.local
+      ONTOP_ENDPOINT_SERVICE_PORT: 8080
+      # GIT_MIRROR_SERVICE_HOST: localhost
+      # GIT_MIRROR_SERVICE_PORT: 80

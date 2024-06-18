@@ -1,0 +1,22 @@
+{{- range $name, $values := .Values.services }}
+{{- with $values }}
+{{- if .service -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "ontopic-studio.name" $ }}-{{ .service.name }}"
+  labels:
+    {{- include "ontopic-studio.labels" $ | nindent 4 }}
+spec:
+  type: {{ .service.type }}
+  ports:
+    - port: {{ .service.port }}
+      targetPort: {{ .service.targetPort }}
+      protocol: TCP
+      name: {{ .service.name }}
+  selector:
+    {{- include "ontopic-studio.selectorLabels" $ | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- end }}

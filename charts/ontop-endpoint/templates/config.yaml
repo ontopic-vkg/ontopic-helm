@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{.Values.envConfigMapName}}
+data:
+{{- include "ontop-endpoint.env" .Values.env }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: access-key-id
+type: Opaque
+data:
+{{ (.Files.Glob "s3/access-key-id").AsSecrets | indent 4 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: access-key-secret
+type: Opaque
+data:
+{{ (.Files.Glob "s3/access-key-secret").AsSecrets | indent 4 }}

@@ -1,0 +1,169 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ontopic-studio.fullname" . }}
+  labels:
+    {{- include "ontopic-studio.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ontopic-studio.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ontopic-studio.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ontopic-studio.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      {{- range $name, $values := .Values.services }}
+      {{- with $values }}
+        - name: {{ $name }}
+          securityContext:
+            {{- toYaml .securityContext | nindent 12 }}
+          image: "{{ $.Values.global.registry }}/{{ .image.repository }}:{{ .image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ .image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .envConfigMapName  | quote }}
+          {{- if .service }}
+          ports:
+            - name: {{ .service.name }}
+              containerPort: {{ .service.port }}
+              protocol: TCP
+          {{- end }}
+          {{- if .livenessProbe }}
+          livenessProbe:
+            {{- toYaml .livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .readinessProbe }}
+          readinessProbe:
+            {{- toYaml .readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .args }}
+          args:
+            {{- toYaml .args | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .resources | nindent 12 }}
+          {{- if or .secrets .volumes }}
+          volumeMounts:
+          {{- if and (hasKey $.Values $name) (hasKey (get $.Values $name) "secrets") }}
+          {{- $secrets := (get $.Values $name).secrets  }}
+          {{- range $name, $mount := $secrets }}
+            - name: "{{ $name }}-volume"
+              mountPath: {{ $mount | quote }}
+          {{- end }}
+          {{- else if .secrets }}
+          {{- range $name, $mount := .secrets }}
+            - name: "{{ $name }}-volume"
+              mountPath: {{ $mount | quote }}
+          {{- end }}
+          {{- end }}
+
+          {{- if .volumes }}
+          {{- range .volumes }}
+            - name: {{ .volumeName }}
+              mountPath: {{ .mountPath }}
+              {{- if .subPath }}
+              subPath: {{ .subPath }}
+              {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- range $name, $values := .Values.services }}
+      {{- with $values }}
+      {{- if and (hasKey $.Values $name) (hasKey (get $.Values $name) "secrets") }}
+      {{- $secrets := (get $.Values $name).secrets  }}
+      {{- range $name, $mount := $secrets }}
+        - name: "{{$name}}-volume"
+          secret:
+            secretName: {{$name | quote}}
+      {{- end }}
+      {{- else if .secrets }}
+      {{- range $name, $mount := .secrets }}
+        - name: "{{$name}}-volume"
+          secret:
+            secretName: {{$name | quote}}
+      {{- end }}
+      {{- end }}
+      {{- range .volumes }}
+        {{- if .existingClaim }}
+        - name: {{ .volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ tpl .existingClaim $ }}
+        {{- else }}
+        - name: {{ .volumeName }}
+          emptyDir: {}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+  {{- if .Values.persistentVolumeClaimRetentionPolicy.enabled }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: {{ .Values.persistentVolumeClaimRetentionPolicy.whenDeleted }}
+    whenScaled: {{ .Values.persistentVolumeClaimRetentionPolicy.whenScaled }}
+  {{- end }}
+  {{- if include "ontopic-studio.hasExistingClaim" .Values | fromYaml }}
+  volumeClaimTemplates:
+  {{- range $name, $values := .Values.services }}
+  {{- with $values }}
+    {{- range .volumes }}
+      {{- if not .existingClaim }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .volumeName }}
+        {{- if .annotations }}
+        annotations: {{- include "common.tplvalues.render" (dict "value" .annotations "context" $values) | nindent 10 }}
+        {{- end }}
+        {{- if .labels }}
+        labels: {{- include "common.tplvalues.render" (dict "value" .labels "context" $values) | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .dataSource }}
+        dataSource: {{- include "common.tplvalues.render" (dict "value" .dataSource "context" $values) | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .size | quote }}
+        {{- if .selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .selector "context" $values) | nindent 10 }}
+        {{- end }}
+        {{- include "common.storage.class" (dict "persistence" . "global" $.Values.global) | nindent 8 }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
