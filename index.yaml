@@ -3,6 +3,16 @@ entries:
   ontop-endpoint:
   - apiVersion: v2
     appVersion: v2024.1.2
+    created: "2024-06-19T09:41:42.93713646Z"
+    description: A Helm chart for Kubernetes
+    digest: e060738b2d751845ca6682f079d4ebce127d49b6c191bddf9b1670961bbdd345
+    name: ontop-endpoint
+    type: application
+    urls:
+    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontop-endpoint-0.1.1/ontop-endpoint-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: v2024.1.2
     created: "2024-06-18T15:08:35.450486918Z"
     description: A Helm chart for Kubernetes
     digest: ba38583e2633558532b4f292911886a9cfcb710be8c4311495253eac798af3cf
@@ -14,6 +24,16 @@ entries:
   ontopic-studio:
   - apiVersion: v2
     appVersion: v2024.1.2
+    created: "2024-06-19T09:41:43.039473481Z"
+    description: A Helm chart for Kubernetes
+    digest: e642ff5fc771e8030b3164acd41e86a51cf663695802d536d87c18c6c634023d
+    name: ontopic-studio
+    type: application
+    urls:
+    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-studio-0.1.1/ontopic-studio-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: v2024.1.2
     created: "2024-06-18T15:08:35.586571277Z"
     description: A Helm chart for Kubernetes
     digest: b9e6bec2142cc9834f0bdfbb25bc0be821242e96ea658bea5ba1588402f0bd49
@@ -22,4 +42,4 @@ entries:
     urls:
     - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-studio-0.1.0/ontopic-studio-0.1.0.tgz
     version: 0.1.0
-generated: "2024-06-18T15:08:35.586581185Z"
+generated: "2024-06-19T09:41:43.039484662Z"
