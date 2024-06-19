@@ -74,9 +74,26 @@ store-server:
 Ontopic Studio has a default user _test_ with password _test_. You can skip this section or customize this value, creating a new user and secret using the script _./create-user.sh_
 
 Create the secret with the script, a new file with the chosen password will be generated in a new folder _secrets_
+
+
 ```bash
 ./create-user.sh
+```
 
+<details>
+ <summary><b>NOTE:</b> Troubleshooting the script</summary>
+
+---
+In case of permission issues running the script (as user root), change ownership of the secrets folder and execute again the script
+```bash
+sudo chown 1000 ./secrets
+./create-user.sh
+```
+---
+</details>
+</br>
+
+```bash
 # Create the secret
 kubectl create secret generic identity-password-db \
     --from-file=password-file-db=./secrets/password-file-db
@@ -94,11 +111,6 @@ identity-service:
     keycloak-admin-password-file: /run/secrets/keycloak-admin-password-file
 ```
 
-In case of permission issues running the script, change ownership of the secrets folder and rexecute the script
-```bash
-sudo chown 1000 ./secrets
-./create-user.sh
-```
 
 ### Add the license as secret
 Add the provided ontopic-studio license.
@@ -146,7 +158,7 @@ To uninstall the chart:
     helm delete ontopic-studio
 
 ## Change DNS
-Edit values.yaml file with the chosen host
+Edit values.yaml file with the chosen host name
 
 ```yaml
 web:

@@ -32,7 +32,7 @@ k3d cluster create -c k3d-example/ontopic-cluster.yaml
 ```
 
 ### Install helm charts
-Follow the steps in the [Readme file](./README.md).
+Follow the steps in the [Readme file](../README.md).
 
 ### Access Ontopic Studio
 
