@@ -1,8 +1,7 @@
-# ontopic-helm
-Ontopic helm chart repository
-
 Helm Chart
 ==========
+
+Ontopic helm chart repository
 
 Requirements
 ------------
@@ -72,7 +71,7 @@ store-server:
 
 ### Create a user and set password as secret
 
-Ontopic Studio has a default user _test_ with password _test_. You can customize this value, creating a new user and secret using the script _./create-user.sh_
+Ontopic Studio has a default user _test_ with password _test_. You can skip this section or customize this value, creating a new user and secret using the script _./create-user.sh_
 
 Create the secret with the script, a new file with the chosen password will be generated in a new folder _secrets_
 ```bash
@@ -83,7 +82,7 @@ kubectl create secret generic identity-password-db \
     --from-file=password-file-db=./secrets/password-file-db
 ```
 
-And then you customize your values file with the secrets  :
+And then you customize your values file with the secrets (all necessary secrets need to be passed not only the edited one)  :
 ```yaml
 identity-service:
   secrets:
@@ -109,16 +108,6 @@ And then you add it in your values file :
 process-server:
   secrets:
     user-license-file: /run/secrets/user-license
-```
-### Install the helm charts manually
-
-Install the charts
-
-```bash
-helm install ontop-endpoint ontop-endpoint --wait
-helm install -f values.yaml ontopic-studio ontopic-studio
-watch kubectl get pod
-
 ```
 
 ## Install helm charts with the repository
@@ -149,3 +138,15 @@ To install the ontopic-studio chart a values.yaml file is needed to override con
 To uninstall the chart:
 
     helm delete ontopic-studio
+
+## Change DNS
+Edit values.yaml file with the chosen host
+
+```yaml
+web:
+  env:
+    virtual_host: ontopicosse.local
+
+ingress:
+  host: ontopicosse.local
+```
