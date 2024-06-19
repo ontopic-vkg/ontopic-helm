@@ -5,9 +5,9 @@
 {{- if and .service .ingress -}}
 {{- $fullName := printf "%s-%s" (include "ontopic-studio.name" $) .service.name -}}
 {{- $svcPort := .service.port -}}
-{{- if and .ingress.className (not (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .ingress.annotations "kubernetes.io/ingress.class" .ingress.className}}
+{{- if and $.Values.ingress.className (not (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey $.Values.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set $.Values.ingress.annotations "kubernetes.io/ingress.class" .ingress.className}}
   {{- end }}
 {{- end }}
 {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion -}}
@@ -22,13 +22,13 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "ontopic-studio.labels" $ | nindent 4 }}
-  {{- $annotations :=   .ingress.annotations }}
+  {{- $annotations :=   $.Values.ingress.annotations | default .ingress.annotations }}
   {{- with $annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .ingress.className (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
+  {{- if and $.Values.ingress.className (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ $.Values.ingress.className | default .ingress.className }}
   {{- end }}
   {{- if or $.Values.ingress.tls .ingress.tls }}
