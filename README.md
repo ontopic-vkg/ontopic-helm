@@ -94,6 +94,12 @@ identity-service:
     keycloak-admin-password-file: /run/secrets/keycloak-admin-password-file
 ```
 
+In case of permission issues running the script, change ownership of the secrets folder and rexecute the script
+```bash
+sudo chown 1000 ./secrets
+./create-user.sh
+```
+
 ### Add the license as secret
 Add the provided ontopic-studio license.
 

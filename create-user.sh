@@ -55,7 +55,7 @@ case ${answer:0:1} in
 
         write_directories "./secrets"
 
-        docker run -it -v "./secrets:/mnt" registry.gitlab.com/ontopic-public/ontopic-helm/identity-service:helm htpasswd -c /mnt/password-file-db "$USERNAME"
+        docker run -it -v "./secrets:/mnt" ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm htpasswd -c /mnt/password-file-db "$USERNAME"
         sed -i "2s/:/:$USER_EMAIL/2" "./secrets/password-file-db"
         sed -i "2s/:/:$USER_FULLNAME/3" "./secrets/password-file-db"
         sed -i "2s/:/:$USER_GROUP/4" "./secrets/password-file-db"

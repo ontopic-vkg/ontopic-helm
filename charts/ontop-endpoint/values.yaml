@@ -1,7 +1,7 @@
 # Default values for ontop-endpoint.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-registry: registry.gitlab.com/ontopic-public/ontopic-helm
+registry: ghcr.io/ontopic-vkg/ontopic-helm
 replicaCount: 1
 
 image:
