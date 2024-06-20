@@ -259,3 +259,8 @@ web:
 ingress:
   host: ontopicosse.local
 ```
+
+# Limitations
+
+ * Currently JDBC drivers are embedded in the containers and are therefore not customizable.
+ * The embedded Git repository (Gitea) is not provided.
