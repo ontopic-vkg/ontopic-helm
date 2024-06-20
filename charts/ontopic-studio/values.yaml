@@ -163,20 +163,20 @@ services:
       ONTOPIC_IDENTITY_SERVICE_CLAIMS_ROLE:
       ONTOPIC_IDENTITY_SERVICE_AZURE_TENANT_ID:
       ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_ID:
-      ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE: /run/secrets/azure-api-client-secret/azure-api-client-secret
+      ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE:
       ONTOPIC_IDENTITY_SERVICE_OKTA_ISSUER_URL:
-      ONTOPIC_IDENTITY_SERVICE_OKTA_SSWS_TOKEN_FILE: /run/secrets/okta-ssws-token/okta-ssws-token
+      ONTOPIC_IDENTITY_SERVICE_OKTA_SSWS_TOKEN_FILE:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_HOST:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_REALM:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_APPLICATION:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_USER:
-      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_PASSWORD_FILE: /run/secrets/keycloak-admin-password-file/keycloak-admin-password-file
+      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_PASSWORD_FILE:
       ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE: /run/secrets/password-file-db/password-file-db
       ONTOPIC_IDENTITY_SERVICE_SESSION_PROMPT:
       ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE:
       ONTOPIC_IDENTITY_SERVICE_SESSION_STORE_FILE: /etc/identity-service/data/session.db
       ONTOPIC_IDENTITY_SERVICE_CLIENT_ID:
-      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
+      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: 
       ONTOPIC_IDENTITY_SERVICE_COOKIE_PREFIX: _ontopic-studio
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECRET_FILE: /run/secrets/cookie-secret/cookie-secret
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE: false
@@ -190,11 +190,7 @@ services:
 
 
     secrets:
-      client-secret: /run/secrets/client-secret
       cookie-secret: /run/secrets/cookie-secret
-      azure-api-client-secret: /run/secrets/azure-api-client-secret
-      okta-ssws-token: /run/secrets/okta-ssws-token
-      keycloak-admin-password-file: /run/secrets/keycloak-admin-password-file
       password-file-db: /run/secrets/password-file-db
 
   ##--- Process server

@@ -18,42 +18,10 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-    name: client-secret
-type: Opaque
-data:
-{{ (.Files.Glob "identity/client-secret").AsSecrets | indent 4 }}
----
-apiVersion: v1
-kind: Secret
-metadata:
     name: cookie-secret
 type: Opaque
 data:
 {{ (.Files.Glob "identity/cookie-secret").AsSecrets | indent 4 }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-    name: azure-api-client-secret
-type: Opaque
-data:
-{{ (.Files.Glob "identity/password-file-db").AsSecrets | indent 4 }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-    name: okta-ssws-token
-type: Opaque
-data:
-{{ (.Files.Glob "identity/password-file-db").AsSecrets | indent 4 }}
----
-apiVersion: v1
-kind: Secret
-metadata:
-    name: keycloak-admin-password-file
-type: Opaque
-data:
-{{ (.Files.Glob "identity/password-file-db").AsSecrets | indent 4 }}
 ---
 apiVersion: v1
 kind: Secret

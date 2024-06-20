@@ -80,12 +80,16 @@ store-server:
 
 By default, the cookie secret is created with a **non-random** value. For providing a custom value:
 ```sh
-docker run ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm-v2024.1.2 generate cookie > "./secrets/cookie-secret"
+# Create folder secret if it has not already been created
+mkdir -p ./secrets
+
+docker run ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm-v2024.1.2 generate cookie > ./secrets/cookie-secret
+
 kubectl create secret generic custom-cookie \
     --from-file=cookie-secret=./secrets/cookie-secret
 ```
 
-Then edit the `values.yaml` file to replace `cookie-secret` by `custom-cookie`:
+Then edit the `values.yaml` file adding `custom-cookie`:
 ```yaml
 identity-service:
   secrets:
@@ -99,7 +103,7 @@ Ontopic Studio has a default user _test_ with password _test_. If you want to us
 
 #### Use default user
 
-To use the default user in an existing `identity-service`section, add the following entry: 
+To use the default user in an existing `identity-service` section, add the following entry:
 
 ```yaml
 identity-service:
@@ -153,6 +157,49 @@ identity-service:
     cookie-secret: /run/secrets/cookie-secret
 ```
 
+### Use Azure as identity service provider
+
+Use or create a registered app from the Azure Active Directory (Microsoft Entra ID).
+Follow the instruction on [how to register Ontopic Studio in Azure Active Directory](https://docs.ontopic.ai/studio/administrate/access-control/azure.html#register-ontopic-studio).
+
+You will need the _Application (client) ID_, the _Directory (tenant) ID_, the _client secret_, and the _Application ID URI_ of the registered app.
+
+Save the client secret in a file in the secrets folder.
+```sh
+# Create folder secret if it has not already been created
+mkdir -p ./secrets
+
+# Save secret in file client-secret
+echo "<client secret>" > ./secrets/client-secrets
+```
+Create a secret for the Azure _client secret_.
+```sh
+kubectl create secret generic client-secret \
+    --from-file=client-secret=./secrets/client-secret
+```
+
+In the `env` section of `identity_service`:
+- insert the _Application (client) ID_ for `ONTOPIC_IDENTITY_SERVICE_CLIENT_ID` and `ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_ID`.
+- add the _Directory (tenant) ID_ as `ONTOPIC_IDENTITY_SERVICE_AZURE_TENANT_ID`.
+- add the _Application ID URI_ in `ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE` after the predefined settings _openid,email,profile,offline_access_.
+- use the created _client-secret_ for `ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE` and `ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE`
+
+See the example below on how to edit the `values.yaml` file to add the environment variables and secret.
+```yaml
+identity-service:
+   env:
+      ONTOPIC_IDENTITY_SERVICE_PROVIDER_OAUTH2: azure
+      ONTOPIC_IDENTITY_SERVICE_AZURE_TENANT_ID: <Directory (tenant) ID>
+      ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_ID: <Application (client) ID>
+      ONTOPIC_IDENTITY_SERVICE_CLIENT_ID: <Application (client) ID>
+      ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE: openid,email,profile,offline_access,<Application ID URI>
+      ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
+      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
+
+    secrets:
+      # ...
+      client-secret: /run/secrets/client-secret
+```
 
 
 
