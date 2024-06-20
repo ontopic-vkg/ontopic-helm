@@ -34,7 +34,15 @@ kubectl ns <your-namespace> # if you installed it with krew
 kubectl-ns <your-namespace>
 ```
 
-### Deploy a postgresql database
+## Create custom values.yaml
+Ontopic Studio needs to be configured with a custom _values.yaml_ file.
+An example is provided in the folder. It can be adapted to your scenario.
+
+```bash
+cp ./values.example.yaml values.yaml
+```
+
+## Deploy a postgresql database
 
 Here is the command to deploy a postgresql database using the [bitnami helm chart](https://artifacthub.io/packages/helm/bitnami/postgresql).
 
@@ -53,15 +61,13 @@ kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/
 
 ### Create the database secret file
 
-
-# Extract the postgres password
 ```bash
 # Create the new secret
 kubectl create secret generic database-password-file \
   --from-literal=database-password-file="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)"
 ```
 
-Add in your values file :
+Add in your custom _values.yaml_ file :
 ```yaml
 store-server:
   secrets:
@@ -113,7 +119,7 @@ identity-service:
 
 
 ### Add the license as secret
-Add the provided ontopic-studio license.
+Add the provided ontopic-studio license as secret.
 
 Create the secret:
 ```bash
@@ -130,32 +136,32 @@ process-server:
 
 ## Install helm charts with the repository
 
-[Helm](https://helm.sh) must be installed to use the charts.  Please refer to
-Helm's [documentation](https://helm.sh/docs) to get started.
+[Helm](https://helm.sh) must be installed to use the charts.
 
-Once Helm has been set up correctly, add the repo as follows:
-
-  helm repo add ontopic-helm  https://ontopic-vkg.github.io/ontopic-helm
-
+Add the repo as follows:
+```bash
+helm repo add ontopic-helm  https://ontopic-vkg.github.io/ontopic-helm
+```
 If you had already added this repo earlier, run `helm repo update` to retrieve
 the latest versions of the packages.  You can then run `helm search repo
 ontopic-helm` to see the charts.
 
 To install the ontop-endpoint chart:
-
-    helm install ontop-endpoint ontopic-helm/ontop-endpoint
-
+```bash
+helm install ontop-endpoint ontopic-helm/ontop-endpoint
+```
 To uninstall the chart:
-
-    helm delete ontop-endpoint
-
+```bash
+helm delete ontop-endpoint
+```
 To install the ontopic-studio chart a values.yaml file is needed to override configurations:
-
-    helm install -f values.yaml ontopic-studio ontopic-helm/ontopic-studio
-
+```bash
+helm install -f values.yaml ontopic-studio ontopic-helm/ontopic-studio
+```
 To uninstall the chart:
-
-    helm delete ontopic-studio
+```bash
+helm delete ontopic-studio
+```
 
 ## Change DNS
 Edit values.yaml file with the chosen host name

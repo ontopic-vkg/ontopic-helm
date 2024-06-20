@@ -1,12 +1,9 @@
 ingress:
-  className: "test"
-  host: k8s-test.ontopic.dev
-  tls: true
-  secretName: ontopic-studio-tls
-  annotations: {
-    "kubernetes.io/ingress.class": "traefik",
-    "cert-manager.io/cluster-issuer": "letsencrypt-staging",
-  }
+  # className: ""
+  # host: ontopicosse.local
+  tls: false
+  # secretName: ontopic-studio-tls
+  # annotations: {}
 
 process-server:
   secrets:
