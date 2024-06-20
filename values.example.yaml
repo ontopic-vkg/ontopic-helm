@@ -26,12 +26,3 @@ web:
   env:
     ONTOP_ENDPOINT_SERVICE_HOST: ontop-endpoint.ontopic.svc.cluster.local
     # virtual_host: ontopicosse.local
-
-# identity-service:
-#   secrets:
-#     client-secret: /run/secrets/client-secret
-#     cookie-secret: /run/secrets/cookie-secret
-#     azure-api-client-secret: /run/secrets/azure-api-client-secret
-#     okta-ssws-token: /run/secrets/okta-ssws-token
-#     keycloak-admin-password-file: /run/secrets/keycloak-admin-password-file
-#     identity-password-db: /run/secrets/password-file-db

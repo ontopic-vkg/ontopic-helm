@@ -19,8 +19,9 @@ Optionally, you can install :
 Getting started
 ---------------
 
-### Create a cluster, see k3d example
-[k3d cluster example](./k3d-example/k3d-cluster-example.md)
+### Create a cluster
+
+See the [k3d cluster example](./k3d-example/k3d-cluster-example.md) if you want to install it locally.
 
 
 ### Create the namespace
@@ -75,11 +76,41 @@ store-server:
 
 ```
 
+### Change the default cookie secret
+
+By default, the cookie secret is created with a **non-random** value. For providing a custom value:
+```sh
+docker run ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm-v2024.1.2 generate cookie > "./secrets/cookie-secret"
+kubectl create secret generic custom-cookie \
+    --from-file=cookie-secret=./secrets/cookie-secret
+```
+
+Then edit the `values.yaml` file to replace `cookie-secret` by `custom-cookie`:
+```yaml
+identity-service:
+  secrets:
+    # ...
+    custom-cookie: /run/secrets/cookie-secret
+```
+
 ### Create a user and set password as secret
 
-Ontopic Studio has a default user _test_ with password _test_. You can skip this section or customize this value, creating a new user and secret using the script _./create-user.sh_
+Ontopic Studio has a default user _test_ with password _test_. If you want to use the default user and didn't create an `identity-service` section in `values.yaml` (e.g. when using a custom cookie), you can skip this section.
 
-Create the secret with the script, a new file with the chosen password will be generated in a new folder _secrets_
+#### Use default user
+
+To use the default user in an existing `identity-service`section, add the following entry: 
+
+```yaml
+identity-service:
+  secrets:
+    # ...
+    password-file-db: /run/secrets/password-file-db
+```
+
+#### Create new user
+
+To create a new user and secret use the script _./create-user.sh_. A new file with the chosen password will be generated in a new folder _secrets_:
 
 
 ```bash
@@ -105,17 +136,24 @@ kubectl create secret generic identity-password-db \
     --from-file=password-file-db=./secrets/password-file-db
 ```
 
-And then you customize your values file with the secrets (all necessary secrets need to be passed not only the edited one)  :
+And then you need to add the created secret in your values file:
 ```yaml
 identity-service:
   secrets:
+    # ...
     identity-password-db: /run/secrets/password-file-db
-    client-secret: /run/secrets/client-secret
-    cookie-secret: /run/secrets/cookie-secret
-    azure-api-client-secret: /run/secrets/azure-api-client-secret
-    okta-ssws-token: /run/secrets/okta-ssws-token
-    keycloak-admin-password-file: /run/secrets/keycloak-admin-password-file
 ```
+
+If you didn't specify a custom cookie secret, please also include the following entry:
+
+```yaml
+identity-service:
+  secrets:
+    # ...
+    cookie-secret: /run/secrets/cookie-secret
+```
+
+
 
 
 ### Add the license as secret
