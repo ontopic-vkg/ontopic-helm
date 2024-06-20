@@ -170,7 +170,7 @@ Save the client secret in a file in the secrets folder.
 mkdir -p ./secrets
 
 # Save secret in file client-secret
-echo "<client secret>" > ./secrets/client-secrets
+echo "<client secret>" > ./secrets/client-secret
 ```
 Create a secret for the Azure _client secret_.
 ```sh

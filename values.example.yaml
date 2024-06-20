@@ -1,6 +1,6 @@
 ingress:
   # className: ""
-  # host: ontopicosse.local
+  # host: ontopic.local
   tls: false
   # secretName: ontopic-studio-tls
   # annotations: {}
@@ -25,4 +25,4 @@ store-server:
 web:
   env:
     ONTOP_ENDPOINT_SERVICE_HOST: ontop-endpoint.ontopic.svc.cluster.local
-    # virtual_host: ontopicosse.local
+    # virtual_host: ontopic.local
