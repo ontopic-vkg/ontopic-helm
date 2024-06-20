@@ -254,10 +254,10 @@ Edit values.yaml file with the chosen host name
 ```yaml
 web:
   env:
-    virtual_host: ontopicosse.local
+    virtual_host: ontopic.local
 
 ingress:
-  host: ontopicosse.local
+  host: ontopic.local
 ```
 
 # Limitations
