@@ -32,27 +32,19 @@ It can be adapted to your scenario.
 cp values.example.yaml values.yaml
 ```
 
-## Deploy a PostgreSQL database
+## Prepare the database
 
-Here is the command to deploy a PostgreSQL database using the [Bitnami Helm Chart](https://artifacthub.io/packages/helm/bitnami/postgresql).
+You need a postgresql database with a dedicated owner.
 
-```sh
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install store-server-db bitnami/postgresql --wait
-```
-
-Wait for the DB to be ready.
-
-### Create the database and users
-
-```sh
-kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql' < create-db-and-users.sql
-```
+In case you don't have one, you can use the provided helm chart to test it.  You can find detailed instructions in the [dedicated documentation](./docs/deploy-postgresql.md).
 
 ### Create the database secret file
 
+You need to provide the database password as a secret. You have to [create a secret](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_generic/) with the key `database-password-file` entry.
+
+For example, if you have a postgresql database deployed with the helm chart, you can create the secret with the following command:
+
 ```sh
-# Create the new secret
 kubectl create secret generic database-password-file \
   --from-literal=database-password-file="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)"
 ```
@@ -62,6 +54,7 @@ Make sure you have the following part in your custom `values.yaml` file:
 ```yaml
 store-server:
   secrets:
+    # database-password-file is the name of the secret
     database-password-file: /run/secrets/database-password-file
 ```
 
