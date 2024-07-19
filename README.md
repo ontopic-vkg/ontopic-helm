@@ -18,16 +18,24 @@ You can then run `helm search repo ontopic` to see the charts.
 
 To install the ontop-endpoint chart:
 
-    helm install ontop-endpoint ontopic/ontop-endpoint
+```sh
+helm install ontop-endpoint ontopic/ontop-endpoint
+```
 
 To uninstall the chart:
 
-    helm delete ontop-endpoint
+```sh
+helm delete ontop-endpoint
+```
 
 To install the ontopic-studio chart a values.yaml file is needed to override configurations:
 
-    helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
+```sh
+helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
+```
 
 To uninstall the chart:
 
-    helm delete ontopic-studio
+```sh
+helm delete ontopic-studio
+```
