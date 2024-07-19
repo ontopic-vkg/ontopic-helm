@@ -327,29 +327,28 @@ env:
 Add the repo as follows:
 
 ```bash
-helm repo add ontopic-helm  https://ontopic-vkg.github.io/ontopic-helm
+helm repo add ontopic  https://ontopic-vkg.github.io/ontopic-helm/
 ```
 
-If you had already added this repo earlier, run `helm repo update` to retrieve
-the latest versions of the packages. You can then run `helm search repo
-ontopic-helm` to see the charts.
+If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.
+You can then run `helm search repo ontopic` to see the charts.
 
-To install the ontop-endpoint chart without extra configuration:
+To install the `ontop-endpoint` chart without extra configuration:
 
 ```bash
-helm install ontop-endpoint ontopic-helm/ontop-endpoint
+helm install ontop-endpoint ontopic/ontop-endpoint
 ```
 
-To install the ontop-endpoint chart with the configuration `values-server.yaml` for materialization:
+To install the `ontop-endpoint` chart with the configuration `values-server.yaml` for materialization:
 
 ```bash
-helm install -f values-server.yaml ontop-endpoint ontopic-helm/ontop-endpoint
+helm install -f values-server.yaml ontop-endpoint ontopic/ontop-endpoint
 ```
 
-To install the ontopic-studio chart a `values.yaml` file is needed to override the configurations:
+To install the `ontopic-studio` chart a `values.yaml` file is needed to override the configurations:
 
 ```bash
-helm install -f values.yaml ontopic-studio ontopic-helm/ontopic-studio
+helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
 ```
 
 To uninstall the charts:
