@@ -1,6 +1,6 @@
 # Helm Chart
 
-Ontopic helm chart repository
+Ontopic Helm Charts repository.
 
 ## Requirements
 
@@ -8,10 +8,6 @@ You need to install :
 
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [helm](https://helm.sh/docs/intro/install/)
-
-Optionally, you can install :
-
-- [kubectx](https://github.com/ahmetb/kubectx) if you want to switch easily between context and namespaces
 
 ## Getting started
 
@@ -22,33 +18,30 @@ See the [k3d cluster example](./k3d-example/k3d-cluster-example.md) if you want 
 ### Create the namespace
 
 ```sh
-kubectl create ns <your-namespace>
-kubens <your-namespace> # if you have kubectx installed
-# or
-kubectl ns <your-namespace> # if you installed it with krew
-# or
-kubectl-ns <your-namespace>
+kubectl create namespace <your-namespace>
+kubectl config set-context --current --namespace=<your-namespace>
 ```
 
 ## Create custom values.yaml
 
-Ontopic Studio needs to be configured with a custom _values.yaml_ file.
-An example is provided in the folder. It can be adapted to your scenario.
+Ontopic Studio needs to be configured with a custom `values.yaml` file.
+An example is provided in the folder.
+It can be adapted to your scenario.
 
 ```sh
-cp ./values.example.yaml values.yaml
+cp values.example.yaml values.yaml
 ```
 
-## Deploy a postgresql database
+## Deploy a PostgreSQL database
 
-Here is the command to deploy a postgresql database using the [bitnami helm chart](https://artifacthub.io/packages/helm/bitnami/postgresql).
+Here is the command to deploy a PostgreSQL database using the [Bitnami Helm Chart](https://artifacthub.io/packages/helm/bitnami/postgresql).
 
 ```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install store-server-db bitnami/postgresql --wait
 ```
 
-Wait for the DB to be ready
+Wait for the DB to be ready.
 
 ### Create the database and users
 
@@ -64,7 +57,7 @@ kubectl create secret generic database-password-file \
   --from-literal=database-password-file="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)"
 ```
 
-Add in your custom _values.yaml_ file :
+Make sure you have the following part in your custom `values.yaml` file:
 
 ```yaml
 store-server:
@@ -74,7 +67,9 @@ store-server:
 
 ### Change the default cookie secret (optional)
 
-By default, the cookie secret is created with a **non-random** value. For providing a custom value:
+By default, the cookie secret is created with a **non-random** value.
+
+For providing a custom value:
 
 ```sh
 # Create folder secret if it has not already been created
@@ -83,7 +78,7 @@ mkdir -p ./secrets
 docker run ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm-v2024.1.2 generate cookie > ./secrets/cookie-secret
 
 kubectl create secret generic custom-cookie \
-    --from-file=cookie-secret=./secrets/cookie-secret
+  --from-file=cookie-secret=./secrets/cookie-secret
 ```
 
 Then edit the `values.yaml` file adding `custom-cookie`:
@@ -97,7 +92,8 @@ identity-service:
 
 ### Create a user and set password as secret (optional)
 
-Ontopic Studio has a default user _test_ with password _test_. If you want to use the default user and didn't create an `identity-service` section in `values.yaml` (e.g. when using a custom cookie), you can skip this section.
+Ontopic Studio has a default user `test` with password `test`.
+If you want to use the default user and didn't create an `identity-service` section in `values.yaml` (e.g. when using a custom cookie), you can skip this section.
 
 #### Use default user
 
@@ -216,10 +212,10 @@ Create the secret:
 
 ```sh
 kubectl create secret generic user-license-file \
-    --from-file=user-license=./user-license
+  --from-file=user-license=./user-license
 ```
 
-And then you add it in your values file :
+And then you add it in your values file:
 
 ```yaml
 process-server:
@@ -229,7 +225,7 @@ process-server:
 
 ## Change DNS
 
-Edit `values.yaml` file with the chosen host name
+Edit `values.yaml` file with the chosen host name:
 
 ```yaml
 web:
@@ -246,16 +242,16 @@ Ontopic Studio supports materialization to RDF using S3 as storage, but it is di
 
 The necessary S3 parameters are:
 
-- _S3_ACCESS_KEY_ID_
+- `S3_ACCESS_KEY_ID`
   Obtain your S3 access key ID from your AWS account.
   This key uniquely identifies your account and grants access to your S3 resources.
-- _S3_ACCESS_KEY_SECRET_
+- `S3_ACCESS_KEY_SECRET`
   Retrieve your S3 access key secret (also known as the secret key) from your AWS account.
   Keep this secret key confidential and secure.
-- _S3_BUCKET_
+- `S3_BUCKET`
   Choose a unique name for your S3 bucket.
   Buckets are containers for storing objects (files) in S3.
-- _S3_REGION_
+- `S3_REGION`
   Determine the AWS region where your S3 bucket will reside.
   Common regions include us-east-1 (North Virginia), us-west-2 (Oregon), and others.
 
@@ -263,12 +259,12 @@ For more detailed information, refer to the [Amazon S3 documentation](https://do
 
 Example:
 
-- _S3_ACCESS_KEY_ID_: AKIAY1234567890
-- _S3_ACCESS_KEY_SECRET_: mySecretAccessKey
-- _S3_BUCKET_: my-materialization-bucket
-- _S3_REGION_: us-west-2
+- `S3_ACCESS_KEY_ID`: `AKIAY1234567890`
+- `S3_ACCESS_KEY_SECRET`: `mySecretAccessKey`
+- `S3_BUCKET`: `my-materialization-bucket`
+- `S3_REGION`: `us-west-2`
 
-Edit the `values.yaml` file adding `enable_materialization` in the `store-server` section :
+Edit the `values.yaml` file and set `enable_materialization` to `true` in the `store-server` section:
 
 ```yaml
 store-server:
@@ -277,7 +273,7 @@ store-server:
     enable_materialization: true
 ```
 
-Save _S3_ACCESS_KEY_ID_ in a file in the secrets folder.
+Save `S3_ACCESS_KEY_ID` in a file in the secrets folder.
 
 ```sh
 # Create folder secret if it has not already been created
@@ -291,11 +287,11 @@ Create a secret for this file.
 
 ```sh
 kubectl create secret generic s3-id \
---from-file=s3-id=./secrets/access-key-id
+  --from-file=s3-id=./secrets/access-key-id
 
 ```
 
-Save _S3_ACCESS_KEY_SECRET_ in a file in the secrets folder.
+Save `S3_ACCESS_KEY_SECRET` in a file in the secrets folder.
 
 ```sh
 echo "<S3_ACCESS_KEY_SECRET>" > ./secrets/access-key-secret
@@ -305,8 +301,7 @@ Create a secret for this file.
 
 ```sh
 kubectl create secret generic s3-secret \
---from-file=s3-secret=./secrets/access-key-secret
-
+  --from-file=s3-secret=./secrets/access-key-secret
 ```
 
 Create a new values file `values-server.yaml` with the s3 configuration that will be used by the `ontop-endpoint` chart:
