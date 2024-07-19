@@ -320,7 +320,7 @@ env:
   ONTOPIC_SERVER_S3_REGION: <S3_REGION>
 ```
 
-## Install helm charts with the repository
+## Install Helm Charts with the repository
 
 [Helm](https://helm.sh) must be installed to use the charts.
 
@@ -332,6 +332,8 @@ helm repo add ontopic https://ontopic-vkg.github.io/ontopic-helm/
 
 If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.
 You can then run `helm search repo ontopic` to see the charts.
+
+### Ontop Endpoint
 
 To install the `ontop-endpoint` chart without extra configuration:
 
@@ -345,16 +347,23 @@ To install the `ontop-endpoint` chart with the configuration `values-server.yaml
 helm install -f values-server.yaml ontop-endpoint ontopic/ontop-endpoint
 ```
 
+To uninstall the chart:
+
+```sh
+helm delete ontop-endpoint
+```
+
+### Ontopic Studio
+
 To install the `ontopic-studio` chart a `values.yaml` file is needed to override the configurations:
 
 ```sh
 helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
 ```
 
-To uninstall the charts:
+To uninstall the chart:
 
 ```sh
-helm delete ontop-endpoint
 helm delete ontopic-studio
 ```
 
