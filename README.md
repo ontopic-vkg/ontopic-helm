@@ -21,7 +21,7 @@ See the [k3d cluster example](./k3d-example/k3d-cluster-example.md) if you want 
 
 ### Create the namespace
 
-```bash
+```sh
 kubectl create ns <your-namespace>
 kubens <your-namespace> # if you have kubectx installed
 # or
@@ -35,7 +35,7 @@ kubectl-ns <your-namespace>
 Ontopic Studio needs to be configured with a custom _values.yaml_ file.
 An example is provided in the folder. It can be adapted to your scenario.
 
-```bash
+```sh
 cp ./values.example.yaml values.yaml
 ```
 
@@ -43,7 +43,7 @@ cp ./values.example.yaml values.yaml
 
 Here is the command to deploy a postgresql database using the [bitnami helm chart](https://artifacthub.io/packages/helm/bitnami/postgresql).
 
-```bash
+```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install store-server-db bitnami/postgresql --wait
 ```
@@ -52,13 +52,13 @@ Wait for the DB to be ready
 
 ### Create the database and users
 
-```bash
+```sh
 kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql' < create-db-and-users.sql
 ```
 
 ### Create the database secret file
 
-```bash
+```sh
 # Create the new secret
 kubectl create secret generic database-password-file \
   --from-literal=database-password-file="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)"
@@ -114,7 +114,7 @@ identity-service:
 
 To create a new user and secret use the script _./create-user.sh_. A new file with the chosen password will be generated in a new folder _secrets_:
 
-```bash
+```sh
 ./create-user.sh
 ```
 
@@ -125,7 +125,7 @@ To create a new user and secret use the script _./create-user.sh_. A new file wi
 
 In case of permission issues running the script (as user root), change ownership of the secrets folder and execute again the script
 
-```bash
+```sh
 sudo chown 1000 ./secrets
 ./create-user.sh
 ```
@@ -135,7 +135,7 @@ sudo chown 1000 ./secrets
 </details>
 </br>
 
-```bash
+```sh
 # Create the secret
 kubectl create secret generic identity-password-db \
     --from-file=password-file-db=./secrets/password-file-db
@@ -214,7 +214,7 @@ Add the provided ontopic-studio license as secret.
 
 Create the secret:
 
-```bash
+```sh
 kubectl create secret generic user-license-file \
     --from-file=user-license=./user-license
 ```
@@ -326,8 +326,8 @@ env:
 
 Add the repo as follows:
 
-```bash
-helm repo add ontopic  https://ontopic-vkg.github.io/ontopic-helm/
+```sh
+helm repo add ontopic https://ontopic-vkg.github.io/ontopic-helm/
 ```
 
 If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.
@@ -335,25 +335,25 @@ You can then run `helm search repo ontopic` to see the charts.
 
 To install the `ontop-endpoint` chart without extra configuration:
 
-```bash
+```sh
 helm install ontop-endpoint ontopic/ontop-endpoint
 ```
 
 To install the `ontop-endpoint` chart with the configuration `values-server.yaml` for materialization:
 
-```bash
+```sh
 helm install -f values-server.yaml ontop-endpoint ontopic/ontop-endpoint
 ```
 
 To install the `ontopic-studio` chart a `values.yaml` file is needed to override the configurations:
 
-```bash
+```sh
 helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
 ```
 
 To uninstall the charts:
 
-```bash
+```sh
 helm delete ontop-endpoint
 helm delete ontopic-studio
 ```
