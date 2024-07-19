@@ -16,26 +16,26 @@ helm repo add ontopic https://ontopic-vkg.github.io/ontopic-helm
 If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.
 You can then run `helm search repo ontopic` to see the charts.
 
-To install the ontop-endpoint chart:
+To install the `ontop-endpoint` chart:
 
 ```sh
-helm install ontop-endpoint ontopic/ontop-endpoint
+helm install ontop-release ontopic/ontop-endpoint
 ```
 
 To uninstall the chart:
 
 ```sh
-helm delete ontop-endpoint
+helm delete ontop-release
 ```
 
-To install the ontopic-studio chart a values.yaml file is needed to override configurations:
+To install the `ontopic-studio` chart a `values.yaml` file is needed to override configurations:
 
 ```sh
-helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
+helm install -f values.yaml ontopic-release ontopic/ontopic-studio
 ```
 
 To uninstall the chart:
 
 ```sh
-helm delete ontopic-studio
+helm delete ontopic-release
 ```
