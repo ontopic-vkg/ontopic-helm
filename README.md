@@ -10,7 +10,7 @@ Please refer to Helm's [documentation](https://helm.sh/docs) to get started.
 Once Helm has been set up correctly, add the repo as follows:
 
 ```sh
-helm repo add ontopic https://ontopic-vkg.github.io/ontopic-helm
+helm repo add ontopic https://ontopic-vkg.github.io/ontopic-helm/
 ```
 
 If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.
