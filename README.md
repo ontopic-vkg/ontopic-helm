@@ -273,6 +273,56 @@ env:
   ONTOPIC_SERVER_S3_REGION: <S3_REGION>
 ```
 
+## Custom JDBC drivers (optional)
+
+It's possible to add additional jdbc drivers to `ontop-endpoint` and `ontopic-studio` by adding some env vars :
+
+
+| Name | Description |
+| --- | --- | --- |
+| JDBC_EXTERNAL_REPO | The path of the git repo |
+| JDBC_EXTERNAL_REPO_FOLDER | The folder whithin the repo |
+| JDBC_EXTERNAL_REPO_KEY_PATH | The path where the ssh key is mounted (optional) |
+
+If you use a deploy key to access the git repo, you need to create a secret and then provide `JDBC_EXTERNAL_REPO_KEY_PATH` if needed.
+
+The default path is : `/run/secrets/jdbc_external_repo/private_key`
+
+So you can create a secret like :
+
+```sh
+kubectl create secret generic jdbc_external_repo \
+  --from-file=private_key=./my-private-key
+```
+
+Then you can add to `values-server.yaml` :
+
+```sh
+env:
+  JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
+  JDBC_EXTERNAL_REPO_FOLDER: my-folder
+
+secrets:
+  # If you use s3, you have to specify values or it should be overriden
+  access-key-id: /run/secrets/s3-access-key-id
+  access-key-secret: /run/secrets/s3-access-key-secret
+  # JDBC
+  jdbc_external_repo: /run/secrets/jdbc_external_repo
+```
+
+And to the `values.yaml` :
+
+```sh
+process-server:
+  env:
+    JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
+    JDBC_EXTERNAL_REPO_FOLDER: my-folder
+
+  secrets:
+    user-license-file: /run/secrets/user-license
+    jdbc_external_repo: /run/secrets/jdbc_external_repo
+```
+
 ## Install Helm Charts with the repository
 
 [Helm](https://helm.sh) must be installed to use the charts.
@@ -322,6 +372,5 @@ helm delete ontopic-studio-release
 
 # Limitations
 
-- Currently JDBC drivers are embedded in the containers and are therefore not customizable.
 - The embedded Git repository (Gitea) is not provided.
 - No sample database is provided.
