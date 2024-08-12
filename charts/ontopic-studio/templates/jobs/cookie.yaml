@@ -1,19 +1,20 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ .Release.Name }}-pre-install
+  name: {{ .Release.Name }}-secret
   annotations:
     helm.sh/hook: pre-install
     helm.sh/hook-weight: "-2"
 rules:
   - apiGroups: [""]
+    resourceNames: ["cookie-secret"]
     resources: ["secrets"]
     verbs: ["create"]
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Release.Name }}-pre-install
+  name: {{ .Release.Name }}-secret
   annotations:
     helm.sh/hook: pre-install
     helm.sh/hook-weight: "-2"
@@ -21,18 +22,18 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .Release.Name }}-pre-install
+  name: {{ .Release.Name }}-secret
   annotations:
     helm.sh/hook: pre-install
     helm.sh/hook-weight: "-1"
 subjects:
   - kind: ServiceAccount
     namespace: {{ .Release.Namespace }}
-    name: {{ .Release.Name }}-pre-install
+    name: {{ .Release.Name }}-secret
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ .Release.Name }}-pre-install
+  name: {{ .Release.Name }}-secret
 ---
 apiVersion: batch/v1
 kind: Job
@@ -46,6 +47,7 @@ metadata:
   annotations:
     helm.sh/hook: pre-install
     helm.sh/hook-weight: "1"
+    helm.sh/hook-delete-policy: hook-succeeded,hook-failed
 spec:
   template:
     metadata:
@@ -55,7 +57,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
-      serviceAccountName: {{ .Release.Name }}-pre-install
+      serviceAccountName: {{ .Release.Name }}-secret
       restartPolicy: Never
       containers:
       - name: generate-secret

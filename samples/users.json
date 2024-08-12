@@ -1,0 +1,25 @@
+{
+    "users": [
+      {
+        "username": "sarahk",
+        "password": "$aprBe1/",
+        "email": "test@email.it",
+        "fullname": "test",
+        "groups": ["developers", "admin"]
+      },
+      {
+        "username": "test",
+        "password": "$apr1$C.",
+        "email": "test@email.it",
+        "fullname": "test",
+        "groups": ["developers"]
+      },
+      {
+        "username": "Robert",
+        "password": "$aprBe1/",
+        "email": "maxime@email.it",
+        "fullname": "test",
+        "groups": ["developers", "admin"]
+      }
+    ]
+  }
