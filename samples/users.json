@@ -1,7 +1,7 @@
 {
     "users": [
       {
-        "username": "sarahk",
+        "username": "admin",
         "password": "$aprBe1/",
         "email": "test@email.it",
         "fullname": "test",
@@ -13,13 +13,6 @@
         "email": "test@email.it",
         "fullname": "test",
         "groups": ["developers"]
-      },
-      {
-        "username": "Robert",
-        "password": "$aprBe1/",
-        "email": "maxime@email.it",
-        "fullname": "test",
-        "groups": ["developers", "admin"]
       }
     ]
   }

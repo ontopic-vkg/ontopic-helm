@@ -58,95 +58,60 @@ store-server:
     database-password-file: /run/secrets/database-password-file
 ```
 
-### Change the default cookie secret (optional)
+### Cookie secret
 
-By default, the cookie secret is created with a **non-random** value.
+By default, the cookie secret is created with a **random** value when the chart is installed.
 
-For providing a custom value:
+The helm chart create a secret with the key `cookie-secret` entry.
 
-```sh
-# Create folder secret if it has not already been created
-mkdir -p ./secrets
+### Create a user and set password as secret
 
-docker run ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm-v2024.1.2 generate cookie > ./secrets/cookie-secret
+Ontopic Studio has no default users.
 
-kubectl create secret generic custom-cookie \
-  --from-file=cookie-secret=./secrets/cookie-secret
+You need to provide your users by creating a secret named `password-db-users` with a json representation of the users.
+
+You can find a sample in the [samples folder](./samples/users.json) :
+
+```json
+{
+    "users": [
+      {
+        "username": "admin",
+        "password": "$aprBe1/",
+        "email": "test@email.it",
+        "fullname": "test",
+        "groups": ["developers", "admin"]
+      },
+      {
+        "username": "test",
+        "password": "$apr1$C.",
+        "email": "test@email.it",
+        "fullname": "test",
+        "groups": ["developers"]
+      }
+    ]
+  }
+
 ```
 
-Then edit the `values.yaml` file adding `custom-cookie`:
-
-```yaml
-identity-service:
-  secrets:
-    # ...
-    custom-cookie: /run/secrets/cookie-secret
-```
-
-### Create a user and set password as secret (optional)
-
-Ontopic Studio has a default user `test` with password `test`.
-If you want to use the default user and didn't create an `identity-service` section in `values.yaml` (e.g. when using a custom cookie), you can skip this section.
-
-#### Use default user
-
-To use the default user in an existing `identity-service` section, add the following entry:
-
-```yaml
-identity-service:
-  secrets:
-    # ...
-    password-file-db: /run/secrets/password-file-db
-```
-
-#### Create new user
-
-To create a new user and secret use the script _./create-user.sh_. A new file with the chosen password will be generated in a new folder _secrets_:
-
-```sh
-./create-user.sh
-```
-
-<details>
- <summary><b>NOTE:</b> Troubleshooting the script</summary>
-
----
-
-In case of permission issues running the script (as user root), change ownership of the secrets folder and execute again the script
-
-```sh
-sudo chown 1000 ./secrets
-./create-user.sh
-```
-
----
-
-</details>
-</br>
+And then create the secret :
 
 ```sh
 # Create the secret
-kubectl create secret generic identity-password-db \
-    --from-file=password-file-db=./secrets/password-file-db
+kubectl create secret generic password-db-users \
+    --from-file=users=./samples/users.json
 ```
 
-And then you need to add the created secret in your values file:
+#### Update users
 
-```yaml
-identity-service:
-  secrets:
-    # ...
-    identity-password-db: /run/secrets/password-file-db
+The chart add a job to handle this secret. This secret is managed at each installation and upgrade.
+
+If you need to only reload the users, you can upgrade the release like this :
+
+```sh
+helm upgrade ontopic-studio ontopic/ontopic-studio --reuse-values --force
 ```
 
-If you didn't specify a custom cookie secret, please also include the following entry:
-
-```yaml
-identity-service:
-  secrets:
-    # ...
-    cookie-secret: /run/secrets/cookie-secret
-```
 
 ### Use Azure as identity service provider (optional)
 
