@@ -313,6 +313,11 @@ env:
   ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-secret/access-key-secret
   ONTOPIC_SERVER_S3_BUCKET: <S3_BUCKET>
   ONTOPIC_SERVER_S3_REGION: <S3_REGION>
+
+secrets:
+  s3-secret: /run/secrets/s3-secret
+  s3-id: /run/secrets/s3-id
+
 ```
 
 ## Install Helm Charts with the repository
