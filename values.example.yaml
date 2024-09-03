@@ -18,11 +18,11 @@ store-server:
     casbin_store_host: store-server-db-postgresql.ontopic.svc.cluster.local
     casbin_store_port: 5432
     casbin_store_user: postgres
-    ontop_endpoint_host: http://ontop-endpoint.ontopic.svc.cluster.local:8080
+    ontop_endpoint_host: http://ontop-endpoint-release.ontopic.svc.cluster.local:8080
   secrets:
     database-password-file: /run/secrets/database-password-file
 
 web:
   env:
-    ONTOP_ENDPOINT_SERVICE_HOST: ontop-endpoint.ontopic.svc.cluster.local
+    ONTOP_ENDPOINT_SERVICE_HOST: ontop-endpoint-release.ontopic.svc.cluster.local
     # virtual_host: ontopic.local

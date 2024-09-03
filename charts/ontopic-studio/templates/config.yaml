@@ -14,11 +14,3 @@ data:
 {{- end }}
 {{- end }}
 {{- end }}
---- # Identity Service
-apiVersion: v1
-kind: Secret
-metadata:
-    name: password-file-db
-type: Opaque
-data:
-{{ (.Files.Glob "identity/password-file-db").AsSecrets | indent 4 }}

@@ -99,6 +99,7 @@ tolerations: []
 
 affinity: {}
 
+
 services:
   ##--- Angular frontend
   angular-frontend:
@@ -176,7 +177,7 @@ services:
       ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE:
       ONTOPIC_IDENTITY_SERVICE_SESSION_STORE_FILE: /etc/identity-service/data/session.db
       ONTOPIC_IDENTITY_SERVICE_CLIENT_ID:
-      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: 
+      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE:
       ONTOPIC_IDENTITY_SERVICE_COOKIE_PREFIX: _ontopic-studio
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECRET_FILE: /run/secrets/cookie-secret/cookie-secret
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE: false
@@ -187,7 +188,6 @@ services:
       ONTOPIC_IDENTITY_SERVICE_PROVIDER_NAME:
       ONTOPIC_IDENTITY_SERVICE_CUSTOM_TEMPLATE_DIR: /etc/identity-service/templates
       ONTOPIC_IDENTITY_SERVICE_IDENTITY_REFRESH:
-
 
     secrets:
       cookie-secret: /run/secrets/cookie-secret

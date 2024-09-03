@@ -1,14 +1,14 @@
-Deploy a postgresql database
+Deploy a PostgreSQL database
 ============================
 
-Here is the command to deploy a postgresql database using the [bitnami helm chart](https://artifacthub.io/packages/helm/bitnami/postgresql).
+Here is the command to deploy a PostgreSQL database using the [Bitnami Helm Chart](https://artifacthub.io/packages/helm/bitnami/postgresql).
 
-```bash
+```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install store-server-db bitnami/postgresql --wait
 ```
 
-Wait for the DB to be ready
+Wait for the DB to be ready.
 
 Create the database and users
 -----------------------------
