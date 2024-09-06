@@ -89,7 +89,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: user-creation
-        image: ghcr.io/ontopic-vkg/ontopic-helm/user-creation:helm-v2024.1.3 #{{ .Chart.AppVersion }}
+        image: ghcr.io/ontopic-vkg/ontopic-helm/user-creation:helm-{{ .Chart.AppVersion }}
         command:
         command:
         - "sh"

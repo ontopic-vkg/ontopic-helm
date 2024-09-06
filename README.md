@@ -13,7 +13,7 @@ You need to install :
 
 ### Create a cluster
 
-See the [k3d cluster example](./k3d-example/k3d-cluster-example.md) if you want to install it locally.
+See the [k3d cluster example](./docs/k3d-cluster-example.md) if you want to install it locally.
 
 ### Create the namespace
 
@@ -34,7 +34,7 @@ cp values.example.yaml values.yaml
 
 ## Prepare the database
 
-You need a postgresql database with a dedicated owner.
+You need a **PostgreSQL** database with a dedicated owner.
 
 In case you don't have one, you can use the provided helm chart to test it.  You can find detailed instructions in the [dedicated documentation](./docs/deploy-postgresql.md).
 
@@ -42,7 +42,7 @@ In case you don't have one, you can use the provided helm chart to test it.  You
 
 You need to provide the database password as a secret. You have to [create a secret](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_generic/) with the key `database-password-file` entry.
 
-For example, if you have a postgresql database deployed with the helm chart, you can create the secret with the following command:
+For example, if you have a PostgreSQL database deployed with the helm chart, you can create the secret with the following command:
 
 ```sh
 kubectl create secret generic database-password-file \
@@ -278,24 +278,25 @@ env:
 It's possible to add additional jdbc drivers to `ontop-endpoint` and `ontopic-studio` by adding some env vars :
 
 
-| Name | Description |
-| --- | --- | --- |
-| JDBC_EXTERNAL_REPO | The path of the git repo |
-| JDBC_EXTERNAL_REPO_FOLDER | The folder whithin the repo |
-| JDBC_EXTERNAL_REPO_KEY_PATH | The path where the ssh key is mounted (optional) |
+
+| Name                        | Description                                      |
+| --------------------------- | ------------------------------------------------ |
+| `JDBC_EXTERNAL_REPO`        | The path of the git repo                         |
+| `JDBC_EXTERNAL_REPO_FOLDER` | The folder within the repo                       |
+| `JDBC_EXTERNAL_REPO_KEY_PATH` | The path where the SSH key is mounted (optional) |
+
 
 If you use a deploy key to access the git repo, you need to create a secret and then provide `JDBC_EXTERNAL_REPO_KEY_PATH` if needed.
 
-The default path is : `/run/secrets/jdbc_external_repo/private_key`
+The default path is : `/run/secrets/jdbc-external-repo/private_key`
 
 So you can create a secret like :
 
 ```sh
-kubectl create secret generic jdbc_external_repo \
+kubectl create secret generic jdbc-external-repo \
   --from-file=private_key=./my-private-key
 ```
-
-Then you can add to `values-server.yaml` :
+Create or add to the values file `values-server.yaml` that will be used by the `ontop-endpoint` chart:
 
 ```sh
 env:
@@ -303,11 +304,10 @@ env:
   JDBC_EXTERNAL_REPO_FOLDER: my-folder
 
 secrets:
-  # If you use s3, you have to specify values or it should be overriden
-  access-key-id: /run/secrets/s3-access-key-id
-  access-key-secret: /run/secrets/s3-access-key-secret
+  # If you use s3, you have to specify the values or it will be overridden
+  # ...
   # JDBC
-  jdbc_external_repo: /run/secrets/jdbc_external_repo
+  jdbc-external-repo: /run/secrets/jdbc-external-repo
 ```
 
 And to the `values.yaml` :
@@ -315,12 +315,13 @@ And to the `values.yaml` :
 ```sh
 process-server:
   env:
+    # ...
     JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
     JDBC_EXTERNAL_REPO_FOLDER: my-folder
 
   secrets:
-    user-license-file: /run/secrets/user-license
-    jdbc_external_repo: /run/secrets/jdbc_external_repo
+    # ...
+    jdbc-external-repo: /run/secrets/jdbc-external-repo
 ```
 
 ## Install Helm Charts with the repository
@@ -341,19 +342,19 @@ You can then run `helm search repo ontopic` to see the charts.
 To install the `ontop-endpoint` chart without extra configuration:
 
 ```sh
-helm install ontop-endpoint-release ontopic/ontop-endpoint
+helm install ontop-endpoint ontopic/ontop-endpoint
 ```
 
 To install the `ontop-endpoint` chart with the configuration `values-server.yaml` for materialization:
 
 ```sh
-helm install -f values-server.yaml ontop-endpoint-release ontopic/ontop-endpoint
+helm install -f values-server.yaml ontop-endpoint ontopic/ontop-endpoint
 ```
 
 To uninstall the chart:
 
 ```sh
-helm delete ontop-endpoint-release
+helm delete ontop-endpoint
 ```
 
 ### Ontopic Studio
@@ -361,13 +362,13 @@ helm delete ontop-endpoint-release
 To install the `ontopic-studio` chart a `values.yaml` file is needed to override the configurations:
 
 ```sh
-helm install -f values.yaml ontopic-studio-release ontopic/ontopic-studio
+helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
 ```
 
 To uninstall the chart:
 
 ```sh
-helm delete ontopic-studio-release
+helm delete ontopic-studio
 ```
 
 # Limitations

@@ -60,14 +60,13 @@ spec:
       containers:
       - name: generate-secret
         image: ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm-{{ .Chart.AppVersion }}
-        command: ["/usr/bin/entrypoint", "generate", "cookie"]
-        args: [ ">", "/mnt/secret/cookie-secret && cat /mnt/secret/cookie-secret" ]
+        command: ["sh", "-c", "/usr/bin/entrypoint generate cookie > /mnt/secret/cookie-secret && echo 'Cookie generated' && cat /mnt/secret/cookie-secret"]
         volumeMounts:
         - name: secret
           mountPath: /mnt/secret
       - name: create-secret
         image: bitnami/kubectl:latest
-        command: ["sh", "-c", "while [ ! -f /mnt/data/output.txt ]; do sleep 1; done; cat /mnt/secret/cookie-secret && kubectl create secret generic cookie-secret --from-file=password=/mnt/secret/cookie-secret"]
+        command: ["sh", "-c", "while [ ! -f /mnt/secret/cookie-secret ]; do echo 'Waiting for /mnt/secret/cookie-secret'; sleep 1; done; echo 'File /mnt/secret/cookie-secret found'; kubectl create secret generic cookie-secret --from-file=cookie-secret=/mnt/secret/cookie-secret; exit 0"]
         volumeMounts:
         - name: secret
           mountPath: /mnt/secret
