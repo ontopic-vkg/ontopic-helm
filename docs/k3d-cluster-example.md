@@ -28,7 +28,7 @@ To access Ontopic Studio locally on http://ontopic.local/ should modify your hos
 ### Create the cluster
 
 ```bash
-k3d cluster create -c k3d-example/ontopic-cluster.yaml
+k3d cluster create -c samples/k3d/ontopic-cluster.yaml
 ```
 
 ### Install helm charts

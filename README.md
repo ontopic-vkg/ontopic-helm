@@ -13,7 +13,7 @@ You need to install :
 
 ### Create a cluster
 
-See the [k3d cluster example](./k3d-example/k3d-cluster-example.md) if you want to install it locally.
+See the [k3d cluster example](./docs/k3d-cluster-example.md) if you want to install it locally.
 
 ### Create the namespace
 
@@ -32,27 +32,19 @@ It can be adapted to your scenario.
 cp values.example.yaml values.yaml
 ```
 
-## Deploy a PostgreSQL database
+## Prepare the database
 
-Here is the command to deploy a PostgreSQL database using the [Bitnami Helm Chart](https://artifacthub.io/packages/helm/bitnami/postgresql).
+You need a **PostgreSQL** database with a dedicated owner.
 
-```sh
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm install store-server-db bitnami/postgresql --wait
-```
-
-Wait for the DB to be ready.
-
-### Create the database and users
-
-```sh
-kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql' < create-db-and-users.sql
-```
+In case you don't have one, you can use the provided helm chart to test it.  You can find detailed instructions in the [dedicated documentation](./docs/deploy-postgresql.md).
 
 ### Create the database secret file
 
+You need to provide the database password as a secret. You have to [create a secret](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_create/kubectl_create_secret_generic/) with the key `database-password-file` entry.
+
+For example, if you have a PostgreSQL database deployed with the helm chart, you can create the secret with the following command:
+
 ```sh
-# Create the new secret
 kubectl create secret generic database-password-file \
   --from-literal=database-password-file="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)"
 ```
@@ -62,98 +54,64 @@ Make sure you have the following part in your custom `values.yaml` file:
 ```yaml
 store-server:
   secrets:
+    # database-password-file is the name of the secret
     database-password-file: /run/secrets/database-password-file
 ```
 
-### Change the default cookie secret (optional)
+### Cookie secret
 
-By default, the cookie secret is created with a **non-random** value.
+By default, the cookie secret is created with a **random** value when the chart is installed.
 
-For providing a custom value:
+The helm chart create a secret with the key `cookie-secret` entry.
 
-```sh
-# Create folder secret if it has not already been created
-mkdir -p ./secrets
+### Create a user and set password as secret
 
-docker run ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm-v2024.1.2 generate cookie > ./secrets/cookie-secret
+Ontopic Studio has no default users.
 
-kubectl create secret generic custom-cookie \
-  --from-file=cookie-secret=./secrets/cookie-secret
+You need to provide your users by creating a secret named `password-db-users` with a json representation of the users.
+
+You can find a sample in the [samples folder](./samples/users.json) :
+
+```json
+{
+    "users": [
+      {
+        "username": "admin",
+        "password": "$aprBe1/",
+        "email": "test@email.it",
+        "fullname": "test",
+        "groups": ["developers", "admin"]
+      },
+      {
+        "username": "test",
+        "password": "$apr1$C.",
+        "email": "test@email.it",
+        "fullname": "test",
+        "groups": ["developers"]
+      }
+    ]
+  }
+
 ```
 
-Then edit the `values.yaml` file adding `custom-cookie`:
-
-```yaml
-identity-service:
-  secrets:
-    # ...
-    custom-cookie: /run/secrets/cookie-secret
-```
-
-### Create a user and set password as secret (optional)
-
-Ontopic Studio has a default user `test` with password `test`.
-If you want to use the default user and didn't create an `identity-service` section in `values.yaml` (e.g. when using a custom cookie), you can skip this section.
-
-#### Use default user
-
-To use the default user in an existing `identity-service` section, add the following entry:
-
-```yaml
-identity-service:
-  secrets:
-    # ...
-    password-file-db: /run/secrets/password-file-db
-```
-
-#### Create new user
-
-To create a new user and secret use the script _./create-user.sh_. A new file with the chosen password will be generated in a new folder _secrets_:
-
-```sh
-./create-user.sh
-```
-
-<details>
- <summary><b>NOTE:</b> Troubleshooting the script</summary>
-
----
-
-In case of permission issues running the script (as user root), change ownership of the secrets folder and execute again the script
-
-```sh
-sudo chown 1000 ./secrets
-./create-user.sh
-```
-
----
-
-</details>
-</br>
+And then create the secret :
 
 ```sh
 # Create the secret
-kubectl create secret generic identity-password-db \
-    --from-file=password-file-db=./secrets/password-file-db
+kubectl create secret generic password-db-users \
+    --from-file=users=./samples/users.json
 ```
 
-And then you need to add the created secret in your values file:
+#### Update users
 
-```yaml
-identity-service:
-  secrets:
-    # ...
-    identity-password-db: /run/secrets/password-file-db
+The chart add a job to handle this secret. This secret is managed at each installation and upgrade.
+
+If you need to only reload the users, you can upgrade the release like this :
+
+```sh
+helm upgrade ontopic-studio ontopic/ontopic-studio --reuse-values --force
 ```
 
-If you didn't specify a custom cookie secret, please also include the following entry:
-
-```yaml
-identity-service:
-  secrets:
-    # ...
-    cookie-secret: /run/secrets/cookie-secret
-```
 
 ### Use Azure as identity service provider (optional)
 
@@ -320,6 +278,57 @@ secrets:
 
 ```
 
+## Custom JDBC drivers (optional)
+
+It's possible to add additional jdbc drivers to `ontop-endpoint` and `ontopic-studio` by adding some env vars :
+
+
+
+| Name                        | Description                                      |
+| --------------------------- | ------------------------------------------------ |
+| `JDBC_EXTERNAL_REPO`        | The path of the git repo                         |
+| `JDBC_EXTERNAL_REPO_FOLDER` | The folder within the repo                       |
+| `JDBC_EXTERNAL_REPO_KEY_PATH` | The path where the SSH key is mounted (optional) |
+
+
+If you use a deploy key to access the git repo, you need to create a secret and then provide `JDBC_EXTERNAL_REPO_KEY_PATH` if needed.
+
+The default path is : `/run/secrets/jdbc-external-repo/private_key`
+
+So you can create a secret like :
+
+```sh
+kubectl create secret generic jdbc-external-repo \
+  --from-file=private_key=./my-private-key
+```
+Create or add to the values file `values-server.yaml` that will be used by the `ontop-endpoint` chart:
+
+```sh
+env:
+  JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
+  JDBC_EXTERNAL_REPO_FOLDER: my-folder
+
+secrets:
+  # If you use s3, you have to specify the values or it will be overridden
+  # ...
+  # JDBC
+  jdbc-external-repo: /run/secrets/jdbc-external-repo
+```
+
+And to the `values.yaml` :
+
+```sh
+process-server:
+  env:
+    # ...
+    JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
+    JDBC_EXTERNAL_REPO_FOLDER: my-folder
+
+  secrets:
+    # ...
+    jdbc-external-repo: /run/secrets/jdbc-external-repo
+```
+
 ## Install Helm Charts with the repository
 
 [Helm](https://helm.sh) must be installed to use the charts.
@@ -338,19 +347,19 @@ You can then run `helm search repo ontopic` to see the charts.
 To install the `ontop-endpoint` chart without extra configuration:
 
 ```sh
-helm install ontop-endpoint-release ontopic/ontop-endpoint
+helm install ontop-endpoint ontopic/ontop-endpoint
 ```
 
 To install the `ontop-endpoint` chart with the configuration `values-server.yaml` for materialization:
 
 ```sh
-helm install -f values-server.yaml ontop-endpoint-release ontopic/ontop-endpoint
+helm install -f values-server.yaml ontop-endpoint ontopic/ontop-endpoint
 ```
 
 To uninstall the chart:
 
 ```sh
-helm delete ontop-endpoint-release
+helm delete ontop-endpoint
 ```
 
 ### Ontopic Studio
@@ -358,17 +367,16 @@ helm delete ontop-endpoint-release
 To install the `ontopic-studio` chart a `values.yaml` file is needed to override the configurations:
 
 ```sh
-helm install -f values.yaml ontopic-studio-release ontopic/ontopic-studio
+helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
 ```
 
 To uninstall the chart:
 
 ```sh
-helm delete ontopic-studio-release
+helm delete ontopic-studio
 ```
 
 # Limitations
 
-- Currently JDBC drivers are embedded in the containers and are therefore not customizable.
 - The embedded Git repository (Gitea) is not provided.
 - No sample database is provided.

@@ -99,13 +99,14 @@ tolerations: []
 
 affinity: {}
 
+
 services:
   ##--- Angular frontend
   angular-frontend:
     image:
       repository: studio
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.2"
+      tag: "helm-v2024.1.3"
 
     livenessProbe:
       httpGet:
@@ -130,7 +131,7 @@ services:
     image:
       repository: identity-service
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.2"
+      tag: "helm-v2024.1.3"
 
     args:
       - '--session.enable=true'
@@ -176,7 +177,7 @@ services:
       ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE:
       ONTOPIC_IDENTITY_SERVICE_SESSION_STORE_FILE: /etc/identity-service/data/session.db
       ONTOPIC_IDENTITY_SERVICE_CLIENT_ID:
-      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: 
+      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE:
       ONTOPIC_IDENTITY_SERVICE_COOKIE_PREFIX: _ontopic-studio
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECRET_FILE: /run/secrets/cookie-secret/cookie-secret
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE: false
@@ -188,7 +189,6 @@ services:
       ONTOPIC_IDENTITY_SERVICE_CUSTOM_TEMPLATE_DIR: /etc/identity-service/templates
       ONTOPIC_IDENTITY_SERVICE_IDENTITY_REFRESH:
 
-
     secrets:
       cookie-secret: /run/secrets/cookie-secret
       password-file-db: /run/secrets/password-file-db
@@ -198,7 +198,7 @@ services:
     image:
       repository: process-server
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.2"
+      tag: "helm-v2024.1.3"
 
     livenessProbe:
       httpGet:
@@ -226,7 +226,7 @@ services:
     image:
       repository: store-server
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.2"
+      tag: "helm-v2024.1.3"
 
     livenessProbe:
       httpGet:
@@ -307,7 +307,7 @@ services:
       pullPolicy: Always
 
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.2"
+      tag: "helm-v2024.1.3"
 
     livenessProbe:
       httpGet:
