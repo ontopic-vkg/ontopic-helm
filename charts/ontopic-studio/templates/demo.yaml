@@ -1,0 +1,36 @@
+{{- if .Values.postgresql.enableDemoData -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ontopic-studio.fullname" . }}-demo-db
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "ontopic-studio.fullname" . }}-demo-db
+  template:
+    metadata:
+      labels:
+        app: {{ include "ontopic-studio.fullname" . }}-demo-db
+    spec:
+      containers:
+        - name: demo-db
+          image: ontopicvkg/destination-tutorial-db
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ontopic-studio.fullname" . }}-demo-db
+spec:
+  selector:
+    app: {{ include "ontopic-studio.fullname" . }}-demo-db
+  ports:
+    - port: 5432
+      targetPort: 5432
+{{- end }}

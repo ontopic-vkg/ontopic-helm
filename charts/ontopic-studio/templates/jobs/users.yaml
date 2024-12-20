@@ -80,7 +80,6 @@ metadata:
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}"
       labels:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -108,7 +107,8 @@ spec:
           mountPath: /mnt/secret
       volumes:
       - name: secret
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: 5Mi
 ---
 {{- end }}
 apiVersion: batch/v1
@@ -127,7 +127,6 @@ metadata:
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}"
       labels:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -177,4 +176,5 @@ spec:
         secret:
           secretName: password-db-users
       - name: secret
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: 5Mi

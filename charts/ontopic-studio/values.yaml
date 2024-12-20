@@ -394,6 +394,8 @@ postgresql:
   enableSecretCreation: true
   # -- enable creation of the "internal" database
   enableDatabaseCreation: true
+  # -- enable demo data
+  enableDemoData: false
   # -- fullnameOverride is used to override the name of the subchart
   fullnameOverride: "store-server-db-postgresql"
 
