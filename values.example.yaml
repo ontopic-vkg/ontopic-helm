@@ -26,3 +26,39 @@ web:
   env:
     ONTOP_ENDPOINT_SERVICE_HOST: ontop-endpoint.ontopic.svc.cluster.local
     # virtual_host: ontopic.local
+
+# Create users
+users:
+  # -- enable the user creation job
+  enabled: true
+  # -- list of users to create
+  list:
+    - username: admin
+      password: "$aprBe1/"
+      email: test@email.it
+      fullname: Admin
+      groups:
+        - developers
+        - admin
+    - username: test
+      password: "$apr1$C."
+      email: test@email.it
+      fullname: Test
+      groups:
+        - developers
+
+# Configure the PostgreSQL subchart
+postgresql:
+  # -- enable the PostgreSQL chart
+  enabled: true
+  # -- enable creation of the secret for Ontopic Studio
+  enableSecretCreation: true
+  # -- enable creation of the "internal" database
+  enableDatabaseCreation: true
+  # -- enable demo data
+  enableDemoData: false
+
+# Configure the Ontop Endpoint subchart
+ontop-endpoint:
+  # -- enable the Ontop Endpoint chart
+  enabled: true

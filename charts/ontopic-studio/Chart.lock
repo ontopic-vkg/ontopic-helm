@@ -1,0 +1,9 @@
+dependencies:
+- name: ontop-endpoint
+  repository: https://ontopic-vkg.github.io/ontopic-helm/
+  version: 0.1.2
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.0.0
+digest: sha256:71c9c3c2a4ef5ad2057d38bd88f86b3536b6a3c8f470bad6da52d0d2f8f11014
+generated: "2024-10-03T16:08:42.497048+02:00"

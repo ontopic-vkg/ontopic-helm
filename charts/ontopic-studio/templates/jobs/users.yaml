@@ -63,6 +63,54 @@ roleRef:
   kind: Role
   name: {{ .Release.Name }}-delete-users
 ---
+{{- if .Values.users.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-generate-password-db-users-secret
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "1"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      serviceAccountName: {{ .Release.Name }}-generate-users
+      restartPolicy: Never
+      containers:
+      - name: create-secret
+        image: bitnami/kubectl:latest
+        command:
+        - "sh"
+        - "-c"
+        - >-
+            NAME="password-db-users";
+            FILE="/mnt/secret/${NAME}";
+            echo {{ printf "{\"users\": %s}" (.Values.users.list | toJson) | quote }} > "${FILE}";
+            if [ -f "${FILE}" ]; then
+              kubectl delete secret "${NAME}";
+              kubectl create secret generic "${NAME}" --from-file=users=${FILE};
+            fi;
+            exit 0
+        volumeMounts:
+        - name: secret
+          mountPath: /mnt/secret
+      volumes:
+      - name: secret
+        emptyDir:
+          sizeLimit: 5Mi
+---
+{{- end }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -73,13 +121,12 @@ metadata:
     app.kubernetes.io/version: {{ .Chart.AppVersion }}
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
   annotations:
-    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook: post-install,post-upgrade
     helm.sh/hook-weight: "1"
-    helm.sh/hook-delete-policy: hook-succeeded,hook-failed
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}"
       labels:
         app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
@@ -87,10 +134,9 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}-generate-users
       restartPolicy: Never
-      containers:
+      initContainers:
       - name: user-creation
         image: ghcr.io/ontopic-vkg/ontopic-helm/user-creation:helm-{{ .Chart.AppVersion }}
-        command:
         command:
         - "sh"
         - "-c"
@@ -108,6 +154,7 @@ spec:
           readOnly: true
         - name: secret
           mountPath: /mnt/secret
+      containers:
       - name: create-secret
         image: bitnami/kubectl:latest
         command:
@@ -124,11 +171,10 @@ spec:
         volumeMounts:
         - name: secret
           mountPath: /mnt/secret
-      restartPolicy: Never
-      volumes:
       volumes:
       - name: users
         secret:
           secretName: password-db-users
       - name: secret
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: 5Mi

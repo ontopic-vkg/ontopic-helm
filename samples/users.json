@@ -1,18 +1,23 @@
 {
-    "users": [
-      {
-        "username": "admin",
-        "password": "$aprBe1/",
-        "email": "test@email.it",
-        "fullname": "test",
-        "groups": ["developers", "admin"]
-      },
-      {
-        "username": "test",
-        "password": "$apr1$C.",
-        "email": "test@email.it",
-        "fullname": "test",
-        "groups": ["developers"]
-      }
-    ]
-  }
+  "users": [
+    {
+      "username": "admin",
+      "password": "$aprBe1/",
+      "email": "test@email.it",
+      "fullname": "test",
+      "groups": [
+        "developers",
+        "admin"
+      ]
+    },
+    {
+      "username": "test",
+      "password": "$apr1$C.",
+      "email": "test@email.it",
+      "fullname": "test",
+      "groups": [
+        "developers"
+      ]
+    }
+  ]
+}

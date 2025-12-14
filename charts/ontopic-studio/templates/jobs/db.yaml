@@ -1,0 +1,93 @@
+{{- if and (.Values.postgresql.enabled) (.Values.postgresql.enableSecretCreation) }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Name }}-update-db-secrets
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create","get","delete","patch", "update"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["create", "get", "patch", "update", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["create", "get", "patch", "update", "delete"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-update-db-secrets
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Release.Name }}-update-db-secrets
+subjects:
+  - kind: ServiceAccount
+    namespace: {{ .Release.Namespace }}
+    name: {{ .Release.Name }}-update-db-secrets
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Release.Name }}-update-db-secrets
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-update-db-secrets
+  labels:
+    app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+    app.kubernetes.io/instance: {{ .Release.Name | quote }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "1"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+        app.kubernetes.io/instance: {{ .Release.Name | quote }}
+        helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    spec:
+      serviceAccountName: {{ .Release.Name }}-update-db-secrets
+      restartPolicy: Never
+      containers:
+      - name: create-secret
+        image: bitnami/kubectl:latest
+        command:
+        - "sh"
+        - "-c"
+        - |
+            sleep 10
+            kubectl create secret generic database-password-file \
+              --from-literal=database-password-file="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)" \
+              --dry-run=client -o yaml | kubectl apply -f -
+      {{- if .Values.postgresql.enableDatabaseCreation }}
+      - name: create-database
+        image: bitnami/kubectl:latest
+        command:
+        - "sh"
+        - "-c"
+        - |
+            sleep 20
+
+            # Create database (can fail if it already exists)
+            echo "Create database"
+            echo "create database internal;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql' || true
+
+            # Grant privileges to the database
+            echo "Grant privileges to the database"
+            echo "grant all privileges on database internal to postgres;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql'
+            echo "alter database internal OWNER TO postgres;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql'
+      {{- end }}
+{{- end }}
