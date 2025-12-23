@@ -1,11 +1,11 @@
 
-{{- define "ontopic-studio.env" -}}
+{{- define "ontopic-suite.env" -}}
 {{- range $name, $value := . }}
     {{upper $name}}: {{$value | quote}}
 {{- end }}
 {{- end }}
 
-{{- define "ontopic-studio.env-deploy" -}}
+{{- define "ontopic-suite.env-deploy" -}}
 {{ $cm := .envConfigMapName }}
 {{- range $name, $value := .env }}
 - name: {{upper $name}}
