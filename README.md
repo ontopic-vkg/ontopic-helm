@@ -48,7 +48,7 @@ You can then run `helm search repo ontopic` to see the charts.
 See the [Ontop Endpoint documentation](./docs/deploy-ontop-endpoint.md).
 In case you want to use the Ontop Endpoint with Ontopic Studio, you can follow the instructions in the [Ontopic Studio documentation](./docs/deploy-ontopic-studio.md) instead, as it is included as a subchart.
 
-### Ontopic Suite
+### Ontopic Studio
 
 See the [Ontopic Studio documentation](./docs/deploy-ontopic-studio.md).
 

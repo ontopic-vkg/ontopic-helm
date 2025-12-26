@@ -3,7 +3,7 @@
 ---
 
 {{- if and .service .ingress -}}
-{{- $fullName := printf "%s-%s" (include "ontopic-suite.name" $) .service.name -}}
+{{- $fullName := printf "%s-%s" (include "ontopic-studio.name" $) .service.name -}}
 {{- $svcPort := .service.port -}}
 {{- if and $.Values.ingress.className (not (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey $.Values.ingress.annotations "kubernetes.io/ingress.class") }}
@@ -21,7 +21,7 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "ontopic-suite.labels" $ | nindent 4 }}
+    {{- include "ontopic-studio.labels" $ | nindent 4 }}
   {{- $annotations :=   $.Values.ingress.annotations | default .ingress.annotations }}
   {{- with $annotations }}
   annotations:

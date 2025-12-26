@@ -5,9 +5,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ include "ontopic-suite.name" $ }}-{{ .service.name }}"
+  name: "{{ include "ontopic-studio.name" $ }}-{{ .service.name }}"
   labels:
-    {{- include "ontopic-suite.labels" $ | nindent 4 }}
+    {{- include "ontopic-studio.labels" $ | nindent 4 }}
 spec:
   type: {{ .service.type }}
   ports:
@@ -16,7 +16,7 @@ spec:
       protocol: TCP
       name: {{ .service.name }}
   selector:
-    {{- include "ontopic-suite.selectorLabels" $ | nindent 4 }}
+    {{- include "ontopic-studio.selectorLabels" $ | nindent 4 }}
 {{- end }}
 {{- end }}
 {{- end }}

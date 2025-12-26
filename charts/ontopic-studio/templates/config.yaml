@@ -8,9 +8,9 @@ metadata:
 data:
 {{- if and (hasKey $.Values $name) (hasKey (get $.Values $name) "env") }}
 {{- $env := merge (get $.Values $name).env .env }}
-{{- include "ontopic-suite.env" $env }}
+{{- include "ontopic-studio.env" $env }}
 {{- else }}
-{{- include "ontopic-suite.env" .env }}
+{{- include "ontopic-studio.env" .env }}
 {{- end }}
 {{- end }}
 {{- end }}

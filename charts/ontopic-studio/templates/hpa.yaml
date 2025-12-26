@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "ontopic-suite.fullname" . }}
+  name: {{ include "ontopic-studio.fullname" . }}
   labels:
-    {{- include "ontopic-suite.labels" . | nindent 4 }}
+    {{- include "ontopic-studio.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "ontopic-suite.fullname" . }}
+    name: {{ include "ontopic-studio.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

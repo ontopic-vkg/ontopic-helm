@@ -2,7 +2,7 @@ ingress:
   # className: ""
   # host: ontopic.local
   tls: false
-  # secretName: ontopic-suite-tls
+  # secretName: ontopic-studio-tls
   # annotations: {}
 
 process-server:

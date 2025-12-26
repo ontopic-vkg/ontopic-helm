@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "ontopic-suite.name" -}}
+{{- define "ontopic-studio.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "ontopic-suite.fullname" -}}
+{{- define "ontopic-studio.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "ontopic-suite.chart" -}}
+{{- define "ontopic-studio.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "ontopic-suite.labels" -}}
-helm.sh/chart: {{ include "ontopic-suite.chart" . }}
-{{ include "ontopic-suite.selectorLabels" . }}
+{{- define "ontopic-studio.labels" -}}
+helm.sh/chart: {{ include "ontopic-studio.chart" . }}
+{{ include "ontopic-studio.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,23 +45,23 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "ontopic-suite.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "ontopic-suite.name" . }}
+{{- define "ontopic-studio.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "ontopic-studio.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "ontopic-suite.serviceAccountName" -}}
+{{- define "ontopic-studio.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "ontopic-suite.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "ontopic-studio.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
-{{- define "ontopic-suite.hasArrayKey" -}}
+{{- define "ontopic-studio.hasArrayKey" -}}
 {{- $key := .Key -}}
 {{- $array := .Array -}}
 {{- $found := false -}}
@@ -74,11 +74,11 @@ Create the name of the service account to use
 {{- $found -}}
 {{- end -}}
 
-{{- define "ontopic-suite.hasExistingClaim" -}}
+{{- define "ontopic-studio.hasExistingClaim" -}}
 {{- $found := false -}}
 {{- range $name, $values := .services }}
   {{- $context := dict "Key" "existingClaim" "Array" $values.volumes -}}
-  {{- if include "ontopic-suite.hasArrayKey" $context | fromYaml -}}
+  {{- if include "ontopic-studio.hasArrayKey" $context | fromYaml -}}
     {{- $found = true -}}
     {{- break -}}
   {{- end -}}
