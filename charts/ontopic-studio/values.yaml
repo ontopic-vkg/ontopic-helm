@@ -2,7 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
-  registry: ghcr.io/ontopic-vkg/ontopic-helm
+  # registry: ghcr.io/ontopic-vkg/ontopic-helm
+  registry: registry.gitlab.com/ontopic/ontopic-suite/helm
 
 replicaCount: 1
 
@@ -19,7 +20,7 @@ ingress:
   # secretName: ontopic-studio-tls
   # annotations: {}
 
-#imagePullSecrets: [{"name": "regcred"}]
+imagePullSecrets: [{ "name": "regcred" }]
 nameOverride: ""
 fullnameOverride: ""
 
@@ -37,12 +38,10 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext:
-  {}
+securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -61,8 +60,7 @@ persistentVolumeClaimRetentionPolicy:
   ##
   whenDeleted: Retain
 
-resources:
-  {}
+resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -115,7 +113,7 @@ services:
     image:
       repository: studio
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.3"
+      tag: "helm-v2026.1.0"
 
     livenessProbe:
       httpGet:
@@ -139,7 +137,7 @@ services:
     image:
       repository: identity-service
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.3"
+      tag: "helm-v2026.1.0"
 
     args:
       - "--session.enable=true"
@@ -206,7 +204,7 @@ services:
     image:
       repository: process-server
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.3"
+      tag: "helm-v2026.1.0"
 
     livenessProbe:
       httpGet:
@@ -234,7 +232,7 @@ services:
     image:
       repository: store-server
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.3"
+      tag: "helm-v2026.1.0"
 
     livenessProbe:
       httpGet:
@@ -262,7 +260,7 @@ services:
       casbin_store_port: 5432
       casbin_store_user: postgres
       casbin_store_password_file: /run/secrets/database-password-file/database-password-file
-      ontop_endpoint_host: http://ontop-endpoint.ontopic.svc.cluster.local:8080
+      ontopic_server_host: http://ontop-endpoint.ontopic.svc.cluster.local:8080
       identity_service_name: localhost
       identity_service_port: 8080
       ontopic_restore_projects_db: false
@@ -315,7 +313,7 @@ services:
       pullPolicy: Always
 
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2024.1.3"
+      tag: "helm-v2026.1.0"
 
     livenessProbe:
       httpGet:
@@ -336,8 +334,7 @@ services:
     ingress:
       enabled: true
       className: ""
-      annotations:
-        {}
+      annotations: {}
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       hosts:

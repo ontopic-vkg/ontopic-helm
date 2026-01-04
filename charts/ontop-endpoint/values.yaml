@@ -1,16 +1,18 @@
 # Default values for ontop-endpoint.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-registry: ghcr.io/ontopic-vkg/ontopic-helm
+# registry: ghcr.io/ontopic-vkg/ontopic-helm
+registry: registry.gitlab.com/ontopic/ontopic-suite/helm
+
 replicaCount: 1
 
 image:
   repository: ontopic-server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "helm-v2024.1.3"
+  tag: "helm-v2026.1.0"
 
-#imagePullSecrets: [{"name": "regcred"}]
+imagePullSecrets: [{ "name": "regcred" }]
 nameOverride: ""
 fullnameOverride: ""
 
@@ -25,12 +27,10 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext:
-  {}
+securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -45,8 +45,7 @@ service:
 ingress:
   enabled: false
   className: ""
-  annotations:
-    {}
+  annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -59,8 +58,7 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources:
-  {}
+resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -88,7 +86,7 @@ affinity: {}
 envConfigMapName: ontop-endpoint-config
 
 env:
-  ontop_cors_allowed_origins: "*"
+  ONTOPIC_SERVER_CORS_ALLOWED_ORIGINS: "*"
   ONTOPIC_SERVER_ENABLE_MATERIALIZATION: false
   ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-access-key-id/access-key-id
   ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/access-key-secret
@@ -96,16 +94,19 @@ env:
   ONTOPIC_SERVER_S3_REGION: eu-central-1
   ONTOPIC_SERVER_MATERIALIZATION_CONFIGURATION_DIR: materialization-configuration
   ONTOPIC_SERVER_MATERIALIZATION_RESULT_DIR: materialization-result
-# volumes:
-#       - ${JDBC_ROOT_DIR:-./services/process-server/jdbc}:/opt/ontop/jdbc
-#       - ${ENDPOINT_DIR:-materialization-endpoint}:/opt/ontop/endpoint
+  ONTOPIC_SERVER_LOG_LEVEL: INFO
+  ONTOPIC_SERVER_ENABLE_POSTGRES_WIRE_PROTOCOL: true
+  ONTOPIC_SERVER_LICENSE_FILE: /run/secrets/user-license/user-license
+  ONTOPIC_SERVER_JDBC_ROOT_DIR: /opt/ontopic-server/jdbc
+  ONTOPIC_SERVER_WEB_API_PORT: 8080
+  ONTOPIC_SERVER_POSTGRES_PORT: 4300
+  # ONTOPIC_SERVER_IDENTITY_SERVICE_URL: http://ontopic-studio-web:8080/
+  ONTOPIC_SERVER_DISABLE_TLS: false
 
-#       - ${MATERIALIZATION_DB_DIR:-materialization-db}:/opt/ontop/db
-#       - ${MATERIALIZATION_CONFIGURATION_DIR:-materialization-configuration}:/opt/ontop/materialization-configuration
-#       - ${MATERIALIZATION_RESULT_DIR:-materialization-result}:/opt/ontop/materialization-result
 secrets:
   access-key-id: /run/secrets/s3-access-key-id
   access-key-secret: /run/secrets/s3-access-key-secret
+  user-license: /run/secrets/user-license
 
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment
@@ -279,6 +280,55 @@ materializationResult:
     ## @param materializationConfiguration.persistence.mountPath The path the volume will be mounted at
     ##
     mountPath: /opt/ontop/materialization-result
+    ## @param materializationConfiguration.persistence.subPath The subdirectory of the volume to mount to
+    ## Useful in dev environments and one PV for multiple services
+    ##
+    subPath: ""
+    ## @param materializationConfiguration.persistence.storageClass PVC Storage Class for Ontopic materializationConfiguration data volume
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param materializationConfiguration.persistence.accessModes PVC Access Mode for Ontopic volume
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param materializationConfiguration.persistence.size PVC Storage Request for Ontopic volume
+    ##
+    size: 8Gi
+    ## @param materializationConfiguration.persistence.annotations Annotations for the PVC
+    ##
+    annotations: {}
+    ## @param materializationConfiguration.persistence.labels Labels for the PVC
+    ##
+    labels: {}
+    ## @param materializationConfiguration.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    selector: {}
+    ## @param materializationConfiguration.persistence.dataSource Custom PVC data source
+    ##
+    dataSource: {}
+
+jdbc:
+  persistence:
+    ## @param materializationConfiguration.persistence.enabled Enable Ontopic materializationConfiguration data persistence using PVC
+    ##
+    enabled: true
+    ## @param materializationConfiguration.persistence.volumeName Name to assign the volume
+    ##
+    volumeName: "jdbc-root-dir"
+    ## @param materializationConfiguration.persistence.existingClaim Name of an existing PVC to use
+    ##
+    existingClaim: ""
+    ## @param materializationConfiguration.persistence.mountPath The path the volume will be mounted at
+    ##
+    mountPath: /opt/ontopic-server/jdbc
     ## @param materializationConfiguration.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##

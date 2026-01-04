@@ -21,14 +21,14 @@ version: 0.1.3
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "v2024.1.3"
+appVersion: "v2026.1.0"
 
 dependencies:
   - name: ontop-endpoint
     version: 0.1.3
-    repository: "https://ontopic-vkg.github.io/ontopic-helm/"
+    repository: "file://../ontop-endpoint" # "https://ontopic-vkg.github.io/ontopic-helm/"
     condition: ontop-endpoint.enabled
   - name: postgresql
-    version: 16.0.0
-    repository: "https://charts.bitnami.com/bitnami"
+    version: 18.2.0
+    repository: "oci://registry-1.docker.io/bitnamicharts"
     condition: postgresql.enabled

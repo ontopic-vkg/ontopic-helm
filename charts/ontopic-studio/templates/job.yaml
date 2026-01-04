@@ -56,11 +56,15 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ .Release.Name }}-pre-install
       restartPolicy: Never
       containers:
       - name: generate-secret
-        image: ghcr.io/ontopic-vkg/ontopic-helm/identity-service:helm-{{ .Chart.AppVersion }}
+        image: "{{ .Values.global.registry }}/identity-service:helm-{{ .Chart.AppVersion }}"
         command: ["sh", "-c", "/usr/bin/entrypoint generate cookie > /mnt/secret/cookie-secret && echo 'Cookie generated' && cat /mnt/secret/cookie-secret"]
         volumeMounts:
         - name: secret

@@ -132,11 +132,15 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name | quote }}
         helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ .Release.Name }}-generate-users
       restartPolicy: Never
       initContainers:
       - name: user-creation
-        image: ghcr.io/ontopic-vkg/ontopic-helm/user-creation:helm-{{ .Chart.AppVersion }}
+        image: "{{ .Values.global.registry }}/user-creation:helm-{{ .Chart.AppVersion }}"
         command:
         - "sh"
         - "-c"

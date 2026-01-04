@@ -63,7 +63,7 @@ You need a **PostgreSQL** database with a dedicated owner.
 By default, a PostgreSQL database is deployed.
 You can disable this by setting `postgresql.enabled` to `false` in the `values.yaml` file.
 
-In case you want to deploy it yourself, you can find detailed instructions in the [dedicated documentation](./docs/deploy-postgresql.md).
+In case you want to deploy it yourself, you can find detailed instructions in the [dedicated documentation](./deploy-postgresql.md).
 
 ### Cookie secret
 
