@@ -244,6 +244,14 @@ services:
         path: /internal-store-api/healthcheck
         port: 3000
 
+    init:
+      - name: init-permissions
+        image: busybox
+        command: ["sh", "-c", "chown 1000:1000 /app/docs"]
+        volumeMounts:
+          - mountPath: /app/docs
+            name: docs-dir
+
     envConfigMapName: store-server-config
 
     env:
@@ -318,18 +326,18 @@ services:
     livenessProbe:
       httpGet:
         path: /
-        port: web
+        port: 8083
 
     readinessProbe:
       httpGet:
         path: /
-        port: web
+        port: 8083
 
     service:
       name: web
       type: ClusterIP
       port: 80
-      targetPort: 80
+      targetPort: 8083
 
     ingress:
       enabled: true
@@ -348,7 +356,7 @@ services:
 
     env:
       virtual_host: ontopic.local
-      virtual_port: 80
+      virtual_port: 8083
       ANGULAR_FRONTEND_SERVICE_HOST: localhost
       ANGULAR_FRONTEND_SERVICE_PORT: 4200
       IDENTITY_SERVICE_HOST: localhost
