@@ -16,7 +16,7 @@ Optionally, you can install :
 
 ### DNS resolving
 
-To access Ontopic Studio locally on http://ontopic.local/ should modify your hosts file with:
+To access Ontopic Suite locally on http://ontopic.local/ should modify your hosts file with:
 
 ```sh
 127.0.0.1  ontopic.local
@@ -32,6 +32,6 @@ k3d cluster create -c samples/k3d/ontopic-cluster.yaml
 
 Follow the steps in the [Readme file](../README.md).
 
-### Access Ontopic Studio
+### Access Ontopic Suite
 
-You should be able to access Ontopic Studio at http://ontopic.local:8080
+You should be able to access Ontopic Suite at http://ontopic.local:8080

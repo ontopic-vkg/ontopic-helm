@@ -2,15 +2,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "ontopic-studio.fullname" . }}-demo-db
+  name: {{ include "ontopic-suite.fullname" . }}-demo-db
 spec:
   selector:
     matchLabels:
-      app: {{ include "ontopic-studio.fullname" . }}-demo-db
+      app: {{ include "ontopic-suite.fullname" . }}-demo-db
   template:
     metadata:
       labels:
-        app: {{ include "ontopic-studio.fullname" . }}-demo-db
+        app: {{ include "ontopic-suite.fullname" . }}-demo-db
     spec:
       containers:
         - name: demo-db
@@ -26,10 +26,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "ontopic-studio.fullname" . }}-demo-db
+  name: {{ include "ontopic-suite.fullname" . }}-demo-db
 spec:
   selector:
-    app: {{ include "ontopic-studio.fullname" . }}-demo-db
+    app: {{ include "ontopic-suite.fullname" . }}-demo-db
   ports:
     - port: 5432
       targetPort: 5432

@@ -28,7 +28,7 @@ Make sure to replace `<your-namespace>` with the name of the namespace you want 
 
 If you want to use the Ontopic Server in a standalone way, you can directly use the dedicated Helm chart.
 
-In case you want to use the Ontopic Server with Ontopic Studio, you can follow the instructions in the [Ontopic Studio documentation](./deploy-ontopic-studio.md).
+In case you want to use the Ontopic Server with Ontopic Suite, you can follow the instructions in the [Ontopic Suite documentation](./deploy-ontopic-suite.md).
 
 ### Standalone
 
@@ -87,7 +87,7 @@ secrets:
 
 ## Enable materialization with S3 (optional)
 
-Ontopic Studio supports materialization to RDF using S3 as storage, but it is disabled by default.
+Ontopic Suite supports materialization to RDF using S3 as storage, but it is disabled by default.
 
 The necessary S3 parameters are:
 
@@ -155,8 +155,8 @@ env:
   ONTOPIC_SERVER_S3_ENDPOINT_URL: <S3_ENDPOINT_URL> # Optional
 ```
 
-### With Ontopic Studio
+### With Ontopic Suite
 
-If you want to use the Ontopic Server with Ontopic Studio, you can follow the instructions in the [Ontopic Studio documentation](./deploy-ontopic-studio.md).
+If you want to use the Ontopic Server with Ontopic Suite, you can follow the instructions in the [Ontopic Suite documentation](./deploy-ontopic-suite.md).
 
-The Ontopic Server is already included in the Ontopic Studio Helm chart, as a subchart.
+The Ontopic Server is already included in the Ontopic Suite Helm chart, as a subchart.

@@ -2,7 +2,7 @@ ingress:
   # className: ""
   # host: ontopic.local
   tls: false
-  # secretName: ontopic-studio-tls
+  # secretName: ontopic-suite-tls
   # annotations: {}
 
 process-server:
@@ -51,7 +51,7 @@ users:
 postgresql:
   # -- enable the PostgreSQL chart
   enabled: true
-  # -- enable creation of the secret for Ontopic Studio
+  # -- enable creation of the secret for Ontopic Suite
   enableSecretCreation: true
   # -- enable creation of the "internal" database
   enableDatabaseCreation: true

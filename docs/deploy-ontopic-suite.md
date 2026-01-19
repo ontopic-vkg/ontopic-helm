@@ -1,4 +1,4 @@
-# Deploy Ontopic Studio
+# Deploy Ontopic Suite
 
 ## Requirements
 
@@ -28,7 +28,7 @@ Make sure to replace `<your-namespace>` with the name of the namespace you want 
 
 ### Create a custom `values.yaml` file
 
-Ontopic Studio needs to be configured with a custom `values.yaml` file.
+Ontopic Suite needs to be configured with a custom `values.yaml` file.
 An example is provided in the folder.
 It can be adapted to your scenario.
 
@@ -38,7 +38,7 @@ cp values.example.yaml values.yaml
 
 ### Add the license as secret
 
-Add the provided Ontopic Studio license as secret.
+Add the provided Ontopic Suite license as secret.
 You can put the license in a file named `user-license` at the root of this repository.
 
 Create the secret from the `user-license` file:
@@ -99,7 +99,7 @@ This secret is managed at each installation and upgrade.
 In the future, if you need to only reload the users, you can upgrade the release like this:
 
 ```sh
-helm upgrade ontopic-studio ontopic/ontopic-studio --reuse-values --force
+helm upgrade ontopic-suite ontopic/ontopic-suite --reuse-values --force
 ```
 
 But since the chart is not deployed, you don't have to run this command, as the users will be created at the first installation automatically.
@@ -107,7 +107,7 @@ But since the chart is not deployed, you don't have to run this command, as the 
 ### Use Azure as identity service provider (optional)
 
 Use or create a registered app from the Azure Active Directory (Microsoft Entra ID).
-Follow the instruction on [how to register Ontopic Studio in Azure Active Directory](https://docs.ontopic.ai/studio/administrate/access-control/azure.html#register-ontopic-studio).
+Follow the instruction on [how to register Ontopic Suite in Azure Active Directory](https://docs.ontopic.ai/studio/administrate/access-control/azure.html#register-ontopic-suite).
 
 You will need the _Application (client) ID_, the _Directory (tenant) ID_, the _client secret_, and the _Application ID URI_ of the registered app.
 
@@ -155,7 +155,7 @@ identity-service:
 
 ## Enable materialization with S3 (optional)
 
-Ontopic Studio supports materialization to RDF using S3 as storage, but it is disabled by default.
+Ontopic Suite supports materialization to RDF using S3 as storage, but it is disabled by default.
 
 Edit the `values.yaml` file and set `enable_materialization` to `true` in the `store-server` section:
 
@@ -242,14 +242,14 @@ ontopic-server:
 
 ### Deploy the Helm chart
 
-To install the `ontopic-studio` chart a `values.yaml` file is needed to override the configurations:
+To install the `ontopic-suite` chart a `values.yaml` file is needed to override the configurations:
 
 ```sh
-helm install -f values.yaml ontopic-studio ontopic/ontopic-studio
+helm install -f values.yaml ontopic-suite ontopic/ontopic-suite
 ```
 
 To uninstall the chart:
 
 ```sh
-helm delete ontopic-studio
+helm delete ontopic-suite
 ```

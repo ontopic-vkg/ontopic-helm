@@ -46,11 +46,11 @@ You can then run `helm search repo ontopic` to see the charts.
 ### Ontopic Server
 
 See the [Ontopic Server documentation](./docs/deploy-ontopic-server.md).
-In case you want to use the Ontopic Server with Ontopic Studio, you can follow the instructions in the [Ontopic Studio documentation](./docs/deploy-ontopic-studio.md) instead, as it is included as a subchart.
+In case you want to use the Ontopic Server with Ontopic Suite, you can follow the instructions in the [Ontopic Suite documentation](./docs/deploy-ontopic-suite.md) instead, as it is included as a subchart.
 
-### Ontopic Studio
+### Ontopic Suite
 
-See the [Ontopic Studio documentation](./docs/deploy-ontopic-studio.md).
+See the [Ontopic Suite documentation](./docs/deploy-ontopic-suite.md).
 
 # Limitations
 

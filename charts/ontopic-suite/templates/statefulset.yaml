@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "ontopic-studio.fullname" . }}
+  name: {{ include "ontopic-suite.fullname" . }}
   labels:
-    {{- include "ontopic-studio.labels" . | nindent 4 }}
+    {{- include "ontopic-suite.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "ontopic-studio.selectorLabels" . | nindent 6 }}
+      {{- include "ontopic-suite.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "ontopic-studio.selectorLabels" . | nindent 8 }}
+        {{- include "ontopic-suite.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "ontopic-studio.serviceAccountName" . }}
+      serviceAccountName: {{ include "ontopic-suite.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
@@ -139,7 +139,7 @@ spec:
     whenDeleted: {{ .Values.persistentVolumeClaimRetentionPolicy.whenDeleted }}
     whenScaled: {{ .Values.persistentVolumeClaimRetentionPolicy.whenScaled }}
   {{- end }}
-  {{- if include "ontopic-studio.hasExistingClaim" .Values | fromYaml }}
+  {{- if include "ontopic-suite.hasExistingClaim" .Values | fromYaml }}
   volumeClaimTemplates:
   {{- range $name, $values := .Values.services }}
   {{- with $values }}
