@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "ontop-endpoint.fullname" . }}
+  name: {{ include "ontopic-server.fullname" . }}
   labels:
-    {{- include "ontop-endpoint.labels" . | nindent 4 }}
+    {{- include "ontopic-server.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "ontop-endpoint.selectorLabels" . | nindent 6 }}
+      {{- include "ontopic-server.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "ontop-endpoint.selectorLabels" . | nindent 8 }}
+        {{- include "ontopic-server.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "ontop-endpoint.serviceAccountName" . }}
+      serviceAccountName: {{ include "ontopic-server.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

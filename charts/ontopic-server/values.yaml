@@ -1,4 +1,4 @@
-# Default values for ontop-endpoint.
+# Default values for ontopic-server.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 # registry: ghcr.io/ontopic-vkg/ontopic-helm

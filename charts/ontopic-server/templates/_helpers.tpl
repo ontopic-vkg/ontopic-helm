@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "ontop-endpoint.name" -}}
+{{- define "ontopic-server.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "ontop-endpoint.fullname" -}}
+{{- define "ontopic-server.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "ontop-endpoint.chart" -}}
+{{- define "ontopic-server.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "ontop-endpoint.labels" -}}
-helm.sh/chart: {{ include "ontop-endpoint.chart" . }}
-{{ include "ontop-endpoint.selectorLabels" . }}
+{{- define "ontopic-server.labels" -}}
+helm.sh/chart: {{ include "ontopic-server.chart" . }}
+{{ include "ontopic-server.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,29 +45,29 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "ontop-endpoint.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "ontop-endpoint.name" . }}
+{{- define "ontopic-server.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "ontopic-server.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "ontop-endpoint.serviceAccountName" -}}
+{{- define "ontopic-server.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "ontop-endpoint.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "ontopic-server.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
-{{- define "ontop-endpoint.env" -}}
+{{- define "ontopic-server.env" -}}
 {{- range $name, $value := . }}
     {{upper $name}}: {{$value | quote}}
 {{- end }}
 {{- end }}
 
-{{- define "ontop-endpoint.env-deploy" -}}
+{{- define "ontopic-server.env-deploy" -}}
 {{ $cm := .Values.envConfigMapName }}
 {{- range $name, $value := .Values.env }}
 - name: {{upper $name}}

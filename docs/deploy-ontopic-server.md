@@ -1,4 +1,4 @@
-# Deploy Ontop Endpoint
+# Deploy Ontopic Server
 
 ## Requirements
 
@@ -26,28 +26,28 @@ Make sure to replace `<your-namespace>` with the name of the namespace you want 
 
 ## Getting started
 
-If you want to use the Ontop Endpoint in a standalone way, you can directly use the dedicated Helm chart.
+If you want to use the Ontopic Server in a standalone way, you can directly use the dedicated Helm chart.
 
-In case you want to use the Ontop Endpoint with Ontopic Studio, you can follow the instructions in the [Ontopic Studio documentation](./deploy-ontopic-studio.md).
+In case you want to use the Ontopic Server with Ontopic Studio, you can follow the instructions in the [Ontopic Studio documentation](./deploy-ontopic-studio.md).
 
 ### Standalone
 
-To install the `ontop-endpoint` chart without extra configuration:
+To install the `ontopic-server` chart without extra configuration:
 
 ```sh
-helm install ontop-endpoint ontopic/ontop-endpoint
+helm install ontopic-server ontopic/ontopic-server
 ```
 
-To install the `ontop-endpoint` chart with the configuration `values-server.yaml` for materialization:
+To install the `ontopic-server` chart with the configuration `values-server.yaml` for materialization:
 
 ```sh
-helm install -f values-server.yaml ontop-endpoint ontopic/ontop-endpoint
+helm install -f values-server.yaml ontopic-server ontopic/ontopic-server
 ```
 
 To uninstall the chart:
 
 ```sh
-helm delete ontop-endpoint
+helm delete ontopic-server
 ```
 
 ### Custom JDBC drivers (optional)
@@ -71,7 +71,7 @@ kubectl create secret generic jdbc-external-repo \
   --from-file=private_key=./my-private-key
 ```
 
-Create or add to the values file `values-server.yaml` that will be used by the `ontop-endpoint` chart:
+Create or add to the values file `values-server.yaml` that will be used by the `ontopic-server` chart:
 
 ```sh
 env:
@@ -143,7 +143,7 @@ kubectl create secret generic s3-secret \
   --from-file=s3-secret=./secrets/access-key-secret
 ```
 
-Create a new values file `values-server.yaml` with the s3 configuration that will be used by the `ontop-endpoint` chart:
+Create a new values file `values-server.yaml` with the s3 configuration that will be used by the `ontopic-server` chart:
 
 ```yaml
 env:
@@ -157,6 +157,6 @@ env:
 
 ### With Ontopic Studio
 
-If you want to use the Ontop Endpoint with Ontopic Studio, you can follow the instructions in the [Ontopic Studio documentation](./deploy-ontopic-studio.md).
+If you want to use the Ontopic Server with Ontopic Studio, you can follow the instructions in the [Ontopic Studio documentation](./deploy-ontopic-studio.md).
 
-The Ontop Endpoint is already included in the Ontopic Studio Helm chart, as a subchart.
+The Ontopic Server is already included in the Ontopic Studio Helm chart, as a subchart.

@@ -24,10 +24,10 @@ version: 0.1.3
 appVersion: "v2026.1.0"
 
 dependencies:
-  - name: ontop-endpoint
+  - name: ontopic-server
     version: 0.1.3
-    repository: "file://../ontop-endpoint" # "https://ontopic-vkg.github.io/ontopic-helm/"
-    condition: ontop-endpoint.enabled
+    repository: "file://../ontopic-server" # "https://ontopic-vkg.github.io/ontopic-helm/"
+    condition: ontopic-server.enabled
   - name: postgresql
     version: 18.2.0
     repository: "oci://registry-1.docker.io/bitnamicharts"

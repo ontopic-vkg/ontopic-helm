@@ -166,11 +166,11 @@ store-server:
     enable_materialization: true
 ```
 
-Follow the instructions in the [Ontop Endpoint documentation](./deploy-ontop-endpoint.md) to configure the S3 parameters, but instead of creating a `values-server.yaml` file, you can add the configuration directly to the `values.yaml` file, under the `ontop-endpoint` section, like this:
+Follow the instructions in the [Ontopic Server documentation](./deploy-ontopic-server.md) to configure the S3 parameters, but instead of creating a `values-server.yaml` file, you can add the configuration directly to the `values.yaml` file, under the `ontopic-server` section, like this:
 
 ```yaml
-# If you use the Ontop Endpoint subchart
-ontop-endpoint:
+# If you use the Ontopic Server subchart
+ontopic-server:
   env:
     ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
     ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-id/access-key-id
@@ -227,8 +227,8 @@ process-server:
     # ...
     jdbc-external-repo: /run/secrets/jdbc-external-repo
 
-# If you use the Ontop Endpoint subchart
-ontop-endpoint:
+# If you use the Ontopic Server subchart
+ontopic-server:
   env:
     JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
     JDBC_EXTERNAL_REPO_FOLDER: my-folder
