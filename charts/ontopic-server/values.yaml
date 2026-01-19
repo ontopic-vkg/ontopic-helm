@@ -83,7 +83,7 @@ tolerations: []
 
 affinity: {}
 
-envConfigMapName: ontop-endpoint-config
+envConfigMapName: ontopic-server-config
 
 env:
   ONTOPIC_SERVER_CORS_ALLOWED_ORIGINS: "*"
