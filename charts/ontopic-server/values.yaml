@@ -132,7 +132,7 @@ endpoint:
     existingClaim: ""
     ## @param endpoint.persistence.mountPath The path the volume will be mounted at
     ##
-    mountPath: /opt/ontop/endpoint
+    mountPath: /opt/ontopic-server/endpoint
     ## @param endpoint.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##
@@ -181,7 +181,7 @@ materializationDb:
     existingClaim: ""
     ## @param materializationDb.persistence.mountPath The path the volume will be mounted at
     ##
-    mountPath: /opt/ontop/db
+    mountPath: /opt/ontopic-server/db
     ## @param materializationDb.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##
@@ -230,7 +230,7 @@ materializationConfiguration:
     existingClaim: ""
     ## @param materializationConfiguration.persistence.mountPath The path the volume will be mounted at
     ##
-    mountPath: /opt/ontop/materialization-configuration
+    mountPath: /opt/ontopic-server/materialization-configuration
     ## @param materializationConfiguration.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##
@@ -279,7 +279,7 @@ materializationResult:
     existingClaim: ""
     ## @param materializationConfiguration.persistence.mountPath The path the volume will be mounted at
     ##
-    mountPath: /opt/ontop/materialization-result
+    mountPath: /opt/ontopic-server/materialization-result
     ## @param materializationConfiguration.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##
