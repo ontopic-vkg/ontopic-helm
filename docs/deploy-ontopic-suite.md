@@ -106,8 +106,8 @@ But since the chart is not deployed, you don't have to run this command, as the 
 
 ### Use Azure as identity service provider (optional)
 
-Use or create a registered app from the Azure Active Directory (Microsoft Entra ID).
-Follow the instruction on [how to register Ontopic Suite in Azure Active Directory](https://docs.ontopic.ai/studio/administrate/access-control/azure.html#register-ontopic-suite).
+Use or create a registered app from Microsoft Entra (Azure Active Directory).
+Follow the instruction on [how to register Ontopic Suite in Microsoft Entra](https://docs.ontopic.ai/suite/administrate/access-control/azure.html#register-ontopic-suite).
 
 You will need the _Application (client) ID_, the _Directory (tenant) ID_, the _client secret_, and the _Application ID URI_ of the registered app.
 
