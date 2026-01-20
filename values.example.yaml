@@ -24,7 +24,7 @@ store-server:
 
 web:
   env:
-    ONTOP_ENDPOINT_SERVICE_HOST: ontopic-server.ontopic.svc.cluster.local
+    ONTOPIC_SERVER_SERVICE_HOST: ontopic-server.ontopic.svc.cluster.local
     # virtual_host: ontopic.local
 
 # Create users
