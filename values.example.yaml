@@ -2,7 +2,7 @@ ingress:
   # className: ""
   # host: ontopic.local
   tls: false
-  # secretName: ontopic-studio-tls
+  # secretName: ontopic-suite-tls
   # annotations: {}
 
 process-server:
@@ -18,13 +18,13 @@ store-server:
     casbin_store_host: store-server-db-postgresql.ontopic.svc.cluster.local
     casbin_store_port: 5432
     casbin_store_user: postgres
-    ontopic_server_host: http://ontop-endpoint.ontopic.svc.cluster.local:8080
+    ontopic_server_host: http://ontopic-server.ontopic.svc.cluster.local:8080
   secrets:
     database-password-file: /run/secrets/database-password-file
 
 web:
   env:
-    ONTOP_ENDPOINT_SERVICE_HOST: ontop-endpoint.ontopic.svc.cluster.local
+    ONTOP_ENDPOINT_SERVICE_HOST: ontopic-server.ontopic.svc.cluster.local
     # virtual_host: ontopic.local
 
 # Create users
@@ -51,14 +51,14 @@ users:
 postgresql:
   # -- enable the PostgreSQL chart
   enabled: true
-  # -- enable creation of the secret for Ontopic Studio
+  # -- enable creation of the secret for Ontopic Suite
   enableSecretCreation: true
   # -- enable creation of the "internal" database
   enableDatabaseCreation: true
   # -- enable demo data
   enableDemoData: false
 
-# Configure the Ontop Endpoint subchart
-ontop-endpoint:
-  # -- enable the Ontop Endpoint chart
+# Configure the Ontopic Server subchart
+ontopic-server:
+  # -- enable the Ontopic Server chart
   enabled: true

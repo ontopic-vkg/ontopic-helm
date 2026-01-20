@@ -1,4 +1,4 @@
-# Default values for ontop-endpoint.
+# Default values for ontopic-server.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 # registry: ghcr.io/ontopic-vkg/ontopic-helm
@@ -83,7 +83,7 @@ tolerations: []
 
 affinity: {}
 
-envConfigMapName: ontop-endpoint-config
+envConfigMapName: ontopic-server-config
 
 env:
   ONTOPIC_SERVER_CORS_ALLOWED_ORIGINS: "*"
@@ -100,7 +100,7 @@ env:
   ONTOPIC_SERVER_JDBC_ROOT_DIR: /opt/ontopic-server/jdbc
   ONTOPIC_SERVER_WEB_API_PORT: 8080
   ONTOPIC_SERVER_POSTGRES_PORT: 4300
-  # ONTOPIC_SERVER_IDENTITY_SERVICE_URL: http://ontopic-studio-web:8080/
+  # ONTOPIC_SERVER_IDENTITY_SERVICE_URL: http://ontopic-suite-web:8080/
   ONTOPIC_SERVER_DISABLE_TLS: false
 
 secrets:
@@ -132,7 +132,7 @@ endpoint:
     existingClaim: ""
     ## @param endpoint.persistence.mountPath The path the volume will be mounted at
     ##
-    mountPath: /opt/ontop/endpoint
+    mountPath: /opt/ontopic-server/endpoint
     ## @param endpoint.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##
@@ -181,7 +181,7 @@ materializationDb:
     existingClaim: ""
     ## @param materializationDb.persistence.mountPath The path the volume will be mounted at
     ##
-    mountPath: /opt/ontop/db
+    mountPath: /opt/ontopic-server/db
     ## @param materializationDb.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##
@@ -230,7 +230,7 @@ materializationConfiguration:
     existingClaim: ""
     ## @param materializationConfiguration.persistence.mountPath The path the volume will be mounted at
     ##
-    mountPath: /opt/ontop/materialization-configuration
+    mountPath: /opt/ontopic-server/materialization-configuration
     ## @param materializationConfiguration.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##
@@ -279,7 +279,7 @@ materializationResult:
     existingClaim: ""
     ## @param materializationConfiguration.persistence.mountPath The path the volume will be mounted at
     ##
-    mountPath: /opt/ontop/materialization-result
+    mountPath: /opt/ontopic-server/materialization-result
     ## @param materializationConfiguration.persistence.subPath The subdirectory of the volume to mount to
     ## Useful in dev environments and one PV for multiple services
     ##

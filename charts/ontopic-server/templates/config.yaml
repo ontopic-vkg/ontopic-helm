@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
     name: {{.Values.envConfigMapName}}
 data:
-{{- include "ontop-endpoint.env" .Values.env }}
+{{- include "ontopic-server.env" .Values.env }}
 ---
 apiVersion: v1
 kind: Secret

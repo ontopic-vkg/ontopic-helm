@@ -1,5 +1,5 @@
 apiVersion: v2
-name: ontop-endpoint
+name: ontopic-suite
 description: A Helm chart for Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
@@ -22,3 +22,13 @@ version: 0.1.3
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "v2026.1.0"
+
+dependencies:
+  - name: ontopic-server
+    version: 0.1.3
+    repository: "file://../ontopic-server" # "https://ontopic-vkg.github.io/ontopic-helm/"
+    condition: ontopic-server.enabled
+  - name: postgresql
+    version: 18.2.0
+    repository: "oci://registry-1.docker.io/bitnamicharts"
+    condition: postgresql.enabled
