@@ -19,7 +19,7 @@ metadata:
     helm.sh/hook-weight: "-2"
 rules:
   - apiGroups: [""]
-    resourceNames: ["password-file-db"]
+    resourceNames: ["password-file-db", "password-db-users"]
     resources: ["secrets"]
     verbs: ["delete"]
 ---
@@ -94,13 +94,16 @@ spec:
         - "sh"
         - "-c"
         - >-
-            NAME="password-db-users";
-            FILE="/mnt/secret/${NAME}";
-            echo {{ printf "{\"users\": %s}" (.Values.users.list | toJson) | quote }} > "${FILE}";
-            if [ -f "${FILE}" ]; then
-              kubectl delete secret "${NAME}";
-              kubectl create secret generic "${NAME}" --from-file=users=${FILE};
-            fi;
+            NAME="password-db-users"
+            FILE="/mnt/secret/${NAME}"
+            printf '%s' {{- printf "{\"users\": %s}" (.Values.users.list | toJson) | toJson }} > "$FILE"
+            if [ -f "$FILE" ]; then
+              kubectl delete secret "$NAME" --ignore-not-found
+              kubectl create secret generic "$NAME" --from-file=users="$FILE"
+            else
+              echo "Error: File $FILE was not created"
+              exit 1
+            fi
             exit 0
         volumeMounts:
         - name: secret
@@ -168,7 +171,7 @@ spec:
             FILE="/mnt/secret/password-file-db";
             NAME="password-file-db";
             if [ -f "$FILE" ]; then
-              kubectl delete secret $NAME;
+              kubectl delete secret $NAME --ignore-not-found;
               kubectl create secret generic $NAME --from-file=$NAME=$FILE;
             fi;
             exit 0
