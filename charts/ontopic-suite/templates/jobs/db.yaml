@@ -68,6 +68,11 @@ spec:
         - "sh"
         - "-c"
         - |
+            set -e
+            if kubectl get secret database-password-file >/dev/null 2>&1; then
+              echo "Secret 'database-password-file' already exists, skipping creation."
+              exit 0
+            fi
             sleep 10
             kubectl create secret generic database-password-file \
               --from-literal=database-password-file="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)" \
@@ -79,15 +84,39 @@ spec:
         - "sh"
         - "-c"
         - |
+            set -e
+            echo "Waiting for database-password-file secret..."
+            until kubectl get secret database-password-file >/dev/null 2>&1; do
+              echo "Secret not ready yet, waiting..."
+              sleep 2
+            done
+            POSTGRES_PASSWORD=$(kubectl get secret database-password-file -o jsonpath="{.data.database-password-file}" | base64 -d)
+            echo "Secret is ready!"
+
+            echo "Waiting for PostgreSQL to be ready..."
+            until kubectl exec store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'pg_isready -U postgres' 2>/dev/null; do
+              echo "PostgreSQL is not ready yet, waiting..."
+              sleep 2
+            done
+            echo "PostgreSQL is ready!"
+
+            # In case of reboot
             sleep 20
 
-            # Create database (can fail if it already exists)
+            # Check if database already exists
+            DB_EXISTS=$(echo "SELECT 1 FROM pg_database WHERE datname = 'internal';" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c "PGPASSWORD=$POSTGRES_PASSWORD psql -t" | xargs)
+            if [ "$DB_EXISTS" = "1" ]; then
+              echo "Database 'internal' already exists, skipping creation."
+              exit 0
+            fi
+
+            # Create database
             echo "Create database"
-            echo "create database internal;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql' || true
+            echo "create database internal;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c "PGPASSWORD=$POSTGRES_PASSWORD psql"
 
             # Grant privileges to the database
             echo "Grant privileges to the database"
-            echo "grant all privileges on database internal to postgres;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql'
-            echo "alter database internal OWNER TO postgres;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c 'PGPASSWORD=$POSTGRES_PASSWORD psql'
+            echo "grant all privileges on database internal to postgres;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c "PGPASSWORD=$POSTGRES_PASSWORD psql"
+            echo "alter database internal OWNER TO postgres;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c "PGPASSWORD=$POSTGRES_PASSWORD psql"
       {{- end }}
 {{- end }}
