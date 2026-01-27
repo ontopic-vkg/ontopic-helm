@@ -268,7 +268,7 @@ services:
       casbin_store_port: 5432
       casbin_store_user: postgres
       casbin_store_password_file: /run/secrets/database-password-file/database-password-file
-      ontopic_server_service_host: http://ontopic-suite-ontopic-server.ontopic.svc.cluster.local:8080
+      ontopic_server_host: ontopic-suite-ontopic-server.ontopic.svc.cluster.local
       identity_service_name: localhost
       identity_service_port: 8080
       ontopic_restore_projects_db: false
