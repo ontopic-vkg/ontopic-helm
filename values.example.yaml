@@ -40,12 +40,16 @@ users:
       groups:
         - developers
         - admin
+      roles:
+        - ots-admin
     - username: test
       password: "$apr1$C."
       email: test@email.it
       fullname: Test
       groups:
         - developers
+      roles:
+        - ots-project-creator
 
 # Configure the PostgreSQL subchart
 postgresql:

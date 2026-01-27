@@ -4,19 +4,25 @@
       "username": "admin",
       "password": "$aprBe1/",
       "email": "test@email.it",
-      "fullname": "test",
+      "fullname": "Admin",
       "groups": [
         "developers",
         "admin"
+      ],
+      "roles": [
+        "ots-admin"
       ]
     },
     {
       "username": "test",
       "password": "$apr1$C.",
       "email": "test@email.it",
-      "fullname": "test",
+      "fullname": "Test",
       "groups": [
         "developers"
+      ],
+      "roles": [
+        "ots-project-creator"
       ]
     }
   ]
