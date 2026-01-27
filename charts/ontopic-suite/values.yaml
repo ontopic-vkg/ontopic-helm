@@ -277,10 +277,10 @@ services:
       process_service_port: 8666
       enable_git_repo: false
       ontopic_sample_db: false
-      ontopic_sample_db_url: ""
-      ontopic_sample_db_username: ""
-      ontopic_sample_db_password: ""
-      ontopic_sample_db_driver: ""
+      ontopic_sample_db_url: jdbc:postgresql://ontopic-suite-demo-db.ontopic.svc.cluster.local/postgres
+      ontopic_sample_db_username: postgres
+      ontopic_sample_db_password: postgres2
+      ontopic_sample_db_driver: org.postgresql.Driver
       ontopic_enable_authentication: true
       enable_materialization: false
       db_client: pg
