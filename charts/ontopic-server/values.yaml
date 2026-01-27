@@ -2,8 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 # registry: ghcr.io/ontopic-vkg/ontopic-helm
-registry: registry.gitlab.com/ontopic/ontopic-suite/helm
-
+registry: ghcr.io/ontopic-vkg/ontopic-helm
 replicaCount: 1
 
 image:
@@ -12,7 +11,7 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "helm-v2026.1.0"
 
-imagePullSecrets: [{ "name": "regcred" }]
+#imagePullSecrets: [{ "name": "regcred" }]
 nameOverride: ""
 fullnameOverride: ""
 
@@ -57,6 +56,19 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+livenessProbe:
+  httpGet:
+    path: /healthcheck
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /healthcheck
+    port: http
+  initialDelaySeconds: 75
+  periodSeconds: 20
+  failureThreshold: 5
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -106,7 +118,7 @@ env:
 secrets:
   access-key-id: /run/secrets/s3-access-key-id
   access-key-secret: /run/secrets/s3-access-key-secret
-  user-license: /run/secrets/user-license
+  user-license-file: /run/secrets/user-license
 
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment

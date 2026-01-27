@@ -268,7 +268,7 @@ services:
       casbin_store_port: 5432
       casbin_store_user: postgres
       casbin_store_password_file: /run/secrets/database-password-file/database-password-file
-      ontopic_server_host: http://ontop-endpoint.ontopic.svc.cluster.local:8080
+      ontopic_server_host: ontopic-suite-ontopic-server.ontopic.svc.cluster.local
       identity_service_name: localhost
       identity_service_port: 8080
       ontopic_restore_projects_db: false
@@ -277,10 +277,10 @@ services:
       process_service_port: 8666
       enable_git_repo: false
       ontopic_sample_db: false
-      ontopic_sample_db_url: ""
-      ontopic_sample_db_username: ""
-      ontopic_sample_db_password: ""
-      ontopic_sample_db_driver: ""
+      ontopic_sample_db_url: jdbc:postgresql://ontopic-suite-demo-db.ontopic.svc.cluster.local/postgres
+      ontopic_sample_db_username: postgres
+      ontopic_sample_db_password: postgres2
+      ontopic_sample_db_driver: org.postgresql.Driver
       ontopic_enable_authentication: true
       enable_materialization: false
       db_client: pg
@@ -366,8 +366,8 @@ services:
       STORE_SERVER_SERVICE_HOST: localhost
       STORE_SERVER_API_SERVICE_PORT: 3000
       STORE_SERVER_DOC_SERVICE_PORT: 3001
-      ONTOP_ENDPOINT_SERVICE_HOST: ontop-endpoint.ontopic.svc.cluster.local
-      ONTOP_ENDPOINT_SERVICE_PORT: 8080
+      ONTOPIC_SERVER_SERVICE_HOST: ontopic-suite-ontopic-server.ontopic.svc.cluster.local
+      ONTOPIC_SERVER_SERVICE_PORT: 8080
       # GIT_MIRROR_SERVICE_HOST: localhost
       # GIT_MIRROR_SERVICE_PORT: 80
 
@@ -404,9 +404,9 @@ postgresql:
   # -- fullnameOverride is used to override the name of the subchart
   fullnameOverride: "store-server-db-postgresql"
 
-# Configure the Ontop Endpoint subchart
-ontop-endpoint:
-  # -- enable the Ontop Endpoint chart
+# Configure the Ontopic Server subchart
+ontopic-server:
+  # -- enable the Ontopic Server chart
   enabled: true
   # -- fullnameOverride is used to override the name of the subchart
-  fullnameOverride: "ontop-endpoint"
+  #fullnameOverride: "ontopic-server"
