@@ -61,14 +61,15 @@ livenessProbe:
   httpGet:
     path: /healthcheck
     port: http
+  initialDelaySeconds: 75
+  periodSeconds: 5
 
 readinessProbe:
   httpGet:
     path: /healthcheck
     port: http
   initialDelaySeconds: 75
-  periodSeconds: 20
-  failureThreshold: 5
+  periodSeconds: 5
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
