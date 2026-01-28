@@ -284,6 +284,7 @@ services:
       ontopic_sample_db_driver: org.postgresql.Driver
       ontopic_enable_authentication: true
       enable_materialization: false
+      enable_semantic_sql: true
       db_client: pg
 
     volumes:
