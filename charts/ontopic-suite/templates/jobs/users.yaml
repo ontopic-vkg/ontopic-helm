@@ -96,7 +96,7 @@ spec:
         - |
             NAME="password-db-users";
             FILE="/mnt/secret/${NAME}";
-            printf '%s' {{- printf "{\"users\": %s}" (.Values.users.list | toJson) | toJson }} > "$FILE";
+            printf '%s' '{{ dict "users" .Values.users.list | toJson | b64enc }}' | base64 -d > "$FILE";
             if [ -f "$FILE" ]; then
               kubectl delete secret "$NAME" --ignore-not-found;
               kubectl create secret generic "$NAME" --from-file=users="$FILE";
