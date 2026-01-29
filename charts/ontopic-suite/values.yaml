@@ -268,7 +268,7 @@ services:
       casbin_store_port: 5432
       casbin_store_user: postgres
       casbin_store_password_file: /run/secrets/database-password-file/database-password-file
-      ontopic_server_host: ontopic-suite-ontopic-server
+      ontopic_server_host: ontopic-server
       ontopic_server_web_api_port: 8080
       identity_service_name: localhost
       identity_service_port: 8080
@@ -368,7 +368,7 @@ services:
       STORE_SERVER_SERVICE_HOST: localhost
       STORE_SERVER_API_SERVICE_PORT: 3000
       STORE_SERVER_DOC_SERVICE_PORT: 3001
-      ONTOPIC_SERVER_SERVICE_HOST: ontopic-suite-ontopic-server
+      ONTOPIC_SERVER_SERVICE_HOST: ontopic-server
       ONTOPIC_SERVER_SERVICE_PORT: 8080
       # GIT_MIRROR_SERVICE_HOST: localhost
       # GIT_MIRROR_SERVICE_PORT: 80
@@ -415,4 +415,4 @@ ontopic-server:
   # -- enable the Ontopic Server chart
   enabled: true
   # -- fullnameOverride is used to override the name of the subchart
-  #fullnameOverride: "ontopic-server"
+  fullnameOverride: "ontopic-server"
