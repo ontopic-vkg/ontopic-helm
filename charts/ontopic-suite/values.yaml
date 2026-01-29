@@ -2,8 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
-  # registry: ghcr.io/ontopic-vkg/ontopic-helm
-  registry: registry.gitlab.com/ontopic/ontopic-suite/helm
+  registry: ghcr.io/ontopic-vkg/ontopic-helm
+  #registry: registry.gitlab.com/ontopic/ontopic-suite/helm
 
 replicaCount: 1
 
