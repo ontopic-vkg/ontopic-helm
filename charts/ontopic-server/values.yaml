@@ -104,6 +104,9 @@ env:
   ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/access-key-secret
   ONTOPIC_SERVER_S3_BUCKET:
   ONTOPIC_SERVER_S3_REGION: eu-central-1
+  ONTOPIC_SERVER_AZURE_ACCOUNT_NAME: /run/secrets/azure-account-name/account-name
+  ONTOPIC_SERVER_AZURE_ACCOUNT_KEY: /run/secrets/azure-account-key/account-key
+  ONTOPIC_SERVER_AZURE_CONTAINER_NAME:
   ONTOPIC_SERVER_MATERIALIZATION_CONFIGURATION_DIR: materialization-configuration
   ONTOPIC_SERVER_MATERIALIZATION_RESULT_DIR: materialization-result
   ONTOPIC_SERVER_LOG_LEVEL: INFO
@@ -119,6 +122,9 @@ secrets:
   access-key-id: /run/secrets/s3-access-key-id
   access-key-secret: /run/secrets/s3-access-key-secret
   user-license-file: /run/secrets/user-license
+  account-name: /run/secrets/azure-account-name
+  account-key: /run/secrets/azure-account-key
+  account-sas-token: /run/secrets/azure-account-sas-token
 
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment

@@ -20,3 +20,28 @@ metadata:
 type: Opaque
 data:
 {{ (.Files.Glob "s3/access-key-secret").AsSecrets | indent 4 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: account-key
+type: Opaque
+data:
+{{ (.Files.Glob "azure/account-key").AsSecrets | indent 4 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: account-name
+type: Opaque
+data:
+{{ (.Files.Glob "azure/account-name").AsSecrets | indent 4 }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: account-sas-token
+type: Opaque
+data:
+{{ (.Files.Glob "azure/account-sas-token").AsSecrets | indent 4 }}
+---
