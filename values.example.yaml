@@ -11,20 +11,20 @@ process-server:
 
 store-server:
   env:
-    database_host: store-server-db-postgresql.ontopic.svc.cluster.local
+    database_host: store-server-db-postgresql
     database_port: 5432
     database_name: internal
     database_user: postgres
-    casbin_store_host: store-server-db-postgresql.ontopic.svc.cluster.local
+    casbin_store_host: store-server-db-postgresql
     casbin_store_port: 5432
     casbin_store_user: postgres
-    ontopic_server_host: http://ontopic-server.ontopic.svc.cluster.local:8080
+    ontopic_server_host: http://ontopic-server:8080
   secrets:
     database-password-file: /run/secrets/database-password-file
 
 web:
   env:
-    ONTOPIC_SERVER_SERVICE_HOST: ontopic-server.ontopic.svc.cluster.local
+    ONTOPIC_SERVER_SERVICE_HOST: ontopic-server
     VIRTUAL_HOST: ontopic.local  # Must match ingress.host
 
 # Create users
