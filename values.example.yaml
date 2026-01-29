@@ -1,6 +1,6 @@
 ingress:
   # className: ""
-  # host: ontopic.local
+  host: ontopic.local  # Set your domain here (must match web.env.virtual_host)
   tls: false
   # secretName: ontopic-suite-tls
   # annotations: {}
@@ -25,7 +25,7 @@ store-server:
 web:
   env:
     ONTOPIC_SERVER_SERVICE_HOST: ontopic-server.ontopic.svc.cluster.local
-    # virtual_host: ontopic.local
+    VIRTUAL_HOST: ontopic.local  # Must match ingress.host
 
 # Create users
 users:

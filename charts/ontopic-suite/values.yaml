@@ -15,7 +15,7 @@ image:
 
 ingress:
   # className: ""
-  # host: ontopic.local
+  host: ontopic.local  # Set your domain here (must match services.web.env.virtual_host)
   tls: false
   # secretName: ontopic-studio-tls
   # annotations: {}
@@ -348,7 +348,7 @@ services:
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       hosts:
-        - host: ontopic.local
+        - host: ontopic.local  # Must match ingress.host
           paths:
             - path: /
               pathType: Prefix
@@ -357,8 +357,8 @@ services:
     envConfigMapName: web-config
 
     env:
-      virtual_host: ontopic.local
-      virtual_port: 8083
+      VIRTUAL_HOST: ontopic.local  # Must match ingress.host
+      VIRTUAL_PORT: 8083
       ANGULAR_FRONTEND_SERVICE_HOST: localhost
       ANGULAR_FRONTEND_SERVICE_PORT: 4200
       IDENTITY_SERVICE_HOST: localhost
