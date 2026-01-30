@@ -38,8 +38,8 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  fsGroup: 1000
 
 securityContext: {}
   # capabilities:
@@ -247,10 +247,12 @@ services:
     init:
       - name: init-permissions
         image: busybox
-        command: ["sh", "-c", "chown 1000:1000 /app/docs"]
+        command: ["sh", "-c", "chown 1000:1000 /app/docs && chown 1000:1000 /app/repos"]
         volumeMounts:
           - mountPath: /app/docs
             name: docs-dir
+          - mountPath: /app/repos
+            name: repos-dir
 
     envConfigMapName: store-server-config
 
