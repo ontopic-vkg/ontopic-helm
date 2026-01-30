@@ -100,12 +100,13 @@ envConfigMapName: ontopic-server-config
 env:
   ONTOPIC_SERVER_CORS_ALLOWED_ORIGINS: "*"
   ONTOPIC_SERVER_ENABLE_MATERIALIZATION: false
-  ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-access-key-id/access-key-id
-  ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/access-key-secret
+  ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/access-key-id/access-key-id
+  ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/access-key-secret/access-key-secret
   ONTOPIC_SERVER_S3_BUCKET:
   ONTOPIC_SERVER_S3_REGION: eu-central-1
-  ONTOPIC_SERVER_AZURE_ACCOUNT_NAME: /run/secrets/azure-account-name/account-name
-  ONTOPIC_SERVER_AZURE_ACCOUNT_KEY: /run/secrets/azure-account-key/account-key
+  ONTOPIC_SERVER_AZURE_ACCOUNT_NAME: /run/secrets/account-name/account-name
+  ONTOPIC_SERVER_AZURE_ACCOUNT_KEY: /run/secrets/account-key/account-key
+  ONTOPIC_SERVER_AZURE_SAS_TOKEN: /run/secrets/sas-token/sas-token
   ONTOPIC_SERVER_AZURE_CONTAINER_NAME:
   ONTOPIC_SERVER_MATERIALIZATION_CONFIGURATION_DIR: materialization-configuration
   ONTOPIC_SERVER_MATERIALIZATION_RESULT_DIR: materialization-result
@@ -119,12 +120,29 @@ env:
   ONTOPIC_SERVER_DISABLE_TLS: false
 
 secrets:
-  access-key-id: /run/secrets/s3-access-key-id
-  access-key-secret: /run/secrets/s3-access-key-secret
-  user-license-file: /run/secrets/user-license
-  account-name: /run/secrets/azure-account-name
-  account-key: /run/secrets/azure-account-key
-  account-sas-token: /run/secrets/azure-account-sas-token
+  common:
+    user-license-file:
+      path: /run/secrets/user-license
+      optional: false
+  s3:
+    access-key-id:
+      path: /run/secrets/access-key-id
+      optional: false
+    access-key-secret:
+      path: /run/secrets/access-key-secret
+      optional: false
+  azure:
+    account-name:
+      path: /run/secrets/account-name
+      optional: false
+    account-key:
+      path: /run/secrets/account-key
+      optional: true
+    sas-token:
+      path: /run/secrets/sas-token
+      optional: true   # Either account-key OR sas-token required
+
+storageProvider: s3 # Options: s3, azure, none
 
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment
