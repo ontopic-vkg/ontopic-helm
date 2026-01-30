@@ -412,6 +412,21 @@ postgresql:
   # -- fullnameOverride is used to override the name of the subchart
   fullnameOverride: "store-server-db-postgresql"
 
+# Configure Let's Encrypt ClusterIssuer for cert-manager
+clusterIssuer:
+  # -- enable creation of the ClusterIssuer
+  enabled: false
+  # -- name of the ClusterIssuer
+  name: letsencrypt-prod
+  # -- ACME server URL (use https://acme-staging-v02.api.letsencrypt.org/directory for staging)
+  server: https://acme-v02.api.letsencrypt.org/directory
+  # -- email address for ACME registration
+  email: ""
+  # -- name of the secret to store the private key
+  privateKeySecretRef: letsencrypt-prod
+  # -- ingress class for HTTP01 solver
+  ingressClass: ""
+
 # Configure the Ontopic Server subchart
 ontopic-server:
   # -- enable the Ontopic Server chart

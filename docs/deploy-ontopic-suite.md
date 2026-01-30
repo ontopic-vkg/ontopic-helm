@@ -193,6 +193,76 @@ ingress:
   host: ontopic.local
 ```
 
+## Enable TLS with Let's Encrypt (optional)
+
+To enable HTTPS with automatic certificate management using Let's Encrypt, you need to install cert-manager and configure the ClusterIssuer.
+
+### Install cert-manager
+
+cert-manager is a Kubernetes add-on that automates the management and issuance of TLS certificates.
+
+Add the Jetstack Helm repository:
+
+```sh
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+```
+
+Install cert-manager with CRDs:
+
+```sh
+helm install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --set crds.enabled=true
+```
+
+Verify the installation:
+
+```sh
+kubectl get pods -n cert-manager
+```
+
+All pods should be in the `Running` state.
+
+### Configure the ClusterIssuer
+
+The Ontopic Suite chart can create a Let's Encrypt ClusterIssuer for you. Enable it in your `values.yaml`:
+
+```yaml
+clusterIssuer:
+  enabled: true
+  name: letsencrypt-prod
+  email: your-email@example.com  # Required: your email for Let's Encrypt notifications
+  ingressClass: nginx            # Your ingress controller class
+```
+
+For testing, you can use the Let's Encrypt staging server to avoid rate limits:
+
+```yaml
+clusterIssuer:
+  enabled: true
+  name: letsencrypt-staging
+  server: https://acme-staging-v02.api.letsencrypt.org/directory
+  email: your-email@example.com
+  privateKeySecretRef: letsencrypt-staging
+  ingressClass: nginx
+```
+
+### Configure ingress for TLS
+
+Update your ingress configuration to use TLS:
+
+```yaml
+ingress:
+  host: ontopic.example.com
+  className: nginx
+  tls: true
+  secretName: ontopic-tls
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+```
+
 ## Custom JDBC drivers (optional)
 
 It's possible to add additional jdbc drivers by adding some env vars:
