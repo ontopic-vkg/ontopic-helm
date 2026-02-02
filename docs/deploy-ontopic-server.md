@@ -242,11 +242,9 @@ env:
 ```
 
 ### File Storage
-Ontopic Server also supports materialization to local file storage. By default, the materialization results are stored at the path `/opt/ontopic-server/materialization-result/yyyy-mm-dd/` .
+By default, Ontopic Server uses local file storage for materialization. The materialization results are stored at the path `/opt/ontopic-server/materialization-results/yyyy-mm-dd/` inside the container and can be configured to use a different directory.
 
 ```yaml
-storageProvider: fileSystem
-
 env:
   ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
   ONTOPIC_SERVER_MATERIALIZATION_RESULT_DIR: # Optional, default is materialization-results
