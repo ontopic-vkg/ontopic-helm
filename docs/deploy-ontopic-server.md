@@ -85,9 +85,12 @@ secrets:
   jdbc-external-repo: /run/secrets/jdbc-external-repo
 ```
 
-## Enable materialization with S3 (optional)
+## Enable materialization (optional)
+Ontopic Server supports materialization to RDF in different storage providers, such as S3 and Azure Blob Storage. Additionally, local storage can also be used for materialization.
 
-Ontopic Suite supports materialization to RDF using S3 as storage, but it is disabled by default.
+By default, materialization is disabled. To enable it, you need to set the environment variable `ONTOPIC_SERVER_ENABLE_MATERIALIZATION` to `true`.
+
+### S3 Storage
 
 The necessary S3 parameters are:
 
@@ -119,43 +122,136 @@ Save `S3_ACCESS_KEY_ID` in a file in the secrets folder.
 # Create folder secret if it has not already been created
 mkdir -p ./secrets
 
-# Save secret in file client-secret
-echo "<S3_ACCESS_KEY_ID>" > ./secrets/access-key-id
+# Save secret in file s3-access-key-id
+echo "<S3_ACCESS_KEY_ID>" > ./secrets/s3-access-key-id
 ```
 
 Create a secret for this file.
 
 ```sh
-kubectl create secret generic s3-id \
-  --from-file=s3-id=./secrets/access-key-id
+kubectl create secret generic s3-access-key-id \
+  --from-file=s3-access-key-id=./secrets/s3-access-key-id
 ```
 
 Save `S3_ACCESS_KEY_SECRET` in a file in the secrets folder.
 
 ```sh
-echo "<S3_ACCESS_KEY_SECRET>" > ./secrets/access-key-secret
+echo "<S3_ACCESS_KEY_SECRET>" > ./secrets/s3-access-key-secret
 ```
 
 Create a secret for this file.
 
 ```sh
-kubectl create secret generic s3-secret \
-  --from-file=s3-secret=./secrets/access-key-secret
+kubectl create secret generic s3-access-key-secret \
+  --from-file=s3-access-key-secret=./secrets/s3-access-key-secret
 ```
 
 Create a new values file `values-server.yaml` with the s3 configuration that will be used by the `ontopic-server` chart:
 
 ```yaml
+storageProvider: s3
+
 env:
   ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
-  ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-id/access-key-id
-  ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-secret/access-key-secret
+  ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-access-key-id/s3-access-key-id
+  ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/s3-access-key-secret
   ONTOPIC_SERVER_S3_BUCKET: <S3_BUCKET>
   ONTOPIC_SERVER_S3_REGION: <S3_REGION>
-  ONTOPIC_SERVER_S3_ENDPOINT_URL: <S3_ENDPOINT_URL> # Optional
+  ONTOPIC_SERVER_S3_ENDPOINT_URL: <S3_ENDPOINT_URL> # Optional, default is https://s3.amazonaws.com
 ```
 
-### With Ontopic Suite
+### Azure Blob Storage
+The necessary Azure Blob Storage parameters are:
+
+- `AZURE_ACCOUNT_NAME`
+  Obtain your Azure Storage account name from your Azure portal.
+  This name uniquely identifies your storage account.
+- `AZURE_ACCOUNT_KEY`
+  Retrieve your Azure Storage account key from your Azure portal.
+  Keep this key confidential and secure. Can be used instead of SAS token.
+- `AZURE_ACCOUNT_SAS_TOKEN`
+  Retrieve your Azure Storage account SAS token from your Azure portal.
+  Keep this token confidential and secure. Can be used instead of account key.
+- `AZURE_CONTAINER_NAME`
+  Choose a unique name for your Azure Blob Storage container.
+  Containers are used to organize blobs within your storage account.
+
+For more detailed information, refer to the [Azure Blob Storage documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/).
+
+Example:
+- `AZURE_ACCOUNT_NAME`: `mystorageaccount`
+- `AZURE_ACCOUNT_KEY`: `myAccountKey`
+- `AZURE_CONTAINER_NAME`: `my-materialization-container`
+
+Save `AZURE_ACCOUNT_NAME` in a file in the secrets folder.
+
+```sh
+# Create folder secret if it has not already been created
+mkdir -p ./secrets
+
+# Save secret in file azure-account-name
+echo "<AZURE_ACCOUNT_NAME>" > ./secrets/azure-account-name
+```
+
+Create a secret for this file.
+
+```sh
+kubectl create secret generic azure-account-name \
+  --from-file=azure-account-name=./secrets/azure-account-name
+```
+
+Save `AZURE_ACCOUNT_KEY` in a file in the secrets folder.
+
+```sh
+echo "<AZURE_ACCOUNT_KEY>" > ./secrets/azure-account-key
+```
+
+Create a secret for this file.
+
+```sh
+kubectl create secret generic azure-account-key \
+  --from-file=azure-account-key=./secrets/azure-account-key
+```
+
+Alternatively, save `AZURE_SAS_TOKEN` in a file in the secrets folder.
+
+```sh
+echo "<AZURE_SAS_TOKEN>" > ./secrets/azure-sas-token
+```
+
+Create a secret for this file.
+
+```sh
+kubectl create secret generic azure-sas-token \
+  --from-file=azure-sas-token=./secrets/azure-sas-token
+```
+
+Create a new values file `values-server.yaml` with the azure configuration that will be used by the `ontopic-server` chart:
+
+```yaml
+storageProvider: azure
+
+env:
+  ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
+  ONTOPIC_SERVER_AZURE_ACCOUNT_NAME_FILE: /run/secrets/azure-account-name/azure-account-name
+  ONTOPIC_SERVER_AZURE_ACCOUNT_KEY_FILE: /run/secrets/azure-account-key/azure-account-key
+  # Or if you use SAS token instead of account key
+  # ONTOPIC_SERVER_AZURE_ACCOUNT_SAS_TOKEN_FILE: /run/secrets/azure-sas-token/azure-sas-token
+  ONTOPIC_SERVER_AZURE_CONTAINER_NAME: <AZURE_CONTAINER_NAME>
+  ONTOPIC_SERVER_AZURE_ENDPOINT_URL_FILE: <AZURE_ENDPOINT_URL> # Optional, default is https://<ACCOUNT_NAME>.blob.core.windows.net/
+```
+
+### File Storage
+By default, Ontopic Server uses local file storage for materialization. The materialization results are stored at the path `/opt/ontopic-server/materialization-results/yyyy-mm-dd/` inside the container and can be configured to use a different directory.
+
+```yaml
+env:
+  ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
+  ONTOPIC_SERVER_MATERIALIZATION_RESULT_DIR: # Optional, default is materialization-results
+```
+
+
+## With Ontopic Suite
 
 If you want to use the Ontopic Server with Ontopic Suite, you can follow the instructions in the [Ontopic Suite documentation](./deploy-ontopic-suite.md).
 

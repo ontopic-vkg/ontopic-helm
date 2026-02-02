@@ -153,9 +153,9 @@ identity-service:
     client-secret: /run/secrets/client-secret
 ```
 
-## Enable materialization with S3 (optional)
+## Enable materialization
 
-Ontopic Suite supports materialization to RDF using S3 as storage, but it is disabled by default.
+Ontopic Server supports materialization to RDF in different storage providers, such as S3 and Azure Blob Storage. Additionally, local storage can also be used for materialization.
 
 Edit the `values.yaml` file and set `enable_materialization` to `true` in the `store-server` section:
 
@@ -166,21 +166,24 @@ store-server:
     enable_materialization: true
 ```
 
-Follow the instructions in the [Ontopic Server documentation](./deploy-ontopic-server.md) to configure the S3 parameters, but instead of creating a `values-server.yaml` file, you can add the configuration directly to the `values.yaml` file, under the `ontopic-server` section, like this:
+Follow the instructions in the [Ontopic Server documentation](./deploy-ontopic-server.md) to configure the parameters, but instead of creating a `values-server.yaml` file, you can add the configuration directly to the `values.yaml` file, under the `ontopic-server`. For example, for S3:
 
 ```yaml
-# If you use the Ontopic Server subchart
 ontopic-server:
+  enabled: true
+
+  storageProvider: s3
+
   env:
     ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
-    ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-id/access-key-id
-    ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-secret/access-key-secret
+    ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-access-key-id/s3-access-key-id
+    ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/s3-access-key-secret
     ONTOPIC_SERVER_S3_BUCKET: <S3_BUCKET>
     ONTOPIC_SERVER_S3_REGION: <S3_REGION>
-    ONTOPIC_SERVER_S3_ENDPOINT_URL: <S3_ENDPOINT_URL> # Optional
+    ONTOPIC_SERVER_S3_ENDPOINT_URL: <S3_ENDPOINT_URL> # Optional, default is https://s3.amazonaws.com
 ```
 
-### Update host name
+## Update host name
 
 Edit the `values.yaml` file with the chosen host name (replace `ontopic.local` with your domain):
 

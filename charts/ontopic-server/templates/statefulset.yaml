@@ -1,3 +1,9 @@
+{{- $activeSecrets := .Values.secrets.common | default dict -}}
+{{- if eq .Values.storageProvider "s3" }}
+  {{- $activeSecrets = merge $activeSecrets (default dict .Values.secrets.s3) -}}
+{{- else if eq .Values.storageProvider "azure" }}
+  {{- $activeSecrets = merge $activeSecrets (default dict .Values.secrets.azure) -}}
+{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -47,9 +53,9 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-          {{- range $name, $mount := .Values.secrets }}
+          {{- range $name, $config := $activeSecrets }}
             - name: "{{ $name }}-volume"
-              mountPath: {{ $mount | quote }}
+              mountPath: {{ $config.path | quote }}
           {{- end }}
             - name: {{ .Values.endpoint.persistence.volumeName }}
               mountPath: {{ .Values.endpoint.persistence.mountPath }}
@@ -84,10 +90,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-      {{- range $name, $mount := .Values.secrets }}
+      {{- range $name, $config := $activeSecrets }}
         - name: "{{$name}}-volume"
           secret:
             secretName: {{$name | quote}}
+            optional: {{ $config.optional | default false }}
       {{- end }}
   {{- if and .Values.endpoint.persistence.enabled .Values.endpoint.persistence.existingClaim }}
         - name: {{ .Values.endpoint.persistence.volumeName }}
