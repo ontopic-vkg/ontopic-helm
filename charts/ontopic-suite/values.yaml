@@ -2,8 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
-  # registry: ghcr.io/ontopic-vkg/ontopic-helm
-  registry: registry.gitlab.com/ontopic/ontopic-suite/helm
+  registry: ghcr.io/ontopic-vkg/ontopic-helm
+  #registry: registry.gitlab.com/ontopic/ontopic-suite/helm
 
 replicaCount: 1
 
@@ -15,7 +15,7 @@ image:
 
 ingress:
   # className: ""
-  # host: ontopic.local
+  host: ontopic.local  # Set your domain here (must match services.web.env.virtual_host)
   tls: false
   # secretName: ontopic-studio-tls
   # annotations: {}
@@ -38,8 +38,8 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  fsGroup: 1000
 
 securityContext: {}
   # capabilities:
@@ -247,10 +247,12 @@ services:
     init:
       - name: init-permissions
         image: busybox
-        command: ["sh", "-c", "chown 1000:1000 /app/docs"]
+        command: ["sh", "-c", "chown 1000:1000 /app/docs && chown 1000:1000 /app/repos"]
         volumeMounts:
           - mountPath: /app/docs
             name: docs-dir
+          - mountPath: /app/repos
+            name: repos-dir
 
     envConfigMapName: store-server-config
 
@@ -259,16 +261,16 @@ services:
       db_reset: "false"
       db_migrate: "true"
       db_seed: "false"
-      database_host: store-server-db-postgresql.ontopic.svc.cluster.local
+      database_host: store-server-db-postgresql
       database_port: 5432
       database_name: internal
       database_user: postgres
       database_password_file: /run/secrets/database-password-file/database-password-file
-      casbin_store_host: store-server-db-postgresql.ontopic.svc.cluster.local
+      casbin_store_host: store-server-db-postgresql
       casbin_store_port: 5432
       casbin_store_user: postgres
       casbin_store_password_file: /run/secrets/database-password-file/database-password-file
-      ontopic_server_host: ontopic-suite-ontopic-server.ontopic.svc.cluster.local
+      ontopic_server_host: ontopic-server
       ontopic_server_web_api_port: 8080
       identity_service_name: localhost
       identity_service_port: 8080
@@ -278,7 +280,7 @@ services:
       process_service_port: 8666
       enable_git_repo: false
       ontopic_sample_db: false
-      ontopic_sample_db_url: jdbc:postgresql://ontopic-suite-demo-db.ontopic.svc.cluster.local/postgres
+      ontopic_sample_db_url: jdbc:postgresql://ontopic-suite-demo-db/postgres
       ontopic_sample_db_username: postgres
       ontopic_sample_db_password: postgres2
       ontopic_sample_db_driver: org.postgresql.Driver
@@ -348,7 +350,7 @@ services:
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       hosts:
-        - host: ontopic.local
+        - host: ontopic.local  # Must match ingress.host
           paths:
             - path: /
               pathType: Prefix
@@ -357,8 +359,8 @@ services:
     envConfigMapName: web-config
 
     env:
-      virtual_host: ontopic.local
-      virtual_port: 8083
+      VIRTUAL_HOST: ontopic.local  # Must match ingress.host
+      VIRTUAL_PORT: 8083
       ANGULAR_FRONTEND_SERVICE_HOST: localhost
       ANGULAR_FRONTEND_SERVICE_PORT: 4200
       IDENTITY_SERVICE_HOST: localhost
@@ -368,7 +370,7 @@ services:
       STORE_SERVER_SERVICE_HOST: localhost
       STORE_SERVER_API_SERVICE_PORT: 3000
       STORE_SERVER_DOC_SERVICE_PORT: 3001
-      ONTOPIC_SERVER_SERVICE_HOST: ontopic-suite-ontopic-server.ontopic.svc.cluster.local
+      ONTOPIC_SERVER_SERVICE_HOST: ontopic-server
       ONTOPIC_SERVER_SERVICE_PORT: 8080
       # GIT_MIRROR_SERVICE_HOST: localhost
       # GIT_MIRROR_SERVICE_PORT: 80
@@ -410,9 +412,24 @@ postgresql:
   # -- fullnameOverride is used to override the name of the subchart
   fullnameOverride: "store-server-db-postgresql"
 
+# Configure Let's Encrypt ClusterIssuer for cert-manager
+clusterIssuer:
+  # -- enable creation of the ClusterIssuer
+  enabled: false
+  # -- name of the ClusterIssuer
+  name: letsencrypt-prod
+  # -- ACME server URL (use https://acme-staging-v02.api.letsencrypt.org/directory for staging)
+  server: https://acme-v02.api.letsencrypt.org/directory
+  # -- email address for ACME registration
+  email: ""
+  # -- name of the secret to store the private key
+  privateKeySecretRef: letsencrypt-prod
+  # -- ingress class for HTTP01 solver
+  ingressClass: ""
+
 # Configure the Ontopic Server subchart
 ontopic-server:
   # -- enable the Ontopic Server chart
   enabled: true
   # -- fullnameOverride is used to override the name of the subchart
-  #fullnameOverride: "ontopic-server"
+  fullnameOverride: "ontopic-server"
