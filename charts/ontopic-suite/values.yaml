@@ -178,7 +178,7 @@ services:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_APPLICATION:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_USER:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_PASSWORD_FILE:
-      ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE: /run/secrets/password-file-db/password-file-db
+      ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE:
       ONTOPIC_IDENTITY_SERVICE_SESSION_PROMPT:
       ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE:
       ONTOPIC_IDENTITY_SERVICE_SESSION_STORE_FILE: /etc/identity-service/data/session.db
@@ -197,12 +197,21 @@ services:
 
     secrets:
       cookie-secret: /run/secrets/cookie-secret
-      password-file-db: /run/secrets/password-file-db
 
-    # Optional secrets - only mounted if the Kubernetes secret exists
-    # These are useful for OAuth2 providers (Azure, Okta, Keycloak)
-    # The envVars are only added to the ConfigMap when the secret is defined
+    # Conditional secrets - mounted based on a values condition (for secrets created by jobs)
+    # The envVars are only added to the ConfigMap when the condition is true
+    conditionalSecrets:
+      # Password file for local user authentication (created by users job when users.enabled=true)
+      password-file-db:
+        mountPath: /run/secrets/password-file-db
+        condition: users.enabled
+        envVars:
+          ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE: /run/secrets/password-file-db/password-file-db
+
+    # Optional secrets - only mounted if the Kubernetes secret exists (uses lookup)
+    # The envVars are only added to the ConfigMap when the secret is detected
     optionalSecrets:
+      # Client secret for OAuth2 providers (Azure, Okta, Keycloak)
       client-secret:
         mountPath: /run/secrets/client-secret
         envVars:

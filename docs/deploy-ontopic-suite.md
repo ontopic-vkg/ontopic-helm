@@ -77,6 +77,8 @@ Some simple users are defined by default in this chart.
 You can see the list in the `users.list` key in the `values.yaml` file.
 To disable the creation of these users, set `users.enabled` to `false`.
 
+When `users.enabled` is `false`, no local password file is created and the identity-service will not have local user authentication. This is useful when you only want to use an OAuth2 provider (Azure, Okta, Keycloak) for authentication.
+
 In case you want to create the users yourself, here are some useful instructions (if you use the users from the chart, you can skip the rest of this section).
 
 You need to provide your users by creating a secret named `password-db-users` with a JSON representation of the users.
