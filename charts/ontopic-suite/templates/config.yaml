@@ -31,6 +31,10 @@ data:
 {{- end }}
 {{- end }}
 {{- end }}
+{{- /* Auto-enable secure cookies for identity-service when TLS is enabled */ -}}
+{{- if and (eq $name "identity-service") $.Values.ingress.tls }}
+{{- $_ := set $env "ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE" true }}
+{{- end }}
 {{- include "ontopic-suite.env" $env }}
 {{- end }}
 {{- end }}
