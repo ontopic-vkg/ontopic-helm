@@ -266,6 +266,282 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 ```
 
+## Azure Application Gateway for Containers (optional)
+
+Azure Application Gateway for Containers (AGC) is a next-generation application load balancing solution for AKS. It supports both Ingress API and Gateway API.
+
+See `values.azure-agc.yaml` in the repository root for a complete example configuration.
+
+### Prerequisites
+
+1. **ALB Controller** installed on your AKS cluster:
+   ```sh
+   # Install ALB Controller via Helm
+   helm install alb-controller oci://mcr.microsoft.com/application-lb/charts/alb-controller \
+     --namespace azure-alb-system \
+     --create-namespace \
+     --set albController.namespace=azure-alb-system
+   ```
+
+2. **Application Gateway for Containers** provisioned in Azure (can be managed by ALB Controller or pre-provisioned)
+
+3. **cert-manager** installed for TLS certificates (see [Enable TLS with Let's Encrypt](#enable-tls-with-lets-encrypt-optional))
+
+### Using Ingress API
+
+Configure your `values.yaml` to use AGC with the Ingress API:
+
+```yaml
+ingress:
+  enabled: true
+  host: ontopic.example.com
+  ingressClassName: azure-alb-external
+  annotations: {}
+    # To use a specific AGC instance:
+    # alb.networking.azure.io/alb-id: /subscriptions/<subscription-id>/resourceGroups/<rg>/providers/Microsoft.ServiceNetworking/trafficControllers/<alb-name>
+  tls:
+    - secretName: ontopic-suite-tls
+      hosts:
+        - ontopic.example.com
+```
+
+### Exposing PostgreSQL with AGC
+
+AGC does not support TCP/Layer 4 traffic, so the PostgreSQL wire protocol port (4300) must be exposed via a direct Azure LoadBalancer:
+
+```yaml
+ontopic-server:
+  service:
+    type: ClusterIP
+    port: 8080
+
+  postgresService:
+    enabled: true
+    type: LoadBalancer
+    port: 4300
+    annotations: {}
+```
+
+After deployment, get the PostgreSQL LoadBalancer IP:
+
+```sh
+kubectl get svc -l app.kubernetes.io/name=ontopic-server -o wide
+```
+
+Clients can then connect to `<loadbalancer-ip>:4300` for Semantic SQL queries.
+
+## Traefik Ingress Controller (optional)
+
+Traefik is a modern HTTP reverse proxy and load balancer that supports both Layer 7 (HTTP/HTTPS) and Layer 4 (TCP) traffic. This makes it ideal for Ontopic Suite as it can handle both the web interface and the PostgreSQL wire protocol through a single ingress controller.
+
+See `values.traefik.yaml` in the repository root for a complete example configuration.
+
+### Install Traefik
+
+Add the Traefik Helm repository:
+
+```sh
+helm repo add traefik https://traefik.github.io/charts
+helm repo update
+```
+
+#### Option 1: Install with Dynamic IP
+
+```sh
+helm install traefik traefik/traefik \
+  --namespace traefik \
+  --create-namespace \
+  --set ports.postgres.port=4300 \
+  --set ports.postgres.expose.default=true \
+  --set ports.postgres.exposedPort=4300 \
+  --set ports.postgres.protocol=TCP
+```
+
+#### Option 2: Install with Static IP (Azure)
+
+First, create a static public IP in Azure:
+
+```sh
+# Use the AKS node resource group (starts with MC_)
+RESOURCE_GROUP="MC_<your-rg>_<your-aks-cluster>_<region>"
+IP_NAME="traefik-public-ip"
+LOCATION="westeurope"
+
+# Create the static IP
+az network public-ip create \
+  --resource-group $RESOURCE_GROUP \
+  --name $IP_NAME \
+  --sku Standard \
+  --allocation-method Static \
+  --location $LOCATION
+
+# Get the IP address
+az network public-ip show \
+  --resource-group $RESOURCE_GROUP \
+  --name $IP_NAME \
+  --query ipAddress -o tsv
+```
+
+Then install Traefik with the static IP:
+
+```sh
+STATIC_IP="<your-static-ip>"
+
+helm install traefik traefik/traefik \
+  --namespace traefik \
+  --create-namespace \
+  --set service.spec.loadBalancerIP=$STATIC_IP \
+  --set ports.postgres.port=4300 \
+  --set ports.postgres.expose.default=true \
+  --set ports.postgres.exposedPort=4300 \
+  --set ports.postgres.protocol=TCP
+```
+
+This configures Traefik with:
+- Default HTTP (port 80) and HTTPS (port 443) entrypoints
+- A custom `postgres` entrypoint on port 4300 for the PostgreSQL wire protocol
+- (Optional) A static IP for stable DNS configuration
+
+Verify the installation:
+
+```sh
+kubectl get pods -n traefik
+kubectl get svc -n traefik
+```
+
+### Configure Ingress for HTTP/HTTPS
+
+Update your `values.yaml` to use Traefik:
+
+```yaml
+ingress:
+  enabled: true
+  host: ontopic.example.com
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  tls: true
+  secretName: ontopic-suite-tls
+
+clusterIssuer:
+  enabled: true
+  name: letsencrypt-prod
+  email: your-email@example.com
+  ingressClass: traefik
+```
+
+### Expose PostgreSQL with Traefik IngressRouteTCP
+
+Traefik can route TCP traffic using the `IngressRouteTCP` custom resource. First, configure the Ontopic Server PostgreSQL service as ClusterIP:
+
+```yaml
+ontopic-server:
+  service:
+    type: ClusterIP
+    port: 8080
+
+  postgresService:
+    enabled: true
+    type: ClusterIP
+    port: 4300
+```
+
+After deploying the Helm chart, create an `IngressRouteTCP` resource to expose PostgreSQL through Traefik. Save the following to `postgres-ingressroute.yaml`:
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ontopic-postgres
+spec:
+  entryPoints:
+    - postgres
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: ontopic-server-postgres
+          port: 4300
+```
+
+Apply the resource:
+
+```sh
+kubectl apply -f postgres-ingressroute.yaml
+```
+
+Get the Traefik LoadBalancer IP:
+
+```sh
+kubectl get svc traefik -n traefik -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+
+Clients can then connect to PostgreSQL at `<traefik-ip>:4300` for Semantic SQL queries.
+
+### Alternative: Direct LoadBalancer for PostgreSQL
+
+If you prefer not to use Traefik for TCP routing, you can expose PostgreSQL directly via a LoadBalancer:
+
+```yaml
+ontopic-server:
+  postgresService:
+    enabled: true
+    type: LoadBalancer
+    port: 4300
+    # Restrict access to specific IPs (recommended):
+    # loadBalancerSourceRanges:
+    #   - 10.0.0.0/8
+```
+
+## Expose PostgreSQL port via Azure Application Gateway with AGIC (optional)
+
+Ontopic Server exposes a PostgreSQL wire protocol port (default 4300) for Semantic SQL queries. If you're using the older Azure Application Gateway with AGIC (Application Gateway Ingress Controller), you can expose this port externally by configuring a TCP listener on the Application Gateway.
+
+Since AGIC only manages HTTP/HTTPS ingress resources, the TCP backend must be configured manually on the Application Gateway.
+
+### Configure Ontopic Server with Internal Load Balancer
+
+After deploying, get the assigned internal IP:
+
+```sh
+kubectl get svc ontopic-server -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+```
+
+### Configure Application Gateway TCP Backend
+
+In the Azure Portal, configure the following:
+
+1. **Backend Pool**
+   - Go to **Application Gateway** → **Backend pools** → **+ Add**
+   - Name: `postgres-backend`
+   - Target type: **IP address or FQDN**
+   - Target: The internal LoadBalancer IP (e.g., `10.224.0.6`)
+
+2. **Backend Settings**
+   - Go to **Backend settings** → **+ Add**
+   - Name: `postgres-settings`
+   - Protocol: **TCP**
+   - Port: `4300`
+
+3. **Listener**
+   - Go to **Listeners** → **+ Add**
+   - Name: `postgres-listener`
+   - Frontend IP: Select your frontend (public or private)
+   - Protocol: **TCP**
+   - Port: Select `postgres-port`
+
+4. **Routing Rule**
+   - Go to **Rules** → **+ Request routing rule**
+   - Name: `postgres-rule`
+   - Priority: `100`
+   - **Listener tab**: Select `postgres-listener`
+   - **Backend targets tab**:
+     - Target type: **Backend pool**
+     - Backend target: `postgres-backend`
+     - Backend settings: `postgres-settings`
+
+After saving, clients can connect to PostgreSQL at `<application-gateway-ip>:5432`.
+
 ## Custom JDBC drivers (optional)
 
 It's possible to add additional jdbc drivers by adding some env vars:

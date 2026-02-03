@@ -35,3 +35,11 @@ Follow the steps in the [Readme file](../README.md).
 ### Access Ontopic Suite
 
 You should be able to access Ontopic Suite at http://ontopic.local:8080
+
+### Connect via PostgreSQL wire protocol
+
+Connect using a PostgreSQL client:
+
+```sh
+psql -h ontopic.local -p 30430 -U <username> -d <database>
+```

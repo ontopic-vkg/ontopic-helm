@@ -38,8 +38,32 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  ## @param service.type Kubernetes Service type for HTTP API
   type: ClusterIP
+  ## @param service.port HTTP API port
   port: 8080
+  annotations: {}
+
+## Separate service for PostgreSQL wire protocol
+## Useful when HTTP needs to go through an ingress/gateway while PostgreSQL needs direct access
+postgresService:
+  ## @param postgresService.enabled Create a separate service for PostgreSQL port
+  enabled: true 
+  ## @param postgresService.type Kubernetes Service type for PostgreSQL
+  type: LoadBalancer
+  ## @param postgresService.port PostgreSQL wire protocol port
+  port: 4300
+  ## @param postgresService.annotations Annotations for the PostgreSQL service
+  annotations: {}
+  ## @param postgresService.loadBalancerIP Fixed LoadBalancer IP (optional)
+  # loadBalancerIP: ""
+  ## @param postgresService.loadBalancerSourceRanges Restrict LoadBalancer access to specific IPs
+  # loadBalancerSourceRanges:
+  #   - 10.0.0.0/8
+  ## @param postgresService.externalTrafficPolicy Traffic policy (Local preserves client IP)
+  # externalTrafficPolicy: Cluster
+  ## @param postgresService.nodePort NodePort when using NodePort type
+  # nodePort: 30430
 
 ingress:
   enabled: false
@@ -50,7 +74,7 @@ ingress:
   hosts:
     - host: ontopic.test
       paths:
-        - path: /ontop
+        - path: /
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls

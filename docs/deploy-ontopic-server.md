@@ -256,3 +256,58 @@ env:
 If you want to use the Ontopic Server with Ontopic Suite, you can follow the instructions in the [Ontopic Suite documentation](./deploy-ontopic-suite.md).
 
 The Ontopic Server is already included in the Ontopic Suite Helm chart, as a subchart.
+
+## PostgreSQL Wire Protocol
+
+Ontopic Server supports a PostgreSQL wire protocol on port 4300, allowing you to query your virtual knowledge graph using standard PostgreSQL clients. This port is exposed externally via NodePort (30430) by default.
+
+### Connect to the PostgreSQL wire protocol
+
+Get any node's external IP:
+
+```sh
+kubectl get nodes -o wide
+```
+
+Connect using a PostgreSQL client:
+
+```sh
+psql -h <NODE-IP> -p <NODE-PORT> -U <username> -d <database>
+```
+
+Or using any PostgreSQL-compatible tool (DBeaver, DataGrip, etc.) with:
+- Host: `<NODE-IP>` or your DNS name pointing to the cluster
+- Port: `30430` (default NodePort)
+
+### Configuration
+
+To change the external port:
+
+```yaml
+service:
+  postgresNodePort: 31234  # custom port
+```
+
+To disable external access:
+
+```yaml
+service:
+  type: ClusterIP
+```
+
+### Notes
+
+- NodePort exposes the service on the same port across all cluster nodes
+- You can use the same DNS name for both HTTP (via Ingress) and PostgreSQL (via NodePort)
+- Ensure your firewall allows traffic to the NodePort (default: 30430)
+
+
+## Public IP for Postgres (AKS)
+
+```bash
+az network public-ip create --resource-group <RESOURCE_GROUP> --name pg-public-ip --sku Standard --allocation-method static
+```
+
+
+
+

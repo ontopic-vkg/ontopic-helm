@@ -22,6 +22,9 @@ ports:
   - port: 8080:80 # same as `--port '8080:80@loadbalancer'`
     nodeFilters:
       - loadbalancer
+  - port: 4300:4300 # PostgreSQL wire protocol
+    nodeFilters:
+      - loadbalancer
 # env:
 #   - envVar: bar=baz # same as `--env 'bar=baz@server:0'`
 #     nodeFilters:

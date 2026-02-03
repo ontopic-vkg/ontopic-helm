@@ -20,7 +20,7 @@ ingress:
   # secretName: ontopic-studio-tls
   # annotations: {}
 
-imagePullSecrets: [{ "name": "regcred" }]
+#imagePullSecrets: [{ "name": "regcred" }]
 nameOverride: ""
 fullnameOverride: ""
 
@@ -272,6 +272,7 @@ services:
       casbin_store_password_file: /run/secrets/database-password-file/database-password-file
       ontopic_server_host: ontopic-server
       ontopic_server_web_api_port: 8080
+      ontopic_server_postgres_port: 4300
       identity_service_name: localhost
       identity_service_port: 8080
       ontopic_restore_projects_db: false

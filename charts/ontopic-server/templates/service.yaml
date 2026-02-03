@@ -4,6 +4,10 @@ metadata:
   name: {{ include "ontopic-server.fullname" . }}
   labels:
     {{- include "ontopic-server.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -11,5 +15,49 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
+    {{- if not .Values.postgresService.enabled }}
+    - port: {{ .Values.postgresService.port | default 4300 }}
+      targetPort: postgres
+      protocol: TCP
+      name: postgres
+    {{- end }}
   selector:
     {{- include "ontopic-server.selectorLabels" . | nindent 4 }}
+{{- if .Values.postgresService.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ontopic-server.fullname" . }}-postgres
+  labels:
+    {{- include "ontopic-server.labels" . | nindent 4 }}
+  {{- with .Values.postgresService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.postgresService.type }}
+  {{- if and (eq .Values.postgresService.type "LoadBalancer") .Values.postgresService.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.postgresService.loadBalancerIP }}
+  {{- end }}
+  {{- if and (eq .Values.postgresService.type "LoadBalancer") .Values.postgresService.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml .Values.postgresService.loadBalancerSourceRanges | nindent 4 }}
+  {{- end }}
+  {{- if .Values.postgresService.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.postgresService.externalTrafficPolicy }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.postgresService.port }}
+      targetPort: postgres
+      protocol: TCP
+      name: postgres
+      {{- if and (eq .Values.postgresService.type "NodePort") .Values.postgresService.nodePort }}
+      nodePort: {{ .Values.postgresService.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "ontopic-server.selectorLabels" . | nindent 4 }}
+{{- end }}
