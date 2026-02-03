@@ -229,6 +229,55 @@ endpoint:
     ##
     dataSource: {}
 
+endpointSecurity:
+  persistence:
+    ## @param endpointSecurity.persistence.enabled Enable Ontopic endpoint-security data persistence using PVC
+    ##
+    enabled: true
+    ## @param endpointSecurity.persistence.volumeName Name to assign the volume
+    ##
+    volumeName: "endpoint-security-dir"
+    ## @param endpointSecurity.persistence.existingClaim Name of an existing PVC to use
+    ##
+    existingClaim: ""
+    ## @param endpointSecurity.persistence.mountPath The path the volume will be mounted at
+    ##
+    mountPath: /opt/ontopic-server/endpoint-security
+    ## @param endpointSecurity.persistence.subPath The subdirectory of the volume to mount to
+    ## Useful in dev environments and one PV for multiple services
+    ##
+    subPath: ""
+    ## @param endpointSecurity.persistence.storageClass PVC Storage Class for Ontopic endpoint data volume
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param endpointSecurity.persistence.accessModes PVC Access Mode for Ontopic volume
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param endpointSecurity.persistence.size PVC Storage Request for Ontopic volume
+    ##
+    size: 8Gi
+    ## @param endpointSecurity.persistence.annotations Annotations for the PVC
+    ##
+    annotations: {}
+    ## @param endpointSecurity.persistence.labels Labels for the PVC
+    ##
+    labels: {}
+    ## @param endpointSecurity.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    selector: {}
+    ## @param endpointSecurity.persistence.dataSource Custom PVC data source
+    ##
+    dataSource: {}
+
 materializationDb:
   persistence:
     ## @param materializationDb.persistence.enabled Enable Ontopic materializationDb data persistence using PVC

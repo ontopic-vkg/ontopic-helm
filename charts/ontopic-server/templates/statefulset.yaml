@@ -65,6 +65,11 @@ spec:
               {{- if .Values.endpoint.persistence.subPath }}
               subPath: {{ .Values.endpoint.persistence.subPath }}
               {{- end }}
+            - name: {{ .Values.endpointSecurity.persistence.volumeName }}
+              mountPath: {{ .Values.endpointSecurity.persistence.mountPath }}
+              {{- if .Values.endpointSecurity.persistence.subPath }}
+              subPath: {{ .Values.endpointSecurity.persistence.subPath }}
+              {{- end }}
             - name: {{ .Values.materializationDb.persistence.volumeName }}
               mountPath: {{ .Values.materializationDb.persistence.mountPath }}
               {{- if .Values.materializationDb.persistence.subPath }}
@@ -107,6 +112,14 @@ spec:
         - name: {{ .Values.endpoint.persistence.volumeName }}
           emptyDir: {}
   {{- end }}
+  {{- if and .Values.endpointSecurity.persistence.enabled .Values.endpointSecurity.persistence.existingClaim }}
+        - name: {{ .Values.endpointSecurity.persistence.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ tpl .Values.endpointSecurity.persistence.existingClaim $ }}
+  {{- else if not .Values.endpointSecurity.persistence.enabled }}
+        - name: {{ .Values.endpointSecurity.persistence.volumeName }}
+          emptyDir: {}
+  {{- end }}
   {{- if and .Values.materializationDb.persistence.enabled .Values.materializationDb.persistence.existingClaim }}
         - name: {{ .Values.materializationDb.persistence.volumeName }}
           persistentVolumeClaim:
@@ -138,9 +151,10 @@ spec:
   {{- end }}
   {{- if or
     (or  (and .Values.endpoint.persistence.enabled (not .Values.endpoint.persistence.existingClaim))
-        (and .Values.materializationDb.persistence.enabled (not .Values.materializationDb.persistence.existingClaim)))
-    (or  (and .Values.materializationConfiguration.persistence.enabled (not .Values.materializationConfiguration.persistence.existingClaim))
-        (and .Values.materializationResult.persistence.enabled (not .Values.materializationResult.persistence.existingClaim)))
+        (and .Values.endpointSecurity.persistence.enabled (not .Values.endpointSecurity.persistence.existingClaim)))
+    (or  (and .Values.materializationDb.persistence.enabled (not .Values.materializationDb.persistence.existingClaim))
+        (and .Values.materializationConfiguration.persistence.enabled (not .Values.materializationConfiguration.persistence.existingClaim)))
+    (and .Values.materializationResult.persistence.enabled (not .Values.materializationResult.persistence.existingClaim))
   }}
   volumeClaimTemplates:
     {{- if and .Values.endpoint.persistence.enabled (not .Values.endpoint.persistence.existingClaim) }}
@@ -169,6 +183,33 @@ spec:
         selector: {{- include "common.tplvalues.render" (dict "value" .Values.endpoint.persistence.selector "context" $) | nindent 10 }}
         {{- end }}
         {{- include "common.storage.class" (dict "persistence" .Values.endpoint.persistence "global" .Values.global) | nindent 8 }}
+    {{- end }}
+    {{- if and .Values.endpointSecurity.persistence.enabled (not .Values.endpointSecurity.persistence.existingClaim) }}
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: {{ .Values.endpointSecurity.persistence.volumeName }}
+        {{- if .Values.endpointSecurity.persistence.annotations }}
+        annotations: {{- include "common.tplvalues.render" (dict "value" .Values.endpointSecurity.persistence.annotations "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.endpointSecurity.persistence.labels }}
+        labels: {{- include "common.tplvalues.render" (dict "value" .Values.endpointSecurity.persistence.labels "context" $) | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+        {{- range .Values.endpointSecurity.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        {{- if .Values.endpointSecurity.persistence.dataSource }}
+        dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.endpointSecurity.persistence.dataSource "context" $) | nindent 10 }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.endpointSecurity.persistence.size | quote }}
+        {{- if .Values.endpointSecurity.persistence.selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .Values.endpointSecurity.persistence.selector "context" $) | nindent 10 }}
+        {{- end }}
+        {{- include "common.storage.class" (dict "persistence" .Values.endpointSecurity.persistence "global" .Values.global) | nindent 8 }}
     {{- end }}
     {{- if and .Values.materializationDb.persistence.enabled (not .Values.materializationDb.persistence.existingClaim) }}
     - apiVersion: v1
