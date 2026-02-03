@@ -6,11 +6,18 @@ kind: ConfigMap
 metadata:
     name: {{.envConfigMapName}}
 data:
+{{- $env := .env }}
 {{- if and (hasKey $.Values $name) (hasKey (get $.Values $name) "env") }}
-{{- $env := merge (get $.Values $name).env .env }}
-{{- include "ontopic-suite.env" $env }}
-{{- else }}
-{{- include "ontopic-suite.env" .env }}
+{{- $env = merge (get $.Values $name).env .env }}
 {{- end }}
+{{- /* Merge env vars from optionalSecrets only if the secret exists */ -}}
+{{- if .optionalSecrets }}
+{{- range $secretName, $config := .optionalSecrets }}
+{{- if and $config.envVars (lookup "v1" "Secret" $.Release.Namespace $secretName) }}
+{{- $env = merge $config.envVars $env }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- include "ontopic-suite.env" $env }}
 {{- end }}
 {{- end }}

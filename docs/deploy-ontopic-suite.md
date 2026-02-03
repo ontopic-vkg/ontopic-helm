@@ -128,14 +128,9 @@ kubectl create secret generic client-secret \
   --from-file=client-secret=./secrets/client-secret
 ```
 
-In the `env` section of `identity_service`:
+The `client-secret` is pre-configured as an optional secret. When the Kubernetes secret exists, it will be automatically mounted and the corresponding environment variables (`ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE` and `ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE`) will be set. You don't need to add it to the `secrets` section or configure the file paths manually.
 
-- insert the _Application (client) ID_ for `ONTOPIC_IDENTITY_SERVICE_CLIENT_ID` and `ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_ID`.
-- add the _Directory (tenant) ID_ as `ONTOPIC_IDENTITY_SERVICE_AZURE_TENANT_ID`.
-- add the _Application ID URI_ in `ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE` after the predefined settings _openid,email,profile,offline_access_.
-- use the created _client-secret_ for `ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE` and `ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE`
-
-See the example below on how to edit the `values.yaml` file to add the environment variables and secret.
+In your `values.yaml`, you only need to set the remaining environment variables:
 
 ```yaml
 identity-service:
@@ -145,13 +140,9 @@ identity-service:
     ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_ID: <Application (client) ID>
     ONTOPIC_IDENTITY_SERVICE_CLIENT_ID: <Application (client) ID>
     ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE: openid,email,profile,offline_access,<Application ID URI>
-    ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
-    ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
-
-  secrets:
-    # ...
-    client-secret: /run/secrets/client-secret
 ```
+
+> **Note**: The optional secret detection uses Helm's `lookup` function, which requires cluster access. When using `helm template` for dry-run rendering, optional secrets won't be included in the output since the command doesn't connect to the cluster.
 
 ## Enable materialization
 

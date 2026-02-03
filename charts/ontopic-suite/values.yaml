@@ -199,6 +199,16 @@ services:
       cookie-secret: /run/secrets/cookie-secret
       password-file-db: /run/secrets/password-file-db
 
+    # Optional secrets - only mounted if the Kubernetes secret exists
+    # These are useful for OAuth2 providers (Azure, Okta, Keycloak)
+    # The envVars are only added to the ConfigMap when the secret is defined
+    optionalSecrets:
+      client-secret:
+        mountPath: /run/secrets/client-secret
+        envVars:
+          ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
+          ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
+
   ##--- Process server
   process-server:
     image:
