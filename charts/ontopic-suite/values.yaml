@@ -239,10 +239,10 @@ services:
     envConfigMapName: process-server-config
 
     env:
-      store_service_host: localhost
-      store_service_port: 3000
-      license_type: ontopic
-      user_license_file: /run/secrets/user-license/user-license
+      STORE_SERVICE_HOST: localhost
+      STORE_SERVICE_PORT: 3000
+      LICENSE_TYPE: ontopic
+      USER_LICENSE_FILE: /run/secrets/user-license/user-license
 
     secrets:
       user-license-file: /run/secrets/user-license
@@ -277,38 +277,38 @@ services:
     envConfigMapName: store-server-config
 
     env:
-      node_env: production
-      db_reset: "false"
-      db_migrate: "true"
-      db_seed: "false"
-      database_host: store-server-db-postgresql
-      database_port: 5432
-      database_name: internal
-      database_user: postgres
-      database_password_file: /run/secrets/database-password-file/database-password-file
-      casbin_store_host: store-server-db-postgresql
-      casbin_store_port: 5432
-      casbin_store_user: postgres
-      casbin_store_password_file: /run/secrets/database-password-file/database-password-file
-      ontopic_server_host: ontopic-server
-      ontopic_server_web_api_port: 8080
-      ontopic_server_postgres_port: 4300
-      identity_service_name: localhost
-      identity_service_port: 8080
-      ontopic_restore_projects_db: false
-      ontopic_restore_projects_db_file: docs/backups/backupjson.log.gz
-      process_service_host: localhost
-      process_service_port: 8666
-      enable_git_repo: false
-      ontopic_sample_db: false
-      ontopic_sample_db_url: jdbc:postgresql://ontopic-suite-demo-db/postgres
-      ontopic_sample_db_username: postgres
-      ontopic_sample_db_password: postgres2
-      ontopic_sample_db_driver: org.postgresql.Driver
-      ontopic_enable_authentication: true
-      enable_materialization: false
-      enable_semantic_sql: true
-      db_client: pg
+      NODE_ENV: production
+      DB_RESET: "false"
+      DB_MIGRATE: "true"
+      DB_SEED: "false"
+      DATABASE_HOST: store-server-db-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_NAME: internal
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD_FILE: /run/secrets/database-password-file/database-password-file
+      CASBIN_STORE_HOST: store-server-db-postgresql
+      CASBIN_STORE_PORT: 5432
+      CASBIN_STORE_USER: postgres
+      CASBIN_STORE_PASSWORD_FILE: /run/secrets/database-password-file/database-password-file
+      ONTOPIC_SERVER_HOST: ontopic-server
+      ONTOPIC_SERVER_WEB_API_PORT: 8080
+      ONTOPIC_SERVER_POSTGRES_PORT: 4300
+      IDENTITY_SERVICE_NAME: localhost
+      IDENTITY_SERVICE_PORT: 8080
+      ONTOPIC_RESTORE_PROJECTS_DB: false
+      ONTOPIC_RESTORE_PROJECTS_DB_FILE: docs/backups/backupjson.log.gz
+      PROCESS_SERVICE_HOST: localhost
+      PROCESS_SERVICE_PORT: 8666
+      ENABLE_GIT_REPO: false
+      ONTOPIC_SAMPLE_DB: false
+      ONTOPIC_SAMPLE_DB_URL: jdbc:postgresql://ontopic-suite-demo-db/postgres
+      ONTOPIC_SAMPLE_DB_USERNAME: postgres
+      ONTOPIC_SAMPLE_DB_PASSWORD: postgres2
+      ONTOPIC_SAMPLE_DB_DRIVER: org.postgresql.Driver
+      ONTOPIC_ENABLE_AUTHENTICATION: true
+      ENABLE_MATERIALIZATION: false
+      ENABLE_SEMANTIC_SQL: true
+      DB_CLIENT: pg
 
     volumes:
       - volumeName: "docs-dir"
