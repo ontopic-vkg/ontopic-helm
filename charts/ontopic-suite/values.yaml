@@ -161,7 +161,6 @@ services:
       ONTOPIC_IDENTITY_SERVICE_TIMEOUT_READ:
       ONTOPIC_IDENTITY_SERVICE_TIMEOUT_WRITE:
       ONTOPIC_IDENTITY_SERVICE_PROVIDER_OAUTH2:
-      ONTOPIC_IDENTITY_SERVICE_PROVIDER_PASSWORD: password-file
       ONTOPIC_IDENTITY_SERVICE_AUDIENCE:
       ONTOPIC_IDENTITY_SERVICE_SCOPES:
       ONTOPIC_IDENTITY_SERVICE_ROLES:
@@ -178,14 +177,15 @@ services:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_APPLICATION:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_USER:
       ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_PASSWORD_FILE:
-      ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE: /run/secrets/password-file-db/password-file-db
+      ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE:
       ONTOPIC_IDENTITY_SERVICE_SESSION_PROMPT:
       ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE:
       ONTOPIC_IDENTITY_SERVICE_SESSION_STORE_FILE: /etc/identity-service/data/session.db
       ONTOPIC_IDENTITY_SERVICE_CLIENT_ID:
       ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE:
-      ONTOPIC_IDENTITY_SERVICE_COOKIE_PREFIX: _ontopic-studio
+      ONTOPIC_IDENTITY_SERVICE_COOKIE_PREFIX: _ontopic-suite
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECRET_FILE: /run/secrets/cookie-secret/cookie-secret
+      # Automatically set to true when ingress.tls is enabled
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE: false
       ONTOPIC_IDENTITY_SERVICE_COOKIE_HTTPONLY: true
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SAME_SITE: lax
@@ -197,7 +197,27 @@ services:
 
     secrets:
       cookie-secret: /run/secrets/cookie-secret
-      password-file-db: /run/secrets/password-file-db
+
+    # Conditional secrets - mounted based on a values condition (for secrets created by jobs)
+    # The envVars are only added to the ConfigMap when the condition is true
+    conditionalSecrets:
+      # Password file for local user authentication (created by users job when users.enabled=true)
+      password-file-db:
+        mountPath: /run/secrets/password-file-db
+        condition: users.enabled
+        envVars:
+          ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE: /run/secrets/password-file-db/password-file-db
+          ONTOPIC_IDENTITY_SERVICE_PROVIDER_PASSWORD: password-file
+
+    # Optional secrets - only mounted if the Kubernetes secret exists (uses lookup)
+    # The envVars are only added to the ConfigMap when the secret is detected
+    optionalSecrets:
+      # Client secret for OAuth2 providers (Azure, Okta, Keycloak)
+      client-secret:
+        mountPath: /run/secrets/client-secret
+        envVars:
+          ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
+          ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE: /run/secrets/client-secret/client-secret
 
   ##--- Process server
   process-server:
@@ -219,10 +239,10 @@ services:
     envConfigMapName: process-server-config
 
     env:
-      store_service_host: localhost
-      store_service_port: 3000
-      license_type: ontopic
-      user_license_file: /run/secrets/user-license/user-license
+      STORE_SERVICE_HOST: localhost
+      STORE_SERVICE_PORT: 3000
+      LICENSE_TYPE: ontopic
+      USER_LICENSE_FILE: /run/secrets/user-license/user-license
 
     secrets:
       user-license-file: /run/secrets/user-license
@@ -257,38 +277,38 @@ services:
     envConfigMapName: store-server-config
 
     env:
-      node_env: production
-      db_reset: "false"
-      db_migrate: "true"
-      db_seed: "false"
-      database_host: store-server-db-postgresql
-      database_port: 5432
-      database_name: internal
-      database_user: postgres
-      database_password_file: /run/secrets/database-password-file/database-password-file
-      casbin_store_host: store-server-db-postgresql
-      casbin_store_port: 5432
-      casbin_store_user: postgres
-      casbin_store_password_file: /run/secrets/database-password-file/database-password-file
-      ontopic_server_host: ontopic-server
-      ontopic_server_web_api_port: 8080
-      ontopic_server_postgres_port: 4300
-      identity_service_name: localhost
-      identity_service_port: 8080
-      ontopic_restore_projects_db: false
-      ontopic_restore_projects_db_file: docs/backups/backupjson.log.gz
-      process_service_host: localhost
-      process_service_port: 8666
-      enable_git_repo: false
-      ontopic_sample_db: false
-      ontopic_sample_db_url: jdbc:postgresql://ontopic-suite-demo-db/postgres
-      ontopic_sample_db_username: postgres
-      ontopic_sample_db_password: postgres2
-      ontopic_sample_db_driver: org.postgresql.Driver
-      ontopic_enable_authentication: true
-      enable_materialization: false
-      enable_semantic_sql: true
-      db_client: pg
+      NODE_ENV: production
+      DB_RESET: "false"
+      DB_MIGRATE: "true"
+      DB_SEED: "false"
+      DATABASE_HOST: store-server-db-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_NAME: internal
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD_FILE: /run/secrets/database-password-file/database-password-file
+      CASBIN_STORE_HOST: store-server-db-postgresql
+      CASBIN_STORE_PORT: 5432
+      CASBIN_STORE_USER: postgres
+      CASBIN_STORE_PASSWORD_FILE: /run/secrets/database-password-file/database-password-file
+      ONTOPIC_SERVER_HOST: ontopic-server
+      ONTOPIC_SERVER_WEB_API_PORT: 8080
+      ONTOPIC_SERVER_POSTGRES_PORT: 4300
+      IDENTITY_SERVICE_NAME: localhost
+      IDENTITY_SERVICE_PORT: 8080
+      ONTOPIC_RESTORE_PROJECTS_DB: false
+      ONTOPIC_RESTORE_PROJECTS_DB_FILE: docs/backups/backupjson.log.gz
+      PROCESS_SERVICE_HOST: localhost
+      PROCESS_SERVICE_PORT: 8666
+      ENABLE_GIT_REPO: false
+      ONTOPIC_SAMPLE_DB: false
+      ONTOPIC_SAMPLE_DB_URL: jdbc:postgresql://ontopic-suite-demo-db/postgres
+      ONTOPIC_SAMPLE_DB_USERNAME: postgres
+      ONTOPIC_SAMPLE_DB_PASSWORD: postgres2
+      ONTOPIC_SAMPLE_DB_DRIVER: org.postgresql.Driver
+      ONTOPIC_ENABLE_AUTHENTICATION: true
+      ENABLE_MATERIALIZATION: false
+      ENABLE_SEMANTIC_SQL: true
+      DB_CLIENT: pg
 
     volumes:
       - volumeName: "docs-dir"

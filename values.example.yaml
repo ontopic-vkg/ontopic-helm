@@ -11,14 +11,14 @@ process-server:
 
 store-server:
   env:
-    database_host: store-server-db-postgresql
-    database_port: 5432
-    database_name: internal
-    database_user: postgres
-    casbin_store_host: store-server-db-postgresql
-    casbin_store_port: 5432
-    casbin_store_user: postgres
-    ontopic_server_host: http://ontopic-server:8080
+    DATABASE_HOST: store-server-db-postgresql
+    DATABASE_PORT: 5432
+    DATABASE_NAME: internal
+    DATABASE_USER: postgres
+    CASBIN_STORE_HOST: store-server-db-postgresql
+    CASBIN_STORE_PORT: 5432
+    CASBIN_STORE_USER: postgres
+    ONTOPIC_SERVER_HOST: http://ontopic-server:8080
   secrets:
     database-password-file: /run/secrets/database-password-file
 

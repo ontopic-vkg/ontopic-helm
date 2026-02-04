@@ -66,7 +66,7 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .resources | nindent 12 }}
-          {{- if or .secrets .volumes }}
+          {{- if or .secrets .conditionalSecrets .optionalSecrets .volumes }}
           volumeMounts:
           {{- if and (hasKey $.Values $name) (hasKey (get $.Values $name) "secrets") }}
           {{- $secrets := (get $.Values $name).secrets  }}
@@ -78,6 +78,27 @@ spec:
           {{- range $name, $mount := .secrets }}
             - name: "{{ $name }}-volume"
               mountPath: {{ $mount | quote }}
+          {{- end }}
+          {{- end }}
+          {{- if .conditionalSecrets }}
+          {{- range $name, $config := .conditionalSecrets }}
+          {{- $conditionPath := splitList "." $config.condition }}
+          {{- $conditionValue := $.Values }}
+          {{- range $conditionPath }}
+          {{- $conditionValue = index $conditionValue . }}
+          {{- end }}
+          {{- if $conditionValue }}
+            - name: "{{ $name }}-volume"
+              mountPath: {{ $config.mountPath | quote }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .optionalSecrets }}
+          {{- range $name, $config := .optionalSecrets }}
+          {{- if lookup "v1" "Secret" $.Release.Namespace $name }}
+            - name: "{{ $name }}-volume"
+              mountPath: {{ $config.mountPath | quote }}
+          {{- end }}
           {{- end }}
           {{- end }}
 
@@ -120,6 +141,29 @@ spec:
         - name: "{{$name}}-volume"
           secret:
             secretName: {{$name | quote}}
+      {{- end }}
+      {{- end }}
+      {{- if .conditionalSecrets }}
+      {{- range $name, $config := .conditionalSecrets }}
+      {{- $conditionPath := splitList "." $config.condition }}
+      {{- $conditionValue := $.Values }}
+      {{- range $conditionPath }}
+      {{- $conditionValue = index $conditionValue . }}
+      {{- end }}
+      {{- if $conditionValue }}
+        - name: "{{$name}}-volume"
+          secret:
+            secretName: {{$name | quote}}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- if .optionalSecrets }}
+      {{- range $name, $config := .optionalSecrets }}
+      {{- if lookup "v1" "Secret" $.Release.Namespace $name }}
+        - name: "{{$name}}-volume"
+          secret:
+            secretName: {{$name | quote}}
+      {{- end }}
       {{- end }}
       {{- end }}
       {{- range .volumes }}

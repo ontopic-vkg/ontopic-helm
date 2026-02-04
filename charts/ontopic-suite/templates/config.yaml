@@ -6,11 +6,35 @@ kind: ConfigMap
 metadata:
     name: {{.envConfigMapName}}
 data:
+{{- $env := .env }}
 {{- if and (hasKey $.Values $name) (hasKey (get $.Values $name) "env") }}
-{{- $env := merge (get $.Values $name).env .env }}
-{{- include "ontopic-suite.env" $env }}
-{{- else }}
-{{- include "ontopic-suite.env" .env }}
+{{- $env = merge (get $.Values $name).env .env }}
 {{- end }}
+{{- /* Merge env vars from conditionalSecrets based on condition */ -}}
+{{- if .conditionalSecrets }}
+{{- range $secretName, $config := .conditionalSecrets }}
+{{- $conditionPath := splitList "." $config.condition }}
+{{- $conditionValue := $.Values }}
+{{- range $conditionPath }}
+{{- $conditionValue = index $conditionValue . }}
+{{- end }}
+{{- if and $config.envVars $conditionValue }}
+{{- $env = merge $config.envVars $env }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- /* Merge env vars from optionalSecrets only if the secret exists */ -}}
+{{- if .optionalSecrets }}
+{{- range $secretName, $config := .optionalSecrets }}
+{{- if and $config.envVars (lookup "v1" "Secret" $.Release.Namespace $secretName) }}
+{{- $env = merge $config.envVars $env }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- /* Auto-enable secure cookies for identity-service when TLS is enabled */ -}}
+{{- if and (eq $name "identity-service") $.Values.ingress.tls }}
+{{- $_ := set $env "ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE" true }}
+{{- end }}
+{{- include "ontopic-suite.env" $env }}
 {{- end }}
 {{- end }}
