@@ -132,19 +132,44 @@ kubectl create secret generic client-secret \
 
 The `client-secret` is pre-configured as an optional secret. When the Kubernetes secret exists, it will be automatically mounted and the corresponding environment variables (`ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE` and `ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE`) will be set. You don't need to add it to the `secrets` section or configure the file paths manually.
 
-In your `values.yaml`, you only need to set the remaining environment variables:
+In your `values.yaml`, configure the OIDC settings:
 
 ```yaml
 identity-service:
-  env:
-    ONTOPIC_IDENTITY_SERVICE_PROVIDER_OAUTH2: azure
-    ONTOPIC_IDENTITY_SERVICE_AZURE_TENANT_ID: <Directory (tenant) ID>
-    ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_ID: <Application (client) ID>
-    ONTOPIC_IDENTITY_SERVICE_CLIENT_ID: <Application (client) ID>
-    ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE: openid,email,profile,offline_access,<Application ID URI>
+  oidc:
+    provider: azure
+    clientId: <Application (client) ID>
+    session:
+      scope: openid,email,profile,offline_access,<Application ID URI>
+    azure:
+      tenantId: <Directory (tenant) ID>
 ```
 
 > **Note**: The optional secret detection uses Helm's `lookup` function, which requires cluster access. When using `helm template` for dry-run rendering, optional secrets won't be included in the output since the command doesn't connect to the cluster.
+
+
+### OIDC Configuration Reference
+
+The `oidc` section supports the following options:
+
+| Parameter | Description |
+|-----------|-------------|
+| `provider` | OIDC provider: `azure`, `okta`, or `keycloak` |
+| `clientId` | OAuth2 client ID |
+| `session.scope` | OIDC scopes to request (e.g., `openid,email,profile,offline_access`) |
+| `session.prompt` | OIDC prompt parameter (e.g., `consent`, `login`) |
+| `audience` | Expected token audience |
+| `scopes` | Required token scopes for authorization |
+| `roles` | Required roles for authorization |
+| `claims.email` | Custom claim name for email |
+| `claims.group` | Custom claim name for groups |
+| `claims.role` | Custom claim name for roles |
+| `azure.tenantId` | Azure Directory (tenant) ID |
+| `okta.issuerUrl` | Okta issuer URL |
+| `keycloak.host` | Keycloak server URL |
+| `keycloak.realm` | Keycloak realm name |
+| `keycloak.adminApplication` | Keycloak admin client ID (for user management) |
+| `keycloak.adminUser` | Keycloak admin username (for user management) |
 
 ## Enable materialization
 
