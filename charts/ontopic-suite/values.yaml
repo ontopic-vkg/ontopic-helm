@@ -155,34 +155,54 @@ services:
 
     envConfigMapName: identity-service-env
 
+    # OIDC Configuration
+    # Configure your identity provider here instead of using raw environment variables
+    oidc:
+      # Provider type: "azure", "okta", "keycloak", or leave empty for password-only auth
+      provider: ""
+
+      # Client credentials (used by all OAuth2 providers)
+      clientId: ""
+
+      # Session configuration
+      session:
+        # OIDC scopes to request (e.g., "openid,email,profile,offline_access")
+        scope: ""
+        # OIDC prompt parameter (e.g., "consent", "login")
+        prompt: ""
+
+      # Token validation settings
+      audience: ""
+      scopes: ""
+      roles: ""
+
+      # Custom claims mapping (override default claim names)
+      claims:
+        email: ""
+        group: ""
+        role: ""
+
+      # Azure-specific settings (when provider: "azure")
+      azure:
+        tenantId: ""
+
+      # Okta-specific settings (when provider: "okta")
+      okta:
+        issuerUrl: ""
+
+      # Keycloak-specific settings (when provider: "keycloak")
+      keycloak:
+        host: ""
+        realm: ""
+        adminApplication: ""
+        adminUser: ""
+
     env:
       ONTOPIC_IDENTITY_SERVICE_DEBUG: false
       ONTOPIC_IDENTITY_SERVICE_TIMEOUT_IDLE:
       ONTOPIC_IDENTITY_SERVICE_TIMEOUT_READ:
       ONTOPIC_IDENTITY_SERVICE_TIMEOUT_WRITE:
-      ONTOPIC_IDENTITY_SERVICE_PROVIDER_OAUTH2:
-      ONTOPIC_IDENTITY_SERVICE_AUDIENCE:
-      ONTOPIC_IDENTITY_SERVICE_SCOPES:
-      ONTOPIC_IDENTITY_SERVICE_ROLES:
-      ONTOPIC_IDENTITY_SERVICE_CLAIMS_EMAIL:
-      ONTOPIC_IDENTITY_SERVICE_CLAIMS_GROUP:
-      ONTOPIC_IDENTITY_SERVICE_CLAIMS_ROLE:
-      ONTOPIC_IDENTITY_SERVICE_AZURE_TENANT_ID:
-      ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_ID:
-      ONTOPIC_IDENTITY_SERVICE_AZURE_API_CLIENT_SECRET_FILE:
-      ONTOPIC_IDENTITY_SERVICE_OKTA_ISSUER_URL:
-      ONTOPIC_IDENTITY_SERVICE_OKTA_SSWS_TOKEN_FILE:
-      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_HOST:
-      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_REALM:
-      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_APPLICATION:
-      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_USER:
-      ONTOPIC_IDENTITY_SERVICE_KEYCLOAK_ADMIN_PASSWORD_FILE:
-      ONTOPIC_IDENTITY_SERVICE_PASSWORD_FILE:
-      ONTOPIC_IDENTITY_SERVICE_SESSION_PROMPT:
-      ONTOPIC_IDENTITY_SERVICE_SESSION_SCOPE:
       ONTOPIC_IDENTITY_SERVICE_SESSION_STORE_FILE: /etc/identity-service/data/session.db
-      ONTOPIC_IDENTITY_SERVICE_CLIENT_ID:
-      ONTOPIC_IDENTITY_SERVICE_CLIENT_SECRET_FILE:
       ONTOPIC_IDENTITY_SERVICE_COOKIE_PREFIX: _ontopic-suite
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SECRET_FILE: /run/secrets/cookie-secret/cookie-secret
       # Automatically set to true when ingress.tls is enabled
@@ -191,7 +211,6 @@ services:
       ONTOPIC_IDENTITY_SERVICE_COOKIE_SAME_SITE: lax
       ONTOPIC_IDENTITY_SERVICE_COOKIE_EXPIRATION:
       ONTOPIC_IDENTITY_SERVICE_COOKIE_REFRESH:
-      ONTOPIC_IDENTITY_SERVICE_PROVIDER_NAME:
       ONTOPIC_IDENTITY_SERVICE_CUSTOM_TEMPLATE_DIR: /etc/identity-service/templates
       ONTOPIC_IDENTITY_SERVICE_IDENTITY_REFRESH:
 

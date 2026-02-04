@@ -10,6 +10,15 @@ data:
 {{- if and (hasKey $.Values $name) (hasKey (get $.Values $name) "env") }}
 {{- $env = merge (get $.Values $name).env .env }}
 {{- end }}
+{{- /* For identity-service: generate env vars from structured OIDC config */ -}}
+{{- if eq $name "identity-service" }}
+{{- $oidcConfig := .oidc }}
+{{- if and (hasKey $.Values "identity-service") (hasKey (get $.Values "identity-service") "oidc") }}
+{{- $oidcConfig = mergeOverwrite (deepCopy .oidc) (get $.Values "identity-service").oidc }}
+{{- end }}
+{{- $oidcEnv := include "ontopic-suite.identity-service-oidc-env" $oidcConfig | fromJson }}
+{{- $env = merge $env $oidcEnv }}
+{{- end }}
 {{- /* Merge env vars from conditionalSecrets based on condition */ -}}
 {{- if .conditionalSecrets }}
 {{- range $secretName, $config := .conditionalSecrets }}
