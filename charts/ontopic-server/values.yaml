@@ -261,7 +261,7 @@ endpointSecurity:
       - ReadWriteOnce
     ## @param endpointSecurity.persistence.size PVC Storage Request for Ontopic volume
     ##
-    size: 8Gi
+    size: 100Mi
     ## @param endpointSecurity.persistence.annotations Annotations for the PVC
     ##
     annotations: {}
