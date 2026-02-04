@@ -3,29 +3,6 @@ ingress:
   host: ontopic.local  # Set your domain here (must match web.env.virtual_host)
   tls: false
   # secretName: ontopic-suite-tls
-  # annotations: {}
-
-process-server:
-  secrets:
-    user-license-file: /run/secrets/user-license
-
-store-server:
-  env:
-    DATABASE_HOST: store-server-db-postgresql
-    DATABASE_PORT: 5432
-    DATABASE_NAME: internal
-    DATABASE_USER: postgres
-    CASBIN_STORE_HOST: store-server-db-postgresql
-    CASBIN_STORE_PORT: 5432
-    CASBIN_STORE_USER: postgres
-    ONTOPIC_SERVER_HOST: http://ontopic-server:8080
-  secrets:
-    database-password-file: /run/secrets/database-password-file
-
-web:
-  env:
-    ONTOPIC_SERVER_SERVICE_HOST: ontopic-server
-    VIRTUAL_HOST: ontopic.local  # Must match ingress.host
 
 # Create users
 users:
@@ -33,36 +10,15 @@ users:
   enabled: true
   # -- list of users to create
   list:
-    - username: admin
-      password: "$aprBe1/"
-      email: test@email.it
-      fullname: Admin
-      groups:
-        - developers
-        - admin
-      roles:
-        - ots-admin
     - username: test
-      password: "$apr1$C."
+      password: "test"
       email: test@email.it
       fullname: Test
-      groups:
-        - developers
+      groups: []
       roles:
-        - ots-project-creator
+        - ots-admin
 
 # Configure the PostgreSQL subchart
 postgresql:
-  # -- enable the PostgreSQL chart
-  enabled: true
-  # -- enable creation of the secret for Ontopic Suite
-  enableSecretCreation: true
-  # -- enable creation of the "internal" database
-  enableDatabaseCreation: true
   # -- enable demo data
-  enableDemoData: false
-
-# Configure the Ontopic Server subchart
-ontopic-server:
-  # -- enable the Ontopic Server chart
-  enabled: true
+  enableDemoData: true

@@ -420,23 +420,13 @@ users:
   enabled: true
   # -- list of users to create
   list:
-    - username: admin
-      password: "$aprBe1/"
-      email: test@email.it
-      fullname: Admin
-      groups:
-        - developers
-        - admin
-      roles:
-        - ots-admin
     - username: test
-      password: "$apr1$C."
+      password: "test"
       email: test@email.it
       fullname: Test
-      groups:
-        - developers
+      groups: []
       roles:
-        - ots-project-creator
+        - ots-admin
 
 # Configure the PostgreSQL subchart
 postgresql:
