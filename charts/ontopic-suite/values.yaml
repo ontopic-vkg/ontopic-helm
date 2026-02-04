@@ -371,7 +371,7 @@ services:
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       hosts:
-        - host: ontopic.local  # Must match ingress.host
+        - host: ontopic.local
           paths:
             - path: /
               pathType: Prefix
@@ -380,7 +380,6 @@ services:
     envConfigMapName: web-config
 
     env:
-      VIRTUAL_HOST: ontopic.local  # Must match ingress.host
       VIRTUAL_PORT: 8083
       ANGULAR_FRONTEND_SERVICE_HOST: localhost
       ANGULAR_FRONTEND_SERVICE_PORT: 4200
