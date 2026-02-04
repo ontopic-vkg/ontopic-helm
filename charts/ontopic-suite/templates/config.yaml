@@ -35,6 +35,10 @@ data:
 {{- if and (eq $name "identity-service") $.Values.ingress.tls }}
 {{- $_ := set $env "ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE" true }}
 {{- end }}
+{{- /* Auto-enable sample DB for store-server when demo data is enabled */ -}}
+{{- if and (eq $name "store-server") $.Values.postgresql.enableDemoData }}
+{{- $_ := set $env "ONTOPIC_SAMPLE_DB" "true" }}
+{{- end }}
 {{- include "ontopic-suite.env" $env }}
 {{- end }}
 {{- end }}
