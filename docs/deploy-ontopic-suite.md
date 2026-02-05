@@ -139,6 +139,7 @@ identity-service:
   oidc:
     provider: azure
     clientId: <Application (client) ID>
+    audience: <Application (client) ID>
     session:
       scope: openid,email,profile,offline_access,<Application ID URI>
     azure:
