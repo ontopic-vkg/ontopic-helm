@@ -1,7 +1,6 @@
 # Default values for ontopic-server.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-# registry: ghcr.io/ontopic-vkg/ontopic-helm
 registry: ghcr.io/ontopic-vkg/ontopic-helm
 replicaCount: 1
 
@@ -171,6 +170,9 @@ optionalSecrets:
     mountPath: /run/secrets/azure-sas-token
     envVars:
       ONTOPIC_SERVER_AZURE_SAS_TOKEN: /run/secrets/azure-sas-token/azure-sas-token
+
+# Materialization configuration
+enableMaterialization: false
 
 # Storage provider configuration
 s3:

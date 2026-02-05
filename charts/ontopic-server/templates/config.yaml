@@ -34,5 +34,7 @@ data:
 {{- if .Values.azure.enabled }}
 {{- $_ := set $env "ONTOPIC_SERVER_AZURE_CONTAINER_NAME" .Values.azure.container }}
 {{- end }}
-{{- include "ontopic-server.env" (dict "env" $env "root" $) }}
+{{- /* Set ONTOPIC_SERVER_ENABLE_MATERIALIZATION based on enableMaterialization */ -}}
+{{- $_ := set $env "ONTOPIC_SERVER_ENABLE_MATERIALIZATION" .Values.enableMaterialization }}
+{{- include "ontopic-server.env" $env }}
 ---
