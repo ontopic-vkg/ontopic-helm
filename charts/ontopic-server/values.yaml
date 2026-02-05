@@ -152,22 +152,20 @@ conditionalSecrets:
     condition: s3.enabled
     envVars:
       ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/s3-access-key-secret
-  # Azure account name - mounted when azure.enabled is true
+  # S3 credentials - mounted when azure.enabled is true
   azure-account-name:
     mountPath: /run/secrets/azure-account-name
     condition: azure.enabled
     envVars:
       ONTOPIC_SERVER_AZURE_ACCOUNT_NAME: /run/secrets/azure-account-name/azure-account-name
-
-# Optional secrets - only mounted if the Kubernetes secret exists (uses lookup)
-# The envVars are only added to the ConfigMap when the secret is detected
-optionalSecrets:
   azure-account-key:
     mountPath: /run/secrets/azure-account-key
+    condition: azure.useAccountKey
     envVars:
       ONTOPIC_SERVER_AZURE_ACCOUNT_KEY: /run/secrets/azure-account-key/azure-account-key
   azure-sas-token:
     mountPath: /run/secrets/azure-sas-token
+    condition: azure.useSasToken
     envVars:
       ONTOPIC_SERVER_AZURE_SAS_TOKEN: /run/secrets/azure-sas-token/azure-sas-token
 
@@ -177,11 +175,15 @@ enableMaterialization: false
 # Storage provider configuration
 s3:
   enabled: false
-  region: eu-central-1
+  region:
   bucket:
+  endpoint:
 azure:
   enabled: false
+  useAccountKey: false
+  useSasToken: false
   container:
+  endpoint:
 
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment

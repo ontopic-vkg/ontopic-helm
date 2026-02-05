@@ -88,7 +88,7 @@ secrets:
 ## Enable materialization (optional)
 Ontopic Server supports materialization to RDF in different storage providers, such as S3 and Azure Blob Storage. Additionally, local storage can also be used for materialization.
 
-By default, materialization is disabled. To enable it, you need to set the environment variable `ONTOPIC_SERVER_ENABLE_MATERIALIZATION` to `true`.
+By default, materialization is disabled. To enable it, you need to set the environment variable `enableMaterialization` to `true`.
 
 ### S3 Storage
 
@@ -149,15 +149,13 @@ kubectl create secret generic s3-access-key-secret \
 Create a new values file `values-server.yaml` with the s3 configuration that will be used by the `ontopic-server` chart:
 
 ```yaml
-storageProvider: s3
+enableMaterialization: true
 
-env:
-  ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
-  ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-access-key-id/s3-access-key-id
-  ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/s3-access-key-secret
-  ONTOPIC_SERVER_S3_BUCKET: <S3_BUCKET>
-  ONTOPIC_SERVER_S3_REGION: <S3_REGION>
-  ONTOPIC_SERVER_S3_ENDPOINT_URL: <S3_ENDPOINT_URL> # Optional, default is https://s3.amazonaws.com
+s3:
+  enabled: true
+  bucket: <S3_BUCKET>
+  region: <S3_REGION>
+  endpoint: # Optional, default is https://s3.amazonaws.com
 ```
 
 ### Azure Blob Storage
@@ -226,27 +224,26 @@ kubectl create secret generic azure-sas-token \
   --from-file=azure-sas-token=./secrets/azure-sas-token
 ```
 
-Create a new values file `values-server.yaml` with the azure configuration that will be used by the `ontopic-server` chart:
+Create a new values file `values-server.yaml` with the azure configuration that will be used by the `ontopic-server` chart. You can choose to use either the account key (`useAccountKey: true`) or the SAS token (`useSasToken: true`):
 
 ```yaml
-storageProvider: azure
+enableMaterialization: true
 
-env:
-  ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
-  ONTOPIC_SERVER_AZURE_ACCOUNT_NAME_FILE: /run/secrets/azure-account-name/azure-account-name
-  ONTOPIC_SERVER_AZURE_ACCOUNT_KEY_FILE: /run/secrets/azure-account-key/azure-account-key
-  # Or if you use SAS token instead of account key
-  # ONTOPIC_SERVER_AZURE_ACCOUNT_SAS_TOKEN_FILE: /run/secrets/azure-sas-token/azure-sas-token
-  ONTOPIC_SERVER_AZURE_CONTAINER_NAME: <AZURE_CONTAINER_NAME>
-  ONTOPIC_SERVER_AZURE_ENDPOINT_URL_FILE: <AZURE_ENDPOINT_URL> # Optional, default is https://<ACCOUNT_NAME>.blob.core.windows.net/
+azure:
+  enabled: true
+  container: <AZURE_CONTAINER_NAME>
+  useSasToken: false # Set to true if you want to use SAS token instead of account key
+  useAccountKey: false # Set to true if you want to use account key instead of SAS token
+  endpoint: # Optional, default is https://<ACCOUNT_NAME>.blob.core.windows.net/
 ```
 
 ### File Storage
 By default, Ontopic Server uses local file storage for materialization. The materialization results are stored at the path `/opt/ontopic-server/materialization-results/yyyy-mm-dd/` inside the container and can be configured to use a different directory.
 
 ```yaml
+enableMaterialization: true
+
 env:
-  ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
   ONTOPIC_SERVER_MATERIALIZATION_RESULT_DIR: # Optional, default is materialization-results
 ```
 

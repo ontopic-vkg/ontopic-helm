@@ -49,7 +49,7 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if or .Values.secrets .Values.conditionalSecrets .Values.optionalSecrets }}
+          {{- if or .Values.secrets .Values.conditionalSecrets }}
           volumeMounts:
           {{- range $name, $mount := .Values.secrets }}
             - name: "{{ $name }}-volume"
@@ -63,14 +63,6 @@ spec:
           {{- $conditionValue = index $conditionValue . }}
           {{- end }}
           {{- if $conditionValue }}
-            - name: "{{ $name }}-volume"
-              mountPath: {{ $config.mountPath | quote }}
-          {{- end }}
-          {{- end }}
-          {{- end }}
-          {{- if .Values.optionalSecrets }}
-          {{- range $name, $config := .Values.optionalSecrets }}
-          {{- if lookup "v1" "Secret" $.Release.Namespace $name }}
             - name: "{{ $name }}-volume"
               mountPath: {{ $config.mountPath | quote }}
           {{- end }}
@@ -128,15 +120,6 @@ spec:
       {{- $conditionValue = index $conditionValue . }}
       {{- end }}
       {{- if $conditionValue }}
-        - name: "{{$name}}-volume"
-          secret:
-            secretName: {{$name | quote}}
-      {{- end }}
-      {{- end }}
-      {{- end }}
-      {{- if .Values.optionalSecrets }}
-      {{- range $name, $config := .Values.optionalSecrets }}
-      {{- if lookup "v1" "Secret" $.Release.Namespace $name }}
         - name: "{{$name}}-volume"
           secret:
             secretName: {{$name | quote}}

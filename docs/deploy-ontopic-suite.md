@@ -171,18 +171,9 @@ The `oidc` section supports the following options:
 | `keycloak.adminApplication` | Keycloak admin client ID (for user management) |
 | `keycloak.adminUser` | Keycloak admin username (for user management) |
 
-## Enable materialization
+## Enable materialization (optional)
 
 Ontopic Server supports materialization to RDF in different storage providers, such as S3 and Azure Blob Storage. Additionally, local storage can also be used for materialization.
-
-Edit the `values.yaml` file and set `enable_materialization` to `true` in the `store-server` section:
-
-```yaml
-store-server:
-  env:
-    # ...
-    enable_materialization: true
-```
 
 Follow the instructions in the [Ontopic Server documentation](./deploy-ontopic-server.md) to configure the parameters, but instead of creating a `values-server.yaml` file, you can add the configuration directly to the `values.yaml` file, under the `ontopic-server`. For example, for S3:
 
@@ -190,15 +181,13 @@ Follow the instructions in the [Ontopic Server documentation](./deploy-ontopic-s
 ontopic-server:
   enabled: true
 
-  storageProvider: s3
+  enableMaterialization: true
 
-  env:
-    ONTOPIC_SERVER_ENABLE_MATERIALIZATION: true
-    ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-access-key-id/s3-access-key-id
-    ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/s3-access-key-secret
-    ONTOPIC_SERVER_S3_BUCKET: <S3_BUCKET>
-    ONTOPIC_SERVER_S3_REGION: <S3_REGION>
-    ONTOPIC_SERVER_S3_ENDPOINT_URL: <S3_ENDPOINT_URL> # Optional, default is https://s3.amazonaws.com
+  s3:
+    enabled: true
+    bucket: <S3_BUCKET>
+    region: <S3_REGION>
+    endpoint: # Optional, default is https://s3.amazonaws.com
 ```
 
 ## Update host name
