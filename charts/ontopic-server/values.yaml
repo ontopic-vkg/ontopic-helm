@@ -50,7 +50,7 @@ postgresService:
   ## @param postgresService.enabled Create a separate service for PostgreSQL port
   enabled: true 
   ## @param postgresService.type Kubernetes Service type for PostgreSQL
-  type: LoadBalancer
+  type: ClusterIP
   ## @param postgresService.port PostgreSQL wire protocol port
   port: 4300
   ## @param postgresService.annotations Annotations for the PostgreSQL service
