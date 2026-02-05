@@ -125,14 +125,6 @@ envConfigMapName: ontopic-server-config
 env:
   ONTOPIC_SERVER_CORS_ALLOWED_ORIGINS: "*"
   ONTOPIC_SERVER_ENABLE_MATERIALIZATION: false
-  ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-access-key-id/s3-access-key-id
-  ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/s3-access-key-secret
-  ONTOPIC_SERVER_S3_BUCKET:
-  ONTOPIC_SERVER_S3_REGION: eu-central-1
-  ONTOPIC_SERVER_AZURE_ACCOUNT_NAME: /run/secrets/azure-account-name/azure-account-name
-  ONTOPIC_SERVER_AZURE_ACCOUNT_KEY: /run/secrets/azure-account-key/azure-account-key
-  ONTOPIC_SERVER_AZURE_SAS_TOKEN: /run/secrets/azure-sas-token/azure-sas-token
-  ONTOPIC_SERVER_AZURE_CONTAINER_NAME:
   ONTOPIC_SERVER_MATERIALIZATION_CONFIGURATION_DIR: materialization-configuration
   ONTOPIC_SERVER_MATERIALIZATION_RESULT_DIR: materialization-result
   ONTOPIC_SERVER_LOG_LEVEL: INFO
@@ -141,33 +133,53 @@ env:
   ONTOPIC_SERVER_JDBC_ROOT_DIR: /opt/ontopic-server/jdbc
   ONTOPIC_SERVER_WEB_API_PORT: 8080
   ONTOPIC_SERVER_POSTGRES_PORT: 4300
-  # ONTOPIC_SERVER_IDENTITY_SERVICE_URL: http://ontopic-suite-web:8080/
   ONTOPIC_SERVER_DISABLE_TLS: false
 
+# Always-mounted secrets
 secrets:
-  common:
-    user-license-file:
-      path: /run/secrets/user-license
-      optional: false
-  s3:
-    s3-access-key-id:
-      path: /run/secrets/s3-access-key-id
-      optional: false
-    s3-access-key-secret:
-      path: /run/secrets/s3-access-key-secret
-      optional: false
-  azure:
-    azure-account-name:
-      path: /run/secrets/azure-account-name
-      optional: false
-    azure-account-key:
-      path: /run/secrets/azure-account-key
-      optional: true
-    azure-sas-token:
-      path: /run/secrets/azure-sas-token
-      optional: true   # Either account-key OR sas-token required
+  user-license-file: /run/secrets/user-license
 
-storageProvider: # Options: s3, azure
+# Conditional secrets - mounted based on a values condition
+# The envVars are only added to the ConfigMap when the condition is true
+conditionalSecrets:
+  # S3 credentials - mounted when s3.enabled is true
+  s3-access-key-id:
+    mountPath: /run/secrets/s3-access-key-id
+    condition: s3.enabled
+    envVars:
+      ONTOPIC_SERVER_S3_ACCESS_KEY_ID_FILE: /run/secrets/s3-access-key-id/s3-access-key-id
+  s3-access-key-secret:
+    mountPath: /run/secrets/s3-access-key-secret
+    condition: s3.enabled
+    envVars:
+      ONTOPIC_SERVER_S3_ACCESS_KEY_SECRET_FILE: /run/secrets/s3-access-key-secret/s3-access-key-secret
+  # Azure account name - mounted when azure.enabled is true
+  azure-account-name:
+    mountPath: /run/secrets/azure-account-name
+    condition: azure.enabled
+    envVars:
+      ONTOPIC_SERVER_AZURE_ACCOUNT_NAME: /run/secrets/azure-account-name/azure-account-name
+
+# Optional secrets - only mounted if the Kubernetes secret exists (uses lookup)
+# The envVars are only added to the ConfigMap when the secret is detected
+optionalSecrets:
+  azure-account-key:
+    mountPath: /run/secrets/azure-account-key
+    envVars:
+      ONTOPIC_SERVER_AZURE_ACCOUNT_KEY: /run/secrets/azure-account-key/azure-account-key
+  azure-sas-token:
+    mountPath: /run/secrets/azure-sas-token
+    envVars:
+      ONTOPIC_SERVER_AZURE_SAS_TOKEN: /run/secrets/azure-sas-token/azure-sas-token
+
+# Storage provider configuration
+s3:
+  enabled: false
+  region: eu-central-1
+  bucket:
+azure:
+  enabled: false
+  container:
 
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment

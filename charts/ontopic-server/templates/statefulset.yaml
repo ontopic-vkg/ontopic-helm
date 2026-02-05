@@ -1,9 +1,3 @@
-{{- $activeSecrets := .Values.secrets.common | default dict -}}
-{{- if eq .Values.storageProvider "s3" }}
-  {{- $activeSecrets = merge $activeSecrets (default dict .Values.secrets.s3) -}}
-{{- else if eq .Values.storageProvider "azure" }}
-  {{- $activeSecrets = merge $activeSecrets (default dict .Values.secrets.azure) -}}
-{{- end }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -55,10 +49,33 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if or .Values.secrets .Values.conditionalSecrets .Values.optionalSecrets }}
           volumeMounts:
-          {{- range $name, $config := $activeSecrets }}
+          {{- range $name, $mount := .Values.secrets }}
             - name: "{{ $name }}-volume"
-              mountPath: {{ $config.path | quote }}
+              mountPath: {{ $mount | quote }}
+          {{- end }}
+          {{- if .Values.conditionalSecrets }}
+          {{- range $name, $config := .Values.conditionalSecrets }}
+          {{- $conditionPath := splitList "." $config.condition }}
+          {{- $conditionValue := $.Values }}
+          {{- range $conditionPath }}
+          {{- $conditionValue = index $conditionValue . }}
+          {{- end }}
+          {{- if $conditionValue }}
+            - name: "{{ $name }}-volume"
+              mountPath: {{ $config.mountPath | quote }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.optionalSecrets }}
+          {{- range $name, $config := .Values.optionalSecrets }}
+          {{- if lookup "v1" "Secret" $.Release.Namespace $name }}
+            - name: "{{ $name }}-volume"
+              mountPath: {{ $config.mountPath | quote }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
           {{- end }}
             - name: {{ .Values.endpoint.persistence.volumeName }}
               mountPath: {{ .Values.endpoint.persistence.mountPath }}
@@ -98,11 +115,33 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-      {{- range $name, $config := $activeSecrets }}
+      {{- range $name, $mount := .Values.secrets }}
         - name: "{{$name}}-volume"
           secret:
             secretName: {{$name | quote}}
-            optional: {{ $config.optional | default false }}
+      {{- end }}
+      {{- if .Values.conditionalSecrets }}
+      {{- range $name, $config := .Values.conditionalSecrets }}
+      {{- $conditionPath := splitList "." $config.condition }}
+      {{- $conditionValue := $.Values }}
+      {{- range $conditionPath }}
+      {{- $conditionValue = index $conditionValue . }}
+      {{- end }}
+      {{- if $conditionValue }}
+        - name: "{{$name}}-volume"
+          secret:
+            secretName: {{$name | quote}}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.optionalSecrets }}
+      {{- range $name, $config := .Values.optionalSecrets }}
+      {{- if lookup "v1" "Secret" $.Release.Namespace $name }}
+        - name: "{{$name}}-volume"
+          secret:
+            secretName: {{$name | quote}}
+      {{- end }}
+      {{- end }}
       {{- end }}
   {{- if and .Values.endpoint.persistence.enabled .Values.endpoint.persistence.existingClaim }}
         - name: {{ .Values.endpoint.persistence.volumeName }}

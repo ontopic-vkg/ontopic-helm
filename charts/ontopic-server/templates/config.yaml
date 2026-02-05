@@ -3,5 +3,36 @@ kind: ConfigMap
 metadata:
     name: {{.Values.envConfigMapName}}
 data:
-{{- include "ontopic-server.env" .Values.env }}
+{{- $env := .Values.env }}
+{{- /* Merge env vars from conditionalSecrets based on condition */ -}}
+{{- if .Values.conditionalSecrets }}
+{{- range $secretName, $config := .Values.conditionalSecrets }}
+{{- $conditionPath := splitList "." $config.condition }}
+{{- $conditionValue := $.Values }}
+{{- range $conditionPath }}
+{{- $conditionValue = index $conditionValue . }}
+{{- end }}
+{{- if and $config.envVars $conditionValue }}
+{{- $env = merge $config.envVars $env }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- /* Merge env vars from optionalSecrets only if the secret exists */ -}}
+{{- if .Values.optionalSecrets }}
+{{- range $secretName, $config := .Values.optionalSecrets }}
+{{- if and $config.envVars (lookup "v1" "Secret" $.Release.Namespace $secretName) }}
+{{- $env = merge $config.envVars $env }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- /* Add S3 env vars when S3 is enabled */ -}}
+{{- if .Values.s3.enabled }}
+{{- $_ := set $env "ONTOPIC_SERVER_S3_BUCKET" .Values.s3.bucket }}
+{{- $_ := set $env "ONTOPIC_SERVER_S3_REGION" .Values.s3.region }}
+{{- end }}
+{{- /* Add Azure env vars when Azure is enabled */ -}}
+{{- if .Values.azure.enabled }}
+{{- $_ := set $env "ONTOPIC_SERVER_AZURE_CONTAINER_NAME" .Values.azure.container }}
+{{- end }}
+{{- include "ontopic-server.env" (dict "env" $env "root" $) }}
 ---
