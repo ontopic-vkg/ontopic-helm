@@ -183,11 +183,11 @@ ontopic-server:
 
   enableMaterialization: true
 
-  s3:
-    enabled: true
-    bucket: <S3_BUCKET>
-    region: <S3_REGION>
-    endpoint: # Optional, default is https://s3.amazonaws.com
+  objectStorage:
+    s3:
+      bucket: <S3_BUCKET>
+      region: <S3_REGION>
+      endpoint: # Optional, default is https://s3.amazonaws.com
 ```
 
 ## Update host name

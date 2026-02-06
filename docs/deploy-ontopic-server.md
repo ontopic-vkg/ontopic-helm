@@ -151,11 +151,11 @@ Create a new values file `values-server.yaml` with the s3 configuration that wil
 ```yaml
 enableMaterialization: true
 
-s3:
-  enabled: true
-  bucket: <S3_BUCKET>
-  region: <S3_REGION>
-  endpoint: # Optional, default is https://s3.amazonaws.com
+objectStorage:
+  s3:
+    bucket: <S3_BUCKET>
+    region: <S3_REGION>
+    endpoint: # Optional, default is https://s3.amazonaws.com
 ```
 
 ### Azure Blob Storage
@@ -224,17 +224,15 @@ kubectl create secret generic azure-sas-token \
   --from-file=azure-sas-token=./secrets/azure-sas-token
 ```
 
-Create a new values file `values-server.yaml` with the azure configuration that will be used by the `ontopic-server` chart. You can choose to use either the account key (`useAccountKey: true`) or the SAS token (`useSasToken: true`):
+Create a new values file `values-server.yaml` with the azure configuration that will be used by the `ontopic-server` chart. Note that if both `AZURE_ACCOUNT_KEY` and `AZURE_ACCOUNT_SAS_TOKEN` are provided, the account key will be used by default.
 
 ```yaml
 enableMaterialization: true
 
-azure:
-  enabled: true
-  container: <AZURE_CONTAINER_NAME>
-  useSasToken: false # Set to true if you want to use SAS token instead of account key
-  useAccountKey: false # Set to true if you want to use account key instead of SAS token
-  endpoint: # Optional, default is https://<ACCOUNT_NAME>.blob.core.windows.net/
+objectStorage:
+  azure:
+    container: <AZURE_CONTAINER_NAME>
+    endpoint: # Optional, default is https://<ACCOUNT_NAME>.blob.core.windows.net/
 ```
 
 ### File Storage
