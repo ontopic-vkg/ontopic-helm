@@ -52,6 +52,10 @@ data:
 {{- if and (eq $name "store-server") (index $.Values "ontopic-server").enableMaterialization }}
 {{- $_ := set $env "ENABLE_MATERIALIZATION" "true" }}
 {{- end }}
+{{- /* Set ONTOPIC_SERVER_DOMAIN for store-server from ontopic-server.postgresService.host when configured */ -}}
+{{- if and (eq $name "store-server") (index $.Values "ontopic-server").postgresService.host }}
+{{- $_ := set $env "ONTOPIC_SERVER_DOMAIN" (index $.Values "ontopic-server").postgresService.host }}
+{{- end }}
 {{- include "ontopic-suite.env" $env }}
 {{- end }}
 {{- end }}

@@ -29,10 +29,6 @@ data:
 {{- if .Values.objectStorage.azure.endpoint }}
 {{- $_ := set $env "ONTOPIC_SERVER_AZURE_ENDPOINT_URL" .Values.objectStorage.azure.endpoint }}
 {{- end }}
-{{- /* Set ONTOPIC_SERVER_DOMAIN from postgresService.host when configured */ -}}
-{{- if .Values.postgresService.host }}
-{{- $_ := set $env "ONTOPIC_SERVER_DOMAIN" .Values.postgresService.host }}
-{{- end }}
 {{- /* Set ONTOPIC_SERVER_ENABLE_MATERIALIZATION based on enableMaterialization */ -}}
 {{- $_ := set $env "ONTOPIC_SERVER_ENABLE_MATERIALIZATION" .Values.enableMaterialization }}
 {{- include "ontopic-server.env" $env }}
