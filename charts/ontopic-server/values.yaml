@@ -52,6 +52,8 @@ postgresService:
   type: ClusterIP
   ## @param postgresService.port PostgreSQL wire protocol port
   port: 4300
+  ## @param postgresService.host Hostname for the PostgreSQL service (sets ONTOPIC_SERVER_DOMAIN when non-empty)
+  host: ""
   ## @param postgresService.annotations Annotations for the PostgreSQL service
   annotations: {}
   ## @param postgresService.loadBalancerIP Fixed LoadBalancer IP (optional)
