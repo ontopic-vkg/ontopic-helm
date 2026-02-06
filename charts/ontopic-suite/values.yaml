@@ -429,7 +429,7 @@ users:
         - ots-admin
 
 # Configure the PostgreSQL subchart
-postgresql:
+db:
   # -- enable the PostgreSQL chart
   enabled: true
   # -- enable creation of the secret for Ontopic Studio

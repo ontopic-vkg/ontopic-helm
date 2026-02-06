@@ -1,4 +1,4 @@
-{{- if .Values.postgresql.enableDemoData -}}
+{{- if .Values.db.enableDemoData -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -45,7 +45,7 @@ data:
 {{- $_ := set $env "ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE" true }}
 {{- end }}
 {{- /* Auto-enable sample DB for store-server when demo data is enabled */ -}}
-{{- if and (eq $name "store-server") $.Values.postgresql.enableDemoData }}
+{{- if and (eq $name "store-server") $.Values.db.enableDemoData }}
 {{- $_ := set $env "ONTOPIC_SAMPLE_DB" "true" }}
 {{- end }}
 {{- /* Set ENABLE_MATERIALIZATION for store-server based on ontopic-server.enableMaterialization */ -}}
