@@ -3,5 +3,33 @@ kind: ConfigMap
 metadata:
     name: {{.Values.envConfigMapName}}
 data:
-{{- include "ontopic-server.env" .Values.env }}
+{{- $env := .Values.env }}
+{{- /* Merge env vars from optionalSecrets only if the secret exists */ -}}
+{{- if .Values.optionalSecrets }}
+{{- range $secretName, $config := .Values.optionalSecrets }}
+{{- if and $config.envVars (lookup "v1" "Secret" $.Release.Namespace $secretName) }}
+{{- $env = merge $config.envVars $env }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- /* Add S3 env vars when objectStorage.s3 is configured */ -}}
+{{- if .Values.objectStorage.s3.bucket }}
+{{- $_ := set $env "ONTOPIC_SERVER_S3_BUCKET" .Values.objectStorage.s3.bucket }}
+{{- end }}
+{{- if .Values.objectStorage.s3.region }}
+{{- $_ := set $env "ONTOPIC_SERVER_S3_REGION" .Values.objectStorage.s3.region }}
+{{- end }}
+{{- if .Values.objectStorage.s3.endpoint }}
+{{- $_ := set $env "ONTOPIC_SERVER_S3_ENDPOINT_URL" .Values.objectStorage.s3.endpoint }}
+{{- end }}
+{{- /* Add Azure env vars when objectStorage.azure is configured */ -}}
+{{- if .Values.objectStorage.azure.container }}
+{{- $_ := set $env "ONTOPIC_SERVER_AZURE_CONTAINER_NAME" .Values.objectStorage.azure.container }}
+{{- end }}
+{{- if .Values.objectStorage.azure.endpoint }}
+{{- $_ := set $env "ONTOPIC_SERVER_AZURE_ENDPOINT_URL" .Values.objectStorage.azure.endpoint }}
+{{- end }}
+{{- /* Set ONTOPIC_SERVER_ENABLE_MATERIALIZATION based on enableMaterialization */ -}}
+{{- $_ := set $env "ONTOPIC_SERVER_ENABLE_MATERIALIZATION" .Values.enableMaterialization }}
+{{- include "ontopic-server.env" $env }}
 ---
