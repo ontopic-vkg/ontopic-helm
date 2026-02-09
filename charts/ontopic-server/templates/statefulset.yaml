@@ -27,6 +27,11 @@ spec:
       serviceAccountName: {{ include "ontopic-server.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.env.JDBC_EXTERNAL_REPO }}
+      initContainers:
+        {{- include "ontopic-server.copyDefaultJdbcDrivers" . | nindent 8 }}
+        {{- include "ontopic-server.jdbcExternalRepoInitContainer" . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -69,6 +74,7 @@ spec:
           {{- include "ontopic-server.volumeMount" (dict "config" .Values.materializationDb) | nindent 12 }}
           {{- include "ontopic-server.volumeMount" (dict "config" .Values.materializationConfiguration) | nindent 12 }}
           {{- include "ontopic-server.volumeMount" (dict "config" .Values.materializationResult) | nindent 12 }}
+          {{- include "ontopic-server.volumeMount" (dict "config" .Values.jdbc) | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -101,6 +107,7 @@ spec:
       {{- include "ontopic-server.volume" (dict "config" .Values.materializationDb "context" $) | nindent 6 }}
       {{- include "ontopic-server.volume" (dict "config" .Values.materializationConfiguration "context" $) | nindent 6 }}
       {{- include "ontopic-server.volume" (dict "config" .Values.materializationResult "context" $) | nindent 6 }}
+      {{- include "ontopic-server.volume" (dict "config" .Values.jdbc "context" $) | nindent 6 }}
   {{- if .Values.persistentVolumeClaimRetentionPolicy.enabled }}
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: {{ .Values.persistentVolumeClaimRetentionPolicy.whenDeleted }}
@@ -112,3 +119,4 @@ spec:
   {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.materializationDb "context" $) | nindent 2 }}
   {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.materializationConfiguration "context" $) | nindent 2 }}
   {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.materializationResult "context" $) | nindent 2 }}
+  {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.jdbc "context" $) | nindent 2 }}

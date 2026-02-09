@@ -26,11 +26,13 @@ Generate volume mount for a persistence configuration
 {{ include "ontopic-server.volumeMount" (dict "config" .Values.endpoint ) }}
 */}}
 {{- define "ontopic-server.volumeMount" -}}
+{{- if .config.persistence.enabled }}
 - name: {{ .config.persistence.volumeName }}
   mountPath: {{ .config.persistence.mountPath }}
   {{- if .config.persistence.subPath }}
   subPath: {{ .config.persistence.subPath }}
   {{- end }}
+{{- end -}}
 {{- end -}}
 
 {{/*

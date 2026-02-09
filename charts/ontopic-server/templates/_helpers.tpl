@@ -77,3 +77,48 @@ Create the name of the service account to use
       key: {{$name | quote}}
 {{- end }}
 {{- end }}
+{{/*
+Init container to copy default JDBC drivers from container image to persistent volume
+Preserves the built-in drivers (H2, etc.) before they get hidden by the volume mount
+*/}}
+{{- define "ontopic-server.copyDefaultJdbcDrivers" -}}
+- name: copy-default-jdbc-drivers
+  image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  command:
+    - sh
+    - -c
+    - |
+        echo "Copying default JDBC drivers from container image to persistent volume"
+        cp -rv /opt/ontopic-server/jdbc/* /mnt/jdbc-volume/ || true
+  volumeMounts:
+    - name: {{ .Values.jdbc.persistence.volumeName }}
+      mountPath: /mnt/jdbc-volume
+      {{- if .Values.jdbc.persistence.subPath }}
+      subPath: {{ .Values.jdbc.persistence.subPath }}
+      {{- end }}
+{{- end }}
+
+{{/*
+Init container to setup JDBC external repository clone directory
+This runs second to create the directory for cloning external JDBC drivers
+*/}}
+{{- define "ontopic-server.jdbcExternalRepoInitContainer" -}}
+{{- if .Values.env.JDBC_EXTERNAL_REPO }}
+- name: setup-jdbc-external-dir
+  image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  command:
+    - sh
+    - -c
+    - |
+      mkdir -p {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}-external
+      echo "Created directory {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}-external for external JDBC repository clone"
+  volumeMounts:
+    - name: {{ .Values.jdbc.persistence.volumeName }}
+      mountPath: {{ .Values.jdbc.persistence.mountPath }}
+      {{- if .Values.jdbc.persistence.subPath }}
+      subPath: {{ .Values.jdbc.persistence.subPath }}
+      {{- end }}
+{{- end }}
+{{- end }}

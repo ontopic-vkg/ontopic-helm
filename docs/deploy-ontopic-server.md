@@ -62,13 +62,13 @@ It's possible to add additional jdbc drivers by adding some env vars:
 
 If you use a deploy key to access the git repo, you need to create a secret and then provide `JDBC_EXTERNAL_REPO_KEY_PATH` if needed.
 
-The default path is : `/run/secrets/jdbc-external-repo/private_key`
+The default path is : `/run/secrets/jdbc-private-key/jdbc-private-key`
 
 So you can create a secret like :
 
 ```sh
-kubectl create secret generic jdbc-external-repo \
-  --from-file=private_key=./my-private-key
+kubectl create secret generic jdbc-private-key \
+  --from-file=jdbc-private-key=./secrets/jdbc-private-key
 ```
 
 Create or add to the values file `values-server.yaml` that will be used by the `ontopic-server` chart:
@@ -79,10 +79,9 @@ env:
   JDBC_EXTERNAL_REPO_FOLDER: my-folder
 
 secrets:
-  # If you use s3, you have to specify the values or it will be overridden
   # ...
   # JDBC
-  jdbc-external-repo: /run/secrets/jdbc-external-repo
+  jdbc-private-key: /run/secrets/jdbc-private-key
 ```
 
 ## Enable materialization (optional)
