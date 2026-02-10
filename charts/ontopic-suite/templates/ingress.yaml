@@ -1,10 +1,9 @@
 {{- range $name, $values := .Values.services }}
 {{- with $values }}
+{{- if and .service .ingress }}
 ---
-
-{{- if and .service .ingress -}}
-{{- $fullName := printf "%s-%s" (include "ontopic-suite.name" $) .service.name -}}
-{{- $svcPort := .service.port -}}
+{{ $fullName := printf "%s-%s" (include "ontopic-suite.name" $) .service.name -}}
+{{ $svcPort := .service.port -}}
 {{- if and $.Values.ingress.className (not (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey $.Values.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set $.Values.ingress.annotations "kubernetes.io/ingress.class" .ingress.className}}
