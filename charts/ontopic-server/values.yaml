@@ -184,6 +184,12 @@ objectStorage:
     container:
     endpoint:
 
+# External JDBC drivers from Git repository
+jdbcExternal:
+  enabled: false
+  repository:
+  folder:
+
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment
   ##

@@ -29,6 +29,15 @@ data:
 {{- if .Values.objectStorage.azure.endpoint }}
 {{- $_ := set $env "ONTOPIC_SERVER_AZURE_ENDPOINT_URL" .Values.objectStorage.azure.endpoint }}
 {{- end }}
+{{- /* Add JDBC external repo env vars when jdbcExternal is enabled */ -}}
+{{- if .Values.jdbcExternal.enabled }}
+{{- if .Values.jdbcExternal.repository }}
+{{- $_ := set $env "JDBC_EXTERNAL_REPO" .Values.jdbcExternal.repository }}
+{{- end }}
+{{- if .Values.jdbcExternal.folder }}
+{{- $_ := set $env "JDBC_EXTERNAL_REPO_FOLDER" .Values.jdbcExternal.folder }}
+{{- end }}
+{{- end }}
 {{- /* Set ONTOPIC_SERVER_ENABLE_MATERIALIZATION based on enableMaterialization */ -}}
 {{- $_ := set $env "ONTOPIC_SERVER_ENABLE_MATERIALIZATION" .Values.enableMaterialization }}
 {{- include "ontopic-server.env" $env }}

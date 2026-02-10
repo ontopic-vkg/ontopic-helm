@@ -104,7 +104,7 @@ Init container to setup JDBC external repository clone directory
 This runs second to create the directory for cloning external JDBC drivers
 */}}
 {{- define "ontopic-server.jdbcExternalRepoInitContainer" -}}
-{{- if .Values.env.JDBC_EXTERNAL_REPO }}
+{{- if .Values.jdbcExternal.enabled }}
 - name: setup-jdbc-external-dir
   image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
   imagePullPolicy: {{ .Values.image.pullPolicy }}

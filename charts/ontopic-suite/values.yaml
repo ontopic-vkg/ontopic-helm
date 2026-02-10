@@ -266,6 +266,13 @@ services:
     secrets:
       user-license-file: /run/secrets/user-license
 
+    # Optional secrets - only mounted if the Kubernetes secret exists
+    optionalSecrets:
+      jdbc-private-key:
+        mountPath: /run/secrets/jdbc-private-key
+        envVars:
+          JDBC_EXTERNAL_REPO_KEY_PATH: /run/secrets/jdbc-private-key/jdbc-private-key
+
   ##--- Store server
   store-server:
     image:

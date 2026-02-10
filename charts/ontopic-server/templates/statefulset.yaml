@@ -27,7 +27,7 @@ spec:
       serviceAccountName: {{ include "ontopic-server.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if .Values.env.JDBC_EXTERNAL_REPO }}
+      {{- if .Values.jdbcExternal.enabled }}
       initContainers:
         {{- include "ontopic-server.copyDefaultJdbcDrivers" . | nindent 8 }}
         {{- include "ontopic-server.jdbcExternalRepoInitContainer" . | nindent 8 }}

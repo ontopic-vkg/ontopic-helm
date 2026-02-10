@@ -52,36 +52,33 @@ helm delete ontopic-server
 
 ### Custom JDBC drivers (optional)
 
-It's possible to add additional jdbc drivers by adding some env vars:
+### Custom JDBC drivers (optional)
 
-| Name                          | Description                                      |
-| ----------------------------- | ------------------------------------------------ |
-| `JDBC_EXTERNAL_REPO`          | The path of the git repo                         |
-| `JDBC_EXTERNAL_REPO_FOLDER`   | The folder within the repo                       |
-| `JDBC_EXTERNAL_REPO_KEY_PATH` | The path where the SSH key is mounted (optional) |
+It's possible to add additional jdbc drivers from an external Git repository by configuring the `jdbcExternal` section:
 
-If you use a deploy key to access the git repo, you need to create a secret and then provide `JDBC_EXTERNAL_REPO_KEY_PATH` if needed.
+```yaml
+jdbcExternal:
+  enabled: true
+  repository: git@github.com:my-user/my-repo
+  folder: my-folder
+```
 
-The default path is : `/run/secrets/jdbc-private-key/jdbc-private-key`
-
-So you can create a secret like :
+If you use a deploy key to access the git repo, you need to create a secret:
 
 ```sh
 kubectl create secret generic jdbc-private-key \
   --from-file=jdbc-private-key=./secrets/jdbc-private-key
 ```
 
-Create or add to the values file `values-server.yaml` that will be used by the `ontopic-server` chart:
+The secret name must be `jdbc-private-key` with a key named `jdbc-private-key`.
 
-```sh
-env:
-  JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
-  JDBC_EXTERNAL_REPO_FOLDER: my-folder
+Complete example in `values-server.yaml`:
 
-secrets:
-  # ...
-  # JDBC
-  jdbc-private-key: /run/secrets/jdbc-private-key
+```yaml
+jdbcExternal:
+  enabled: true
+  repository: git@github.com:my-user/my-repo
+  folder: my-folder
 ```
 
 ## Enable materialization (optional)

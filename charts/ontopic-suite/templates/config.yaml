@@ -52,6 +52,18 @@ data:
 {{- if and (eq $name "store-server") (index $.Values "ontopic-server").enableMaterialization }}
 {{- $_ := set $env "ENABLE_MATERIALIZATION" "true" }}
 {{- end }}
+{{- /* Set JDBC_EXTERNAL_REPO variables for process-server based on ontopic-server.jdbcExternal */ -}}
+{{- if eq $name "process-server" }}
+{{- $ontopicServer := index $.Values "ontopic-server" }}
+{{- if and $ontopicServer.jdbcExternal $ontopicServer.jdbcExternal.enabled }}
+{{- if $ontopicServer.jdbcExternal.repository }}
+{{- $_ := set $env "JDBC_EXTERNAL_REPO" $ontopicServer.jdbcExternal.repository }}
+{{- end }}
+{{- if $ontopicServer.jdbcExternal.folder }}
+{{- $_ := set $env "JDBC_EXTERNAL_REPO_FOLDER" $ontopicServer.jdbcExternal.folder }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- /* Set ONTOPIC_SERVER_DOMAIN for store-server from ontopic-server.postgresService.host when configured */ -}}
 {{- if and (eq $name "store-server") (index $.Values "ontopic-server").postgresService.host }}
 {{- $_ := set $env "ONTOPIC_SERVER_DOMAIN" (index $.Values "ontopic-server").postgresService.host }}
