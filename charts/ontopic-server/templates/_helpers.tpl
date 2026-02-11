@@ -79,7 +79,7 @@ Create the name of the service account to use
 {{- end }}
 {{/*
 Init container to copy default JDBC drivers from container image to persistent volume
-Preserves the built-in drivers (H2, etc.) before they get hidden by the volume mount
+Preserves the built-in drivers before they get hidden by the volume mount
 */}}
 {{- define "ontopic-server.copyDefaultJdbcDrivers" -}}
 - name: copy-default-jdbc-drivers
@@ -90,7 +90,7 @@ Preserves the built-in drivers (H2, etc.) before they get hidden by the volume m
     - -c
     - |
         echo "Copying default JDBC drivers from container image to persistent volume"
-        cp -rv /opt/ontopic-server/jdbc/* /mnt/jdbc-volume/ || true
+        cp -rv {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}/* /mnt/jdbc-volume/ || true
   volumeMounts:
     - name: {{ .Values.jdbc.persistence.volumeName }}
       mountPath: /mnt/jdbc-volume
