@@ -32,4 +32,4 @@ dependencies:
     version: 18.2.0
     repository: "oci://registry-1.docker.io/bitnamicharts"
     alias: db
-    condition: db.enabled
+    condition: db.deployedInCluster

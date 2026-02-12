@@ -45,7 +45,7 @@ data:
 {{- $_ := set $env "ONTOPIC_IDENTITY_SERVICE_COOKIE_SECURE" true }}
 {{- end }}
 {{- /* Auto-enable sample DB for store-server when demo data is enabled */ -}}
-{{- if and (eq $name "store-server") $.Values.db.enableDemoData }}
+{{- if and (eq $name "store-server") $.Values.demoData.enabled }}
 {{- $_ := set $env "ONTOPIC_SAMPLE_DB" "true" }}
 {{- end }}
 {{- /* Set ENABLE_MATERIALIZATION for store-server based on ontopic-server.enableMaterialization */ -}}
@@ -55,6 +55,24 @@ data:
 {{- /* Set ONTOPIC_SERVER_DOMAIN for store-server from ontopic-server.postgresService.host when configured */ -}}
 {{- if and (eq $name "store-server") (index $.Values "ontopic-server").postgresService.host }}
 {{- $_ := set $env "ONTOPIC_SERVER_DOMAIN" (index $.Values "ontopic-server").postgresService.host }}
+{{- end }}
+{{- /* Set database and casbin configuration for the store-server from db configuration */ -}}
+{{- if eq $name "store-server" }}
+{{- if $.Values.db.host }}
+{{- $_ := set $env "DATABASE_HOST" $.Values.db.host }}
+{{- $_ := set $env "CASBIN_STORE_HOST" $.Values.db.host }}
+{{- end }}
+{{- if $.Values.db.port }}
+{{- $_ := set $env "DATABASE_PORT" (toString $.Values.db.port) }}
+{{- $_ := set $env "CASBIN_STORE_PORT" (toString $.Values.db.port) }}
+{{- end }}
+{{- if $.Values.db.name }}
+{{- $_ := set $env "DATABASE_NAME" $.Values.db.name }}
+{{- end }}
+{{- if $.Values.db.user }}
+{{- $_ := set $env "DATABASE_USER" $.Values.db.user }}
+{{- $_ := set $env "CASBIN_STORE_USER" $.Values.db.user }}
+{{- end }}
 {{- end }}
 {{- include "ontopic-suite.env" $env }}
 {{- end }}
