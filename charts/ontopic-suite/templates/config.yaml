@@ -56,11 +56,11 @@ data:
 {{- if eq $name "process-server" }}
 {{- $ontopicServer := index $.Values "ontopic-server" }}
 {{- if and $ontopicServer.jdbcExternal $ontopicServer.jdbcExternal.enabled }}
-{{- if $ontopicServer.jdbcExternal.repository }}
-{{- $_ := set $env "JDBC_EXTERNAL_REPO" $ontopicServer.jdbcExternal.repository }}
+{{- if $ontopicServer.jdbcExternal.sourceRepository }}
+{{- $_ := set $env "JDBC_EXTERNAL_REPO" $ontopicServer.jdbcExternal.sourceRepository }}
 {{- end }}
-{{- if $ontopicServer.jdbcExternal.folder }}
-{{- $_ := set $env "JDBC_EXTERNAL_REPO_FOLDER" $ontopicServer.jdbcExternal.folder }}
+{{- if $ontopicServer.jdbcExternal.sourceFolder }}
+{{- $_ := set $env "JDBC_EXTERNAL_REPO_FOLDER" $ontopicServer.jdbcExternal.sourceFolder }}
 {{- end }}
 {{- end }}
 {{- end }}

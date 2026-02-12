@@ -185,10 +185,18 @@ objectStorage:
     endpoint:
 
 # External JDBC drivers from Git repository
+# The jdbc volume is always created and mounted at ONTOPIC_SERVER_JDBC_ROOT_DIR
 jdbcExternal:
+  ## @param jdbcExternal.enabled Enable fetching JDBC drivers from external Git repository
   enabled: false
-  repository:
-  folder:
+  ## @param jdbcExternal.replaceExistingDrivers Controls driver behavior:
+  ##   false: Add external drivers to built-in default drivers (merge mode)
+  ##   true: Replace all default drivers with only external repository drivers
+  replaceExistingDrivers: false
+  ## @param jdbcExternal.sourceRepository Git repository URL for external JDBC drivers
+  sourceRepository:
+  ## @param jdbcExternal.sourceFolder Folder path within the repository containing drivers
+  sourceFolder:
 
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment

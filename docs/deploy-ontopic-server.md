@@ -59,8 +59,8 @@ It's possible to add additional jdbc drivers from an external Git repository by 
 ```yaml
 jdbcExternal:
   enabled: true
-  repository: git@github.com:my-user/my-repo
-  folder: my-folder
+  sourceRepository: git@github.com:my-user/my-repo
+  sourceFolder: my-folder
 ```
 
 If you use a deploy key to access the git repo, you need to create a secret:
@@ -77,8 +77,8 @@ Complete example in `values-server.yaml`:
 ```yaml
 jdbcExternal:
   enabled: true
-  repository: git@github.com:my-user/my-repo
-  folder: my-folder
+  sourceRepository: git@github.com:my-user/my-repo
+  sourceFolder: my-folder
 ```
 
 ## Enable materialization (optional)

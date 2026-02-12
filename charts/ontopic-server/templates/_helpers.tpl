@@ -80,8 +80,10 @@ Create the name of the service account to use
 {{/*
 Init container to copy default JDBC drivers from container image to persistent volume
 Preserves the built-in drivers before they get hidden by the volume mount
+Skips copying when jdbcExternal is enabled with replaceExistingDrivers=true
 */}}
 {{- define "ontopic-server.copyDefaultJdbcDrivers" -}}
+{{- if not (and .Values.jdbcExternal.enabled .Values.jdbcExternal.replaceExistingDrivers) }}
 - name: copy-default-jdbc-drivers
   image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
   imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -89,14 +91,19 @@ Preserves the built-in drivers before they get hidden by the volume mount
     - sh
     - -c
     - |
-        echo "Copying default JDBC drivers from container image to persistent volume"
-        cp -rv {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}/* /mnt/jdbc-volume/ || true
+        if [ -z "$(ls -A /mnt/jdbc-volume)" ]; then
+          echo "JDBC volume is empty. Copying default JDBC drivers from container image to persistent volume"
+          cp -rv {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}/* /mnt/jdbc-volume/ || true
+        else
+          echo "JDBC volume already contains files. Skipping default driver copy."
+        fi
   volumeMounts:
     - name: {{ .Values.jdbc.persistence.volumeName }}
       mountPath: /mnt/jdbc-volume
       {{- if .Values.jdbc.persistence.subPath }}
       subPath: {{ .Values.jdbc.persistence.subPath }}
       {{- end }}
+{{- end }}
 {{- end }}
 
 {{/*

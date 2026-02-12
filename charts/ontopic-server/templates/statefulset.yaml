@@ -29,9 +29,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         {{- include "ontopic-server.copyDefaultJdbcDrivers" . | nindent 8 }}
-        {{- if .Values.jdbcExternal.enabled }}
         {{- include "ontopic-server.jdbcExternalRepoInitContainer" . | nindent 8 }}
-        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
