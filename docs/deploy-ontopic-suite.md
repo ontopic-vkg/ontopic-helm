@@ -550,52 +550,6 @@ In the Azure Portal, configure the following:
 
 After saving, clients can connect to PostgreSQL at `<application-gateway-ip>:5432`.
 
-## Custom JDBC drivers (optional)
-
-It's possible to add additional jdbc drivers by adding some env vars:
-
-| Name                          | Description                                      |
-| ----------------------------- | ------------------------------------------------ |
-| `JDBC_EXTERNAL_REPO`          | The path of the git repo                         |
-| `JDBC_EXTERNAL_REPO_FOLDER`   | The folder within the repo                       |
-| `JDBC_EXTERNAL_REPO_KEY_PATH` | The path where the SSH key is mounted (optional) |
-
-If you use a deploy key to access the git repo, you need to create a secret and then provide `JDBC_EXTERNAL_REPO_KEY_PATH` if needed.
-
-The default path is : `/run/secrets/jdbc-private-key/jdbc-private_key`
-
-So you can create a secret like :
-
-```sh
-kubectl create secret generic jdbc-private-key \
-  --from-file=jdbc-private-key=./secrets/jdbc-private-key
-```
-
-Create or add to the values file `values.yaml` that will be used by the Helm chart:
-
-```sh
-process-server:
-  env:
-    # ...
-    JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
-    JDBC_EXTERNAL_REPO_FOLDER: my-folder
-
-  secrets:
-    # ...
-    jdbc-private-key: /run/secrets/jdbc-private-key
-
-# If you use the Ontopic Server subchart
-ontopic-server:
-  env:
-    JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
-    JDBC_EXTERNAL_REPO_FOLDER: my-folder
-
-  secrets:
-    # ...
-    # JDBC
-    jdbc-private-key: /run/secrets/jdbc-private-key
-```
-
 ### Deploy the Helm chart
 
 To install the `ontopic-suite` chart a `values.yaml` file is needed to override the configurations:

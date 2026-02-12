@@ -190,7 +190,7 @@ jdbcExternal:
   ## @param jdbcExternal.enabled Enable fetching JDBC drivers from external Git repository
   enabled: false
   ## @param jdbcExternal.replaceExistingDrivers Controls driver behavior:
-  ##   false: Add external drivers to built-in default drivers (merge mode)
+  ##   false: Add external drivers to built-in default drivers
   ##   true: Replace all default drivers with only external repository drivers
   replaceExistingDrivers: false
   ## @param jdbcExternal.sourceRepository Git repository URL for external JDBC drivers

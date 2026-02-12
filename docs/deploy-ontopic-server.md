@@ -52,8 +52,6 @@ helm delete ontopic-server
 
 ### Custom JDBC drivers (optional)
 
-### Custom JDBC drivers (optional)
-
 It's possible to add additional jdbc drivers from an external Git repository by configuring the `jdbcExternal` section:
 
 ```yaml
@@ -76,10 +74,19 @@ Complete example in `values-server.yaml`:
 
 ```yaml
 jdbcExternal:
-  enabled: true
-  sourceRepository: git@github.com:my-user/my-repo
-  sourceFolder: my-folder
+  ## @param jdbcExternal.enabled Enable fetching JDBC drivers from external Git repository
+  enabled: false
+  ## @param jdbcExternal.replaceExistingDrivers Controls driver behavior:
+  ##   false: Add external drivers to built-in default drivers
+  ##   true: Replace all default drivers with only external repository drivers
+  replaceExistingDrivers: false
+  ## @param jdbcExternal.sourceRepository Git repository URL for external JDBC drivers
+  sourceRepository:
+  ## @param jdbcExternal.sourceFolder Folder path within the repository containing drivers
+  sourceFolder:
 ```
+
+**Note**: If you decide to replace the existing drivers, make sure to include a PostgreSQL and H2 JDBC driver in the external repository, as they are required for the Ontopic server to function properly.
 
 ## Enable materialization (optional)
 Ontopic Server supports materialization to RDF in different storage providers, such as S3 and Azure Blob Storage. Additionally, local storage can also be used for materialization.
