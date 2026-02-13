@@ -33,6 +33,16 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if and .Values.jdbcExternal.enabled .Values.jdbcExternal.replaceExistingDrivers }}
+          command:
+            - sh
+            - -c
+            - |
+              echo "Clearing existing JDBC drivers..."
+              rm -rf {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}/*
+              echo "Starting ontopic-server..."
+              exec /opt/ontopic-server/entrypoint.sh
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{.Values.envConfigMapName  | quote}}

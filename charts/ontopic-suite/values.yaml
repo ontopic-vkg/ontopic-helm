@@ -249,11 +249,15 @@ services:
       httpGet:
         path: /process-api/healthcheck
         port: 8666
+      initialDelaySeconds: 75
+      periodSeconds: 5
 
     readinessProbe:
       httpGet:
         path: /process-api/healthcheck
         port: 8666
+      initialDelaySeconds: 75
+      periodSeconds: 5
 
     envConfigMapName: process-server-config
 
@@ -262,9 +266,17 @@ services:
       STORE_SERVICE_PORT: 3000
       LICENSE_TYPE: ontopic
       USER_LICENSE_FILE: /run/secrets/user-license/user-license
+      JDBC_ROOT_DIR: /app/jdbc
 
     secrets:
       user-license-file: /run/secrets/user-license
+
+    # Optional secrets - only mounted if the Kubernetes secret exists
+    optionalSecrets:
+      jdbc-private-key:
+        mountPath: /run/secrets/jdbc-private-key
+        envVars:
+          JDBC_EXTERNAL_REPO_KEY_PATH: /run/secrets/jdbc-private-key/jdbc-private-key
 
   ##--- Store server
   store-server:

@@ -43,6 +43,20 @@ spec:
             {{- toYaml .securityContext | nindent 12 }}
           image: "{{ $.Values.global.registry }}/{{ .image.repository }}:{{ .image.tag | default $.Chart.AppVersion }}"
           imagePullPolicy: {{ .image.pullPolicy }}
+          {{- if eq $name "process-server" }}
+          {{- $ontopicServer := index $.Values "ontopic-server" -}}
+          {{- $processServer := index $.Values "services" "process-server" -}}
+          {{- if and $ontopicServer.jdbcExternal.enabled $ontopicServer.jdbcExternal.replaceExistingDrivers }}
+          command:
+            - sh
+            - -c
+            - |
+              echo "Clearing existing JDBC drivers..."
+              rm -rf {{ $processServer.env.JDBC_ROOT_DIR }}/*
+              echo "Starting process-server..."
+              exec /usr/bin/entrypoint
+          {{- end }}
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ .envConfigMapName  | quote }}

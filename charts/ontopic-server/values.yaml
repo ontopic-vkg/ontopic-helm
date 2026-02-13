@@ -132,6 +132,7 @@ env:
   ONTOPIC_SERVER_ENABLE_POSTGRES_WIRE_PROTOCOL: true
   ONTOPIC_SERVER_LICENSE_FILE: /run/secrets/user-license/user-license
   ONTOPIC_SERVER_JDBC_ROOT_DIR: /opt/ontopic-server/jdbc
+  JDBC_ROOT_DIR: /opt/ontopic-server/jdbc # used for external jdbc repo
   ONTOPIC_SERVER_WEB_API_PORT: 8080
   ONTOPIC_SERVER_POSTGRES_PORT: 4300
   ONTOPIC_SERVER_DISABLE_TLS: false
@@ -165,6 +166,10 @@ optionalSecrets:
     mountPath: /run/secrets/azure-sas-token
     envVars:
       ONTOPIC_SERVER_AZURE_SAS_TOKEN: /run/secrets/azure-sas-token/azure-sas-token
+  jdbc-private-key:
+    mountPath: /run/secrets/jdbc-private-key
+    envVars: 
+      JDBC_EXTERNAL_REPO_KEY_PATH: /run/secrets/jdbc-private-key/jdbc-private-key
 
 # Materialization configuration
 enableMaterialization: false
@@ -178,6 +183,20 @@ objectStorage:
   azure:
     container:
     endpoint:
+
+# External JDBC drivers from Git repository
+# The jdbc volume is always created and mounted at ONTOPIC_SERVER_JDBC_ROOT_DIR
+jdbcExternal:
+  ## @param jdbcExternal.enabled Enable fetching JDBC drivers from external Git repository
+  enabled: false
+  ## @param jdbcExternal.replaceExistingDrivers Controls driver behavior:
+  ##   false: Add external drivers to built-in default drivers
+  ##   true: Replace all default drivers with only external repository drivers
+  replaceExistingDrivers: false
+  ## @param jdbcExternal.sourceRepository Git repository URL for external JDBC drivers
+  sourceRepository:
+  ## @param jdbcExternal.sourceFolder Folder path within the repository containing drivers
+  sourceFolder:
 
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment
