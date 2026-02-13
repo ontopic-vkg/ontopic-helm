@@ -249,11 +249,15 @@ services:
       httpGet:
         path: /process-api/healthcheck
         port: 8666
+      initialDelaySeconds: 90
+      periodSeconds: 10
 
     readinessProbe:
       httpGet:
         path: /process-api/healthcheck
         port: 8666
+      initialDelaySeconds: 90
+      periodSeconds: 10
 
     envConfigMapName: process-server-config
 
