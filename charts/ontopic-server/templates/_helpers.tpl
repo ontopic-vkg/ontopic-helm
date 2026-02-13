@@ -78,37 +78,7 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 {{/*
-Init container to copy default JDBC drivers from container image to persistent volume
-Preserves the built-in drivers before they get hidden by the volume mount
-Skips copying when jdbcExternal is enabled with replaceExistingDrivers=true
-*/}}
-{{- define "ontopic-server.copyDefaultJdbcDrivers" -}}
-{{- if not (and .Values.jdbcExternal.enabled .Values.jdbcExternal.replaceExistingDrivers) }}
-- name: copy-default-jdbc-drivers
-  image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-  imagePullPolicy: {{ .Values.image.pullPolicy }}
-  command:
-    - sh
-    - -c
-    - |
-        if [ -z "$(ls -A /mnt/jdbc-volume)" ]; then
-          echo "JDBC volume is empty. Copying default JDBC drivers from container image to persistent volume"
-          cp -rv {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}/* /mnt/jdbc-volume/ || true
-        else
-          echo "JDBC volume already contains files. Skipping default driver copy."
-        fi
-  volumeMounts:
-    - name: {{ .Values.jdbc.persistence.volumeName }}
-      mountPath: /mnt/jdbc-volume
-      {{- if .Values.jdbc.persistence.subPath }}
-      subPath: {{ .Values.jdbc.persistence.subPath }}
-      {{- end }}
-{{- end }}
-{{- end }}
-
-{{/*
-Init container to setup JDBC external repository clone directory
-This runs second to create the directory for cloning external JDBC drivers
+Init container to create the directory for cloning external JDBC drivers
 */}}
 {{- define "ontopic-server.jdbcExternalRepoInitContainer" -}}
 {{- if .Values.jdbcExternal.enabled }}
@@ -121,11 +91,5 @@ This runs second to create the directory for cloning external JDBC drivers
     - |
       mkdir -p {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}-external
       echo "Created directory {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}-external for external JDBC repository clone"
-  volumeMounts:
-    - name: {{ .Values.jdbc.persistence.volumeName }}
-      mountPath: {{ .Values.jdbc.persistence.mountPath }}
-      {{- if .Values.jdbc.persistence.subPath }}
-      subPath: {{ .Values.jdbc.persistence.subPath }}
-      {{- end }}
 {{- end }}
 {{- end }}

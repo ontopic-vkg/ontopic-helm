@@ -85,13 +85,3 @@ Create the name of the service account to use
 {{- end -}}
 {{- $found -}}
 {{- end -}}
-
-{{/*
-Generate the ontopic-server JDBC PVC name for sharing with process-server
-The PVC is created by the ontopic-server StatefulSet with the pattern: <volumeName>-<statefulsetName>-<ordinal>
-*/}}
-{{- define "ontopic-suite.ontopicServerJdbcPvcName" -}}
-{{- $ontopicServerName := index .Values "ontopic-server" "fullnameOverride" | default "ontopic-server" -}}
-{{- $jdbcVolumeName := index .Values "ontopic-server" "jdbc" "persistence" "volumeName" | default "jdbc-root-dir" -}}
-{{- printf "%s-%s-0" $jdbcVolumeName $ontopicServerName -}}
-{{- end }}

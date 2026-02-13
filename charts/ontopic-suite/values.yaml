@@ -263,14 +263,6 @@ services:
       LICENSE_TYPE: ontopic
       USER_LICENSE_FILE: /run/secrets/user-license/user-license
 
-    # Shared JDBC volume from ontopic-server
-    volumes:
-      - volumeName: "jdbc-root-dir"
-        # References the PVC created by ontopic-server's StatefulSet (e.g., jdbc-root-dir-ontopic-server-0)
-        existingClaim: '{{ include "ontopic-suite.ontopicServerJdbcPvcName" . }}'
-        mountPath: /app/jdbc
-        subPath: ""
-
     secrets:
       user-license-file: /run/secrets/user-license
 

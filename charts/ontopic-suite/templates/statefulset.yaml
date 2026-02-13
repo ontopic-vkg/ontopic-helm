@@ -104,13 +104,11 @@ spec:
 
           {{- if .volumes }}
           {{- range .volumes }}
-            {{- if or (ne $name "process-server") (ne .volumeName "jdbc-root-dir") (index $.Values "ontopic-server").enabled }}
             - name: {{ .volumeName }}
               mountPath: {{ .mountPath }}
               {{- if .subPath }}
               subPath: {{ .subPath }}
               {{- end }}
-            {{- end }}
           {{- end }}
           {{- end }}
           {{- end }}
@@ -170,11 +168,9 @@ spec:
       {{- end }}
       {{- range .volumes }}
         {{- if .existingClaim }}
-          {{- if or (ne $name "process-server") (ne .volumeName "jdbc-root-dir") (index $.Values "ontopic-server").enabled }}
         - name: {{ .volumeName }}
           persistentVolumeClaim:
             claimName: {{ tpl .existingClaim $ }}
-        {{- end }}
         {{- else }}
         - name: {{ .volumeName }}
           emptyDir: {}
