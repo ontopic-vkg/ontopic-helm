@@ -77,19 +77,3 @@ Create the name of the service account to use
       key: {{$name | quote}}
 {{- end }}
 {{- end }}
-{{/*
-Init container to create the directory for cloning external JDBC drivers
-*/}}
-{{- define "ontopic-server.jdbcExternalRepoInitContainer" -}}
-{{- if .Values.jdbcExternal.enabled }}
-- name: setup-jdbc-external-dir
-  image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-  imagePullPolicy: {{ .Values.image.pullPolicy }}
-  command:
-    - sh
-    - -c
-    - |
-      mkdir -p {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}-external
-      echo "Created directory {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}-external for external JDBC repository clone"
-{{- end }}
-{{- end }}
