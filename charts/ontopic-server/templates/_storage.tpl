@@ -36,6 +36,20 @@ Generate volume mount for a persistence configuration
 {{- end -}}
 
 {{/*
+Generate multiple volume mounts from a single volume with subPath entries
+{{ include "ontopic-server.volumeMounts" (dict "config" .Values.endpoints) }}
+*/}}
+{{- define "ontopic-server.volumeMounts" -}}
+{{- if .config.persistence.enabled }}
+{{- range $key, $mount := .config.mounts }}
+- name: {{ $.config.persistence.volumeName }}
+  mountPath: {{ $mount.mountPath }}
+  subPath: {{ $mount.subPath }}
+{{- end }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Generate volume definition for a persistence configuration
 {{ include "ontopic-server.volume" (dict "config" .Values.endpoint "context" $) }}
 */}}
