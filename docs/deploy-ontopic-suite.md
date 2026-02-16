@@ -64,7 +64,7 @@ By default, a PostgreSQL database is deployed. In case you want to deploy it you
 
 ```
 db:
-  # Whether to deploy the PostgreSQL database in the cluster using the Bitnami PostgreSQL chart or to connect to an external database 
+  # Deploy the PostgreSQL database in the cluster using the Bitnami PostgreSQL chart or connect to an external database 
   deployedInCluster: false
   host: database-host
   port: 5432
@@ -72,17 +72,17 @@ db:
   user: postgres
 ```
 
-Additionally, you will need to create a secret called `database-password-file` storing the database password:
+Additionally, you will need to create a secret called `database-password` storing the database password:
 
 ```sh
 # Create folder secret if it has not already been created
 mkdir -p ./secrets
 
-# Save secret in file database-password-file
-echo "<your-db-password>" > ./secrets/database-password-file
+# Save secret in file database-password
+echo "<your-db-password>" > ./secrets/database-password
 
-kubectl create secret generic database-password-file \
-  --from-file=database-password-file=./secrets/database-password-file
+kubectl create secret generic database-password \
+  --from-file=database-password=./secrets/database-password
 ```
 
 ### Cookie secret

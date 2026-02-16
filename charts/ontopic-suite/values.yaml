@@ -312,8 +312,8 @@ services:
       DB_RESET: "false"
       DB_MIGRATE: "true"
       DB_SEED: "false"
-      DATABASE_PASSWORD_FILE: /run/secrets/database-password-file/database-password-file
-      CASBIN_STORE_PASSWORD_FILE: /run/secrets/database-password-file/database-password-file
+      DATABASE_PASSWORD_FILE: /run/secrets/database-password/database-password
+      CASBIN_STORE_PASSWORD_FILE: /run/secrets/database-password/database-password
       ONTOPIC_SERVER_HOST: ontopic-server
       ONTOPIC_SERVER_WEB_API_PORT: 8080
       ONTOPIC_SERVER_POSTGRES_PORT: 4300
@@ -361,7 +361,7 @@ services:
         dataSource: {}
 
     secrets:
-      database-password-file: /run/secrets/database-password-file
+      database-password: /run/secrets/database-password
 
   ##--- Web
   web:
@@ -435,8 +435,8 @@ users:
 
 # Configure the PostgreSQL subchart
 db:
-  # -- whether to deploy a PostgreSQL database in the cluster using the Bitnami PostgreSQL chart
-  # -- or to connect to an external database 
+  # -- deploy the PostgreSQL database in the cluster using the Bitnami PostgreSQL chart
+  # -- or connect to an external database 
   deployedInCluster: true
   # -- enable creation of the secret for Ontopic Studio, only relevant when deployedInCluster=true
   enableSecretCreation: true
