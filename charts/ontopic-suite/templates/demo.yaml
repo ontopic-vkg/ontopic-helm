@@ -1,4 +1,4 @@
-{{- if .Values.db.enableDemoData -}}
+{{- if .Values.demoData.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

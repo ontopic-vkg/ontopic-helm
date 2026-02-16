@@ -312,15 +312,8 @@ services:
       DB_RESET: "false"
       DB_MIGRATE: "true"
       DB_SEED: "false"
-      DATABASE_HOST: store-server-db-postgresql
-      DATABASE_PORT: 5432
-      DATABASE_NAME: internal
-      DATABASE_USER: postgres
-      DATABASE_PASSWORD_FILE: /run/secrets/database-password-file/database-password-file
-      CASBIN_STORE_HOST: store-server-db-postgresql
-      CASBIN_STORE_PORT: 5432
-      CASBIN_STORE_USER: postgres
-      CASBIN_STORE_PASSWORD_FILE: /run/secrets/database-password-file/database-password-file
+      DATABASE_PASSWORD_FILE: /run/secrets/database-password/database-password
+      CASBIN_STORE_PASSWORD_FILE: /run/secrets/database-password/database-password
       ONTOPIC_SERVER_HOST: ontopic-server
       ONTOPIC_SERVER_WEB_API_PORT: 8080
       ONTOPIC_SERVER_POSTGRES_PORT: 4300
@@ -368,7 +361,7 @@ services:
         dataSource: {}
 
     secrets:
-      database-password-file: /run/secrets/database-password-file
+      database-password: /run/secrets/database-password
 
   ##--- Web
   web:
@@ -442,16 +435,23 @@ users:
 
 # Configure the PostgreSQL subchart
 db:
-  # -- enable the PostgreSQL chart
-  enabled: true
-  # -- enable creation of the secret for Ontopic Studio
-  enableSecretCreation: true
-  # -- enable creation of the "internal" database
-  enableDatabaseCreation: true
-  # -- enable demo data
-  enableDemoData: false
+  # -- deploy the PostgreSQL database in the cluster using the Bitnami PostgreSQL chart
+  # -- or connect to an external database 
+  deployedInCluster: true
+  # -- database host 
+  host: store-server-db-postgresql
+  # -- database port
+  port: 5432
+  # -- database name
+  name: internal
+  # -- database user
+  user: postgres
   # -- fullnameOverride is used to override the name of the subchart
   fullnameOverride: "store-server-db-postgresql"
+
+# Include demo database
+demoData:
+  enabled: false
 
 # Configure Let's Encrypt ClusterIssuer for cert-manager
 clusterIssuer:

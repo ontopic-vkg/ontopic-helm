@@ -18,7 +18,6 @@ users:
       roles:
         - ots-admin
 
-# Configure the PostgreSQL subchart
-db:
-  # -- enable demo data
-  enableDemoData: true
+# Include demo database
+demoData:
+  enabled: true

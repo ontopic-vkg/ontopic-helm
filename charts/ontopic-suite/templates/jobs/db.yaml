@@ -1,4 +1,4 @@
-{{- if and (.Values.db.enabled) (.Values.db.enableSecretCreation) }}
+{{- if .Values.db.deployedInCluster }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -69,15 +69,14 @@ spec:
         - "-c"
         - |
             set -e
-            if kubectl get secret database-password-file >/dev/null 2>&1; then
-              echo "Secret 'database-password-file' already exists, skipping creation."
+            if kubectl get secret database-password >/dev/null 2>&1; then
+              echo "Secret 'database-password' already exists, skipping creation."
               exit 0
             fi
             sleep 10
-            kubectl create secret generic database-password-file \
-              --from-literal=database-password-file="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)" \
+            kubectl create secret generic database-password \
+              --from-literal=database-password="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)" \
               --dry-run=client -o yaml | kubectl apply -f -
-      {{- if .Values.db.enableDatabaseCreation }}
       - name: create-database
         image: bitnami/kubectl:latest
         command:
@@ -85,12 +84,12 @@ spec:
         - "-c"
         - |
             set -e
-            echo "Waiting for database-password-file secret..."
-            until kubectl get secret database-password-file >/dev/null 2>&1; do
+            echo "Waiting for database-password secret..."
+            until kubectl get secret database-password >/dev/null 2>&1; do
               echo "Secret not ready yet, waiting..."
               sleep 2
             done
-            POSTGRES_PASSWORD=$(kubectl get secret database-password-file -o jsonpath="{.data.database-password-file}" | base64 -d)
+            POSTGRES_PASSWORD=$(kubectl get secret database-password -o jsonpath="{.data.database-password}" | base64 -d)
             echo "Secret is ready!"
 
             echo "Waiting for PostgreSQL to be ready..."
@@ -118,5 +117,4 @@ spec:
             echo "Grant privileges to the database"
             echo "grant all privileges on database internal to postgres;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c "PGPASSWORD=$POSTGRES_PASSWORD psql"
             echo "alter database internal OWNER TO postgres;" | kubectl exec -i store-server-db-postgresql-0 -- /opt/bitnami/scripts/postgresql/entrypoint.sh /bin/bash -c "PGPASSWORD=$POSTGRES_PASSWORD psql"
-      {{- end }}
 {{- end }}

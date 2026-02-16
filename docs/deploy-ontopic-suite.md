@@ -60,10 +60,30 @@ process-server:
 
 You need a **PostgreSQL** database with a dedicated owner.
 
-By default, a PostgreSQL database is deployed.
-You can disable this by setting `postgresql.enabled` to `false` in the `values.yaml` file.
+By default, a PostgreSQL database is deployed. In case you want to deploy it yourself, you can do so by setting `db.deployedInCluster` to `false` and configuring the database connection parameters in the `values.yaml` file.
 
-In case you want to deploy it yourself, you can find detailed instructions in the [dedicated documentation](./deploy-postgresql.md).
+```
+db:
+  # Deploy the PostgreSQL database in the cluster using the Bitnami PostgreSQL chart or connect to an external database 
+  deployedInCluster: false
+  host: database-host
+  port: 5432
+  name: database-name
+  user: postgres
+```
+
+Additionally, you will need to create a secret called `database-password` storing the database password:
+
+```sh
+# Create folder secret if it has not already been created
+mkdir -p ./secrets
+
+# Save secret in file database-password
+echo "<your-db-password>" > ./secrets/database-password
+
+kubectl create secret generic database-password \
+  --from-file=database-password=./secrets/database-password
+```
 
 ### Cookie secret
 
