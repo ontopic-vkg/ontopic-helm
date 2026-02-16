@@ -22,7 +22,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: {{ include "postgresql.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.imagePullPolicy | default "IfNotPresent" }}
           ports:
             - name: tcp-postgresql
               containerPort: 5432

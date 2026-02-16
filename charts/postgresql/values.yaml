@@ -1,8 +1,10 @@
+global: {}
+
 image:
   registry: docker.io
   repository: postgres
   tag: "18.2"
-  pullPolicy: IfNotPresent
+
 
 fullnameOverride: ""
 

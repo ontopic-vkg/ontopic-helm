@@ -15,6 +15,7 @@ spec:
       containers:
         - name: demo-db
           image: ontopicvkg/destination-tutorial-db
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
           ports:
             - containerPort: 5432
           env:

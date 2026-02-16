@@ -65,12 +65,14 @@ spec:
       containers:
       - name: generate-secret
         image: "{{ .Values.global.registry }}/identity-service:helm-{{ .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command: ["sh", "-c", "/usr/bin/entrypoint generate cookie > /mnt/secret/cookie-secret && echo 'Cookie generated' && cat /mnt/secret/cookie-secret"]
         volumeMounts:
         - name: secret
           mountPath: /mnt/secret
       - name: create-secret
         image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command: ["sh", "-c", "while [ ! -f /mnt/secret/cookie-secret ]; do echo 'Waiting for /mnt/secret/cookie-secret'; sleep 1; done; echo 'File /mnt/secret/cookie-secret found'; kubectl create secret generic cookie-secret --from-file=cookie-secret=/mnt/secret/cookie-secret; exit 0"]
         volumeMounts:
         - name: secret

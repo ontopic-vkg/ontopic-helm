@@ -10,6 +10,7 @@ spec:
   containers:
     - name: wget
       image: busybox
+      imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.imagePullPolicy | default "IfNotPresent" }}
       command: ['wget']
       args: ['{{ include "ontopic-server.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never

@@ -42,7 +42,7 @@ spec:
           securityContext:
             {{- toYaml .securityContext | nindent 12 }}
           image: "{{ $.Values.global.registry }}/{{ .image.repository }}:{{ .image.tag | default $.Chart.AppVersion }}"
-          imagePullPolicy: {{ .image.pullPolicy }}
+          imagePullPolicy: {{ .image.pullPolicy | default $.Values.global.imagePullPolicy }}
           {{- if eq $name "process-server" }}
           {{- $ontopicServer := index $.Values "ontopic-server" -}}
           {{- $processServer := index $.Values "services" "process-server" -}}

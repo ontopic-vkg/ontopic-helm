@@ -64,6 +64,7 @@ spec:
       containers:
       - name: create-secret
         image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command:
         - "sh"
         - "-c"
@@ -79,6 +80,7 @@ spec:
               --dry-run=client -o yaml | kubectl apply -f -
       - name: create-database
         image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command:
         - "sh"
         - "-c"

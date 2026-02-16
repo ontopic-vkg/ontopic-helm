@@ -4,6 +4,7 @@
 global:
   registry: ghcr.io/ontopic-vkg/ontopic-helm
   #registry: registry.gitlab.com/ontopic/ontopic-suite/helm
+  imagePullPolicy: IfNotPresent
   kubectl:
     image: docker.io/alpine/k8s
     tag: "1.35.1"
@@ -12,7 +13,6 @@ replicaCount: 1
 
 image:
   repository: nginx
-  pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -370,8 +370,6 @@ services:
   web:
     image:
       repository: nginx
-      pullPolicy: Always
-
       # Overrides the image tag whose default is the chart appVersion.
       tag: "helm-v2026.1.0"
 

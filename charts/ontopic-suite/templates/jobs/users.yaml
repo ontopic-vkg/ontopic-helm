@@ -90,6 +90,7 @@ spec:
       containers:
       - name: create-secret
         image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command:
         - "sh"
         - "-c"
@@ -144,6 +145,7 @@ spec:
       initContainers:
       - name: user-creation
         image: "{{ .Values.global.registry }}/user-creation:helm-{{ .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command:
         - "sh"
         - "-c"
@@ -164,6 +166,7 @@ spec:
       containers:
       - name: create-secret
         image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
         command:
         - "sh"
         - "-c"
