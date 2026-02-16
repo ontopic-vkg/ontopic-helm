@@ -438,10 +438,6 @@ db:
   # -- deploy the PostgreSQL database in the cluster using the Bitnami PostgreSQL chart
   # -- or connect to an external database 
   deployedInCluster: true
-  # -- enable creation of the secret for Ontopic Studio, only relevant when deployedInCluster=true
-  enableSecretCreation: true
-  # -- enable creation of the "internal" database, only relevant when deployedInCluster=true
-  enableDatabaseCreation: true
   # -- database host 
   host: store-server-db-postgresql
   # -- database port

@@ -60,7 +60,7 @@ process-server:
 
 You need a **PostgreSQL** database with a dedicated owner.
 
-By default, a PostgreSQL database is deployed. In case you want to deploy it yourself, you can do so by setting `db.deployInCluster` to `false` and configuring the database connection parameters in the `values.yaml` file.
+By default, a PostgreSQL database is deployed. In case you want to deploy it yourself, you can do so by setting `db.deployedInCluster` to `false` and configuring the database connection parameters in the `values.yaml` file.
 
 ```
 db:
