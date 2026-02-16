@@ -70,7 +70,7 @@ spec:
         - name: secret
           mountPath: /mnt/secret
       - name: create-secret
-        image: bitnami/kubectl:latest
+        image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
         command: ["sh", "-c", "while [ ! -f /mnt/secret/cookie-secret ]; do echo 'Waiting for /mnt/secret/cookie-secret'; sleep 1; done; echo 'File /mnt/secret/cookie-secret found'; kubectl create secret generic cookie-secret --from-file=cookie-secret=/mnt/secret/cookie-secret; exit 0"]
         volumeMounts:
         - name: secret

@@ -63,7 +63,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: create-secret
-        image: bitnami/kubectl:latest
+        image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
         command:
         - "sh"
         - "-c"
@@ -78,7 +78,7 @@ spec:
               --from-literal=database-password="$(kubectl get secret store-server-db-postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)" \
               --dry-run=client -o yaml | kubectl apply -f -
       - name: create-database
-        image: bitnami/kubectl:latest
+        image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
         command:
         - "sh"
         - "-c"

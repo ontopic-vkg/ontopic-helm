@@ -89,7 +89,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: create-secret
-        image: bitnami/kubectl:latest
+        image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
         command:
         - "sh"
         - "-c"
@@ -163,7 +163,7 @@ spec:
           mountPath: /mnt/secret
       containers:
       - name: create-secret
-        image: bitnami/kubectl:latest
+        image: "{{ .Values.global.kubectl.image }}:{{ .Values.global.kubectl.tag }}"
         command:
         - "sh"
         - "-c"
