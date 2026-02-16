@@ -448,6 +448,8 @@ db:
   user: postgres
   # -- fullnameOverride is used to override the name of the subchart
   fullnameOverride: "store-server-db-postgresql"
+  image:
+    tag: "17"
 
 # Include demo database
 demoData:

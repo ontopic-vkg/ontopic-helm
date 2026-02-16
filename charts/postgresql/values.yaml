@@ -1,0 +1,27 @@
+image:
+  registry: docker.io
+  repository: postgres
+  tag: "18.2"
+  pullPolicy: IfNotPresent
+
+fullnameOverride: ""
+
+auth:
+  postgresPassword: ""          # auto-generated if empty
+  existingSecret: ""            # use existing secret instead
+
+podSecurityContext:
+  fsGroup: 999
+
+securityContext:
+  runAsUser: 999
+  runAsNonRoot: true
+
+persistence:
+  enabled: true
+  size: 8Gi
+  storageClass: ""
+  accessModes:
+    - ReadWriteOnce
+
+resources: {}
