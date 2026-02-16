@@ -132,6 +132,7 @@ env:
   ONTOPIC_SERVER_ENABLE_POSTGRES_WIRE_PROTOCOL: true
   ONTOPIC_SERVER_LICENSE_FILE: /run/secrets/user-license/user-license
   ONTOPIC_SERVER_JDBC_ROOT_DIR: /opt/ontopic-server/jdbc
+  JDBC_ROOT_DIR: /opt/ontopic-server/jdbc # used for external jdbc repo
   ONTOPIC_SERVER_WEB_API_PORT: 8080
   ONTOPIC_SERVER_POSTGRES_PORT: 4300
   ONTOPIC_SERVER_DISABLE_TLS: false
@@ -165,6 +166,10 @@ optionalSecrets:
     mountPath: /run/secrets/azure-sas-token
     envVars:
       ONTOPIC_SERVER_AZURE_SAS_TOKEN: /run/secrets/azure-sas-token/azure-sas-token
+  jdbc-private-key:
+    mountPath: /run/secrets/jdbc-private-key
+    envVars: 
+      JDBC_EXTERNAL_REPO_KEY_PATH: /run/secrets/jdbc-private-key/jdbc-private-key
 
 # Materialization configuration
 enableMaterialization: false
@@ -179,6 +184,20 @@ objectStorage:
     container:
     endpoint:
 
+# External JDBC drivers from Git repository
+# The jdbc volume is always created and mounted at ONTOPIC_SERVER_JDBC_ROOT_DIR
+jdbcExternal:
+  ## @param jdbcExternal.enabled Enable fetching JDBC drivers from external Git repository
+  enabled: false
+  ## @param jdbcExternal.replaceExistingDrivers Controls driver behavior:
+  ##   false: Add external drivers to built-in default drivers
+  ##   true: Replace all default drivers with only external repository drivers
+  replaceExistingDrivers: false
+  ## @param jdbcExternal.sourceRepository Git repository URL for external JDBC drivers
+  sourceRepository:
+  ## @param jdbcExternal.sourceFolder Folder path within the repository containing drivers
+  sourceFolder:
+
 persistentVolumeClaimRetentionPolicy:
   ## @param persistentVolumeClaimRetentionPolicy.enabled Enable Persistent volume retention policy for Deployment
   ##
@@ -190,25 +209,18 @@ persistentVolumeClaimRetentionPolicy:
   ##
   whenDeleted: Retain
 
-endpoint:
+runtimeConfiguration:
   persistence:
-    ## @param endpoint.persistence.enabled Enable Ontopic endpoint data persistence using PVC
+    ## @param runtimeConfiguration.persistence.enabled Enable Ontopic runtime-configuration data persistence using PVC
     ##
     enabled: true
-    ## @param endpoint.persistence.volumeName Name to assign the volume
+    ## @param runtimeConfiguration.persistence.volumeName Name to assign the volume
     ##
-    volumeName: "endpoint-dir"
-    ## @param endpoint.persistence.existingClaim Name of an existing PVC to use
+    volumeName: "runtime-configuration"
+    ## @param runtimeConfiguration.persistence.existingClaim Name of an existing PVC to use
     ##
     existingClaim: ""
-    ## @param endpoint.persistence.mountPath The path the volume will be mounted at
-    ##
-    mountPath: /opt/ontopic-server/endpoint
-    ## @param endpoint.persistence.subPath The subdirectory of the volume to mount to
-    ## Useful in dev environments and one PV for multiple services
-    ##
-    subPath: ""
-    ## @param endpoint.persistence.storageClass PVC Storage Class for Ontopic endpoint data volume
+    ## @param runtimeConfiguration.persistence.storageClass PVC Storage Class for Ontopic runtime-configuration data volume
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -216,28 +228,38 @@ endpoint:
     ##   GKE, AWS & OpenStack)
     ##
     storageClass: ""
-    ## @param endpoint.persistence.accessModes PVC Access Mode for Ontopic volume
+    ## @param runtimeConfiguration.persistence.accessModes PVC Access Mode for Ontopic volume
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param endpoint.persistence.size PVC Storage Request for Ontopic volume
+    ## @param runtimeConfiguration.persistence.size PVC Storage Request for Ontopic volume
     ##
     size: 8Gi
-    ## @param endpoint.persistence.annotations Annotations for the PVC
+    ## @param runtimeConfiguration.persistence.annotations Annotations for the PVC
     ##
     annotations: {}
-    ## @param endpoint.persistence.labels Labels for the PVC
+    ## @param runtimeConfiguration.persistence.labels Labels for the PVC
     ##
     labels: {}
-    ## @param endpoint.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
+    ## @param runtimeConfiguration.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
     ## selector:
     ##   matchLabels:
     ##     app: my-app
     ##
     selector: {}
-    ## @param endpoint.persistence.dataSource Custom PVC data source
+    ## @param runtimeConfiguration.persistence.dataSource Custom PVC data source
     ##
     dataSource: {}
+  mounts:
+    endpoint:
+      mountPath: /opt/ontopic-server/endpoint
+      subPath: endpoint
+    materializationDb:
+      mountPath: /opt/ontopic-server/db
+      subPath: db
+    materializationConfiguration:
+      mountPath: /opt/ontopic-server/materialization-configuration
+      subPath: materialization-configuration
 
 endpointSecurity:
   persistence:
@@ -285,153 +307,6 @@ endpointSecurity:
     ##
     selector: {}
     ## @param endpointSecurity.persistence.dataSource Custom PVC data source
-    ##
-    dataSource: {}
-
-materializationDb:
-  persistence:
-    ## @param materializationDb.persistence.enabled Enable Ontopic materializationDb data persistence using PVC
-    ##
-    enabled: true
-    ## @param materializationDb.persistence.volumeName Name to assign the volume
-    ##
-    volumeName: "materialization-db-dir"
-    ## @param materializationDb.persistence.existingClaim Name of an existing PVC to use
-    ##
-    existingClaim: ""
-    ## @param materializationDb.persistence.mountPath The path the volume will be mounted at
-    ##
-    mountPath: /opt/ontopic-server/db
-    ## @param materializationDb.persistence.subPath The subdirectory of the volume to mount to
-    ## Useful in dev environments and one PV for multiple services
-    ##
-    subPath: ""
-    ## @param materializationDb.persistence.storageClass PVC Storage Class for Ontopic materializationDb data volume
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-    ##   GKE, AWS & OpenStack)
-    ##
-    storageClass: ""
-    ## @param materializationDb.persistence.accessModes PVC Access Mode for Ontopic volume
-    ##
-    accessModes:
-      - ReadWriteOnce
-    ## @param materializationDb.persistence.size PVC Storage Request for Ontopic volume
-    ##
-    size: 8Gi
-    ## @param materializationDb.persistence.annotations Annotations for the PVC
-    ##
-    annotations: {}
-    ## @param materializationDb.persistence.labels Labels for the PVC
-    ##
-    labels: {}
-    ## @param materializationDb.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
-    ## selector:
-    ##   matchLabels:
-    ##     app: my-app
-    ##
-    selector: {}
-    ## @param materializationDb.persistence.dataSource Custom PVC data source
-    ##
-    dataSource: {}
-
-materializationConfiguration:
-  persistence:
-    ## @param materializationConfiguration.persistence.enabled Enable Ontopic materializationConfiguration data persistence using PVC
-    ##
-    enabled: true
-    ## @param materializationConfiguration.persistence.volumeName Name to assign the volume
-    ##
-    volumeName: "materialization-configuration-dir"
-    ## @param materializationConfiguration.persistence.existingClaim Name of an existing PVC to use
-    ##
-    existingClaim: ""
-    ## @param materializationConfiguration.persistence.mountPath The path the volume will be mounted at
-    ##
-    mountPath: /opt/ontopic-server/materialization-configuration
-    ## @param materializationConfiguration.persistence.subPath The subdirectory of the volume to mount to
-    ## Useful in dev environments and one PV for multiple services
-    ##
-    subPath: ""
-    ## @param materializationConfiguration.persistence.storageClass PVC Storage Class for Ontopic materializationConfiguration data volume
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-    ##   GKE, AWS & OpenStack)
-    ##
-    storageClass: ""
-    ## @param materializationConfiguration.persistence.accessModes PVC Access Mode for Ontopic volume
-    ##
-    accessModes:
-      - ReadWriteOnce
-    ## @param materializationConfiguration.persistence.size PVC Storage Request for Ontopic volume
-    ##
-    size: 8Gi
-    ## @param materializationConfiguration.persistence.annotations Annotations for the PVC
-    ##
-    annotations: {}
-    ## @param materializationConfiguration.persistence.labels Labels for the PVC
-    ##
-    labels: {}
-    ## @param materializationConfiguration.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
-    ## selector:
-    ##   matchLabels:
-    ##     app: my-app
-    ##
-    selector: {}
-    ## @param materializationConfiguration.persistence.dataSource Custom PVC data source
-    ##
-    dataSource: {}
-
-materializationResult:
-  persistence:
-    ## @param materializationConfiguration.persistence.enabled Enable Ontopic materializationConfiguration data persistence using PVC
-    ##
-    enabled: true
-    ## @param materializationConfiguration.persistence.volumeName Name to assign the volume
-    ##
-    volumeName: "materialization-result-dir"
-    ## @param materializationConfiguration.persistence.existingClaim Name of an existing PVC to use
-    ##
-    existingClaim: ""
-    ## @param materializationConfiguration.persistence.mountPath The path the volume will be mounted at
-    ##
-    mountPath: /opt/ontopic-server/materialization-result
-    ## @param materializationConfiguration.persistence.subPath The subdirectory of the volume to mount to
-    ## Useful in dev environments and one PV for multiple services
-    ##
-    subPath: ""
-    ## @param materializationConfiguration.persistence.storageClass PVC Storage Class for Ontopic materializationConfiguration data volume
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-    ##   GKE, AWS & OpenStack)
-    ##
-    storageClass: ""
-    ## @param materializationConfiguration.persistence.accessModes PVC Access Mode for Ontopic volume
-    ##
-    accessModes:
-      - ReadWriteOnce
-    ## @param materializationConfiguration.persistence.size PVC Storage Request for Ontopic volume
-    ##
-    size: 8Gi
-    ## @param materializationConfiguration.persistence.annotations Annotations for the PVC
-    ##
-    annotations: {}
-    ## @param materializationConfiguration.persistence.labels Labels for the PVC
-    ##
-    labels: {}
-    ## @param materializationConfiguration.persistence.selector Selector to match an existing Persistent Volume (this value is evaluated as a template)
-    ## selector:
-    ##   matchLabels:
-    ##     app: my-app
-    ##
-    selector: {}
-    ## @param materializationConfiguration.persistence.dataSource Custom PVC data source
     ##
     dataSource: {}
 

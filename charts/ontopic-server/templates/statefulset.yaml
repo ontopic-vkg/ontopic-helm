@@ -33,6 +33,16 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if and .Values.jdbcExternal.enabled .Values.jdbcExternal.replaceExistingDrivers }}
+          command:
+            - sh
+            - -c
+            - |
+              echo "Clearing existing JDBC drivers..."
+              rm -rf {{ .Values.env.ONTOPIC_SERVER_JDBC_ROOT_DIR }}/*
+              echo "Starting ontopic-server..."
+              exec /opt/ontopic-server/entrypoint.sh
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{.Values.envConfigMapName  | quote}}
@@ -64,11 +74,8 @@ spec:
           {{- end }}
           {{- end }}
           {{- end }}
-          {{- include "ontopic-server.volumeMount" (dict "config" .Values.endpoint) | nindent 12 }}
+          {{- include "ontopic-server.volumeMounts" (dict "config" .Values.runtimeConfiguration) | nindent 12 }}
           {{- include "ontopic-server.volumeMount" (dict "config" .Values.endpointSecurity) | nindent 12 }}
-          {{- include "ontopic-server.volumeMount" (dict "config" .Values.materializationDb) | nindent 12 }}
-          {{- include "ontopic-server.volumeMount" (dict "config" .Values.materializationConfiguration) | nindent 12 }}
-          {{- include "ontopic-server.volumeMount" (dict "config" .Values.materializationResult) | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -96,19 +103,13 @@ spec:
       {{- end }}
       {{- end }}
       {{- end }}
-      {{- include "ontopic-server.volume" (dict "config" .Values.endpoint "context" $) | nindent 6 }}
+      {{- include "ontopic-server.volume" (dict "config" .Values.runtimeConfiguration "context" $) | nindent 6 }}
       {{- include "ontopic-server.volume" (dict "config" .Values.endpointSecurity "context" $) | nindent 6 }}
-      {{- include "ontopic-server.volume" (dict "config" .Values.materializationDb "context" $) | nindent 6 }}
-      {{- include "ontopic-server.volume" (dict "config" .Values.materializationConfiguration "context" $) | nindent 6 }}
-      {{- include "ontopic-server.volume" (dict "config" .Values.materializationResult "context" $) | nindent 6 }}
   {{- if .Values.persistentVolumeClaimRetentionPolicy.enabled }}
   persistentVolumeClaimRetentionPolicy:
     whenDeleted: {{ .Values.persistentVolumeClaimRetentionPolicy.whenDeleted }}
     whenScaled: {{ .Values.persistentVolumeClaimRetentionPolicy.whenScaled }}
   {{- end }}
   volumeClaimTemplates:
-  {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.endpoint "context" $) | nindent 2 }}
+  {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.runtimeConfiguration "context" $) | nindent 2 }}
   {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.endpointSecurity "context" $) | nindent 2 }}
-  {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.materializationDb "context" $) | nindent 2 }}
-  {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.materializationConfiguration "context" $) | nindent 2 }}
-  {{- include "ontopic-server.volumeClaimTemplate" (dict "config" .Values.materializationResult "context" $) | nindent 2 }}

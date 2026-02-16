@@ -52,38 +52,41 @@ helm delete ontopic-server
 
 ### Custom JDBC drivers (optional)
 
-It's possible to add additional jdbc drivers by adding some env vars:
+It's possible to add additional jdbc drivers from an external Git repository by configuring the `jdbcExternal` section:
 
-| Name                          | Description                                      |
-| ----------------------------- | ------------------------------------------------ |
-| `JDBC_EXTERNAL_REPO`          | The path of the git repo                         |
-| `JDBC_EXTERNAL_REPO_FOLDER`   | The folder within the repo                       |
-| `JDBC_EXTERNAL_REPO_KEY_PATH` | The path where the SSH key is mounted (optional) |
-
-If you use a deploy key to access the git repo, you need to create a secret and then provide `JDBC_EXTERNAL_REPO_KEY_PATH` if needed.
-
-The default path is : `/run/secrets/jdbc-external-repo/private_key`
-
-So you can create a secret like :
-
-```sh
-kubectl create secret generic jdbc-external-repo \
-  --from-file=private_key=./my-private-key
+```yaml
+jdbcExternal:
+  enabled: true
+  sourceRepository: git@github.com:my-user/my-repo
+  sourceFolder: my-folder
 ```
 
-Create or add to the values file `values-server.yaml` that will be used by the `ontopic-server` chart:
+If you use a deploy key to access the git repo, you need to create a secret:
 
 ```sh
-env:
-  JDBC_EXTERNAL_REPO: git@github.com:my-user/my-repo
-  JDBC_EXTERNAL_REPO_FOLDER: my-folder
-
-secrets:
-  # If you use s3, you have to specify the values or it will be overridden
-  # ...
-  # JDBC
-  jdbc-external-repo: /run/secrets/jdbc-external-repo
+kubectl create secret generic jdbc-private-key \
+  --from-file=jdbc-private-key=./secrets/jdbc-private-key
 ```
+
+The secret name must be `jdbc-private-key` with a key named `jdbc-private-key`.
+
+Complete example in `values-server.yaml`:
+
+```yaml
+jdbcExternal:
+  ## @param jdbcExternal.enabled Enable fetching JDBC drivers from external Git repository
+  enabled: false
+  ## @param jdbcExternal.replaceExistingDrivers Controls driver behavior:
+  ##   false: Add external drivers to built-in default drivers
+  ##   true: Replace all default drivers with only external repository drivers
+  replaceExistingDrivers: false
+  ## @param jdbcExternal.sourceRepository Git repository URL for external JDBC drivers
+  sourceRepository:
+  ## @param jdbcExternal.sourceFolder Folder path within the repository containing drivers
+  sourceFolder:
+```
+
+**Note**: If you decide to replace the existing drivers, make sure to include a PostgreSQL and H2 JDBC driver in the external repository, as they are required for the Ontopic server to function properly.
 
 ## Enable materialization (optional)
 Ontopic Server supports materialization to RDF in different storage providers, such as S3 and Azure Blob Storage. Additionally, local storage can also be used for materialization.

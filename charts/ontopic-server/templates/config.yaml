@@ -12,6 +12,12 @@ data:
 {{- end }}
 {{- end }}
 {{- end }}
+{{- /* Validate that object storage is configured when materialization is enabled */ -}}
+{{- if .Values.enableMaterialization }}
+{{- if not (or .Values.objectStorage.s3.bucket .Values.objectStorage.azure.container) }}
+{{- fail "enableMaterialization is true but no object storage is configured. Set objectStorage.s3.bucket or objectStorage.azure.container." }}
+{{- end }}
+{{- end }}
 {{- /* Add S3 env vars when objectStorage.s3 is configured */ -}}
 {{- if .Values.objectStorage.s3.bucket }}
 {{- $_ := set $env "ONTOPIC_SERVER_S3_BUCKET" .Values.objectStorage.s3.bucket }}
@@ -28,6 +34,15 @@ data:
 {{- end }}
 {{- if .Values.objectStorage.azure.endpoint }}
 {{- $_ := set $env "ONTOPIC_SERVER_AZURE_ENDPOINT_URL" .Values.objectStorage.azure.endpoint }}
+{{- end }}
+{{- /* Add JDBC external repo env vars when jdbcExternal is enabled */ -}}
+{{- if .Values.jdbcExternal.enabled }}
+{{- if .Values.jdbcExternal.sourceRepository }}
+{{- $_ := set $env "JDBC_EXTERNAL_REPO" .Values.jdbcExternal.sourceRepository }}
+{{- end }}
+{{- if .Values.jdbcExternal.sourceFolder }}
+{{- $_ := set $env "JDBC_EXTERNAL_REPO_FOLDER" .Values.jdbcExternal.sourceFolder }}
+{{- end }}
 {{- end }}
 {{- /* Set ONTOPIC_SERVER_ENABLE_MATERIALIZATION based on enableMaterialization */ -}}
 {{- $_ := set $env "ONTOPIC_SERVER_ENABLE_MATERIALIZATION" .Values.enableMaterialization }}
