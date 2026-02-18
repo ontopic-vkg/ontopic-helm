@@ -1,58 +1,6 @@
 # Helm Chart
 
-Ontopic Helm Charts repository.
+OntopicHelm Charts repository.
 
-## Requirements
+To install Ontopic Suite, please visit [the official documentation](https://docs.ontopic.ai/suite/install/kubernetes).
 
-You need to install :
-
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [helm](https://helm.sh/docs/intro/install/)
-
-## Getting started
-
-### Create a cluster
-
-See the [k3d cluster example](./docs/k3d-cluster-example.md) if you want to install it locally.
-
-You can also directly use [Docker Desktop](https://docs.docker.com/desktop/kubernetes/) to quickly create a local cluster.
-
-### Create the namespace
-
-Here is how you can create a namespace and set it as the current context:
-
-```sh
-kubectl create namespace <your-namespace>
-kubectl config set-context --current --namespace=<your-namespace>
-```
-
-Make sure to replace `<your-namespace>` with the name of the namespace you want to use.
-
-### Add the repository
-
-[Helm](https://helm.sh) must be installed to use the charts.
-
-Add the repo as follows:
-
-```sh
-helm repo add ontopic https://ontopic-vkg.github.io/ontopic-helm/
-```
-
-If you had already added this repo earlier, run `helm repo update` to retrieve the latest versions of the packages.
-You can then run `helm search repo ontopic` to see the charts.
-
-## Charts
-
-### Ontopic Server
-
-See the [Ontopic Server documentation](./docs/deploy-ontopic-server.md).
-In case you want to use the Ontopic Server with Ontopic Suite, you can follow the instructions in the [Ontopic Suite documentation](./docs/deploy-ontopic-suite.md) instead, as it is included as a subchart.
-
-### Ontopic Suite
-
-See the [Ontopic Suite documentation](./docs/deploy-ontopic-suite.md).
-
-# Limitations
-
-- The embedded Git repository (Gitea) is not provided.
-- No sample database is provided.
