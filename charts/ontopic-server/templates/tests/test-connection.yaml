@@ -9,7 +9,7 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: alpine
       imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.imagePullPolicy | default "IfNotPresent" }}
       command: ['wget']
       args: ['{{ include "ontopic-server.fullname" . }}:{{ .Values.service.port }}']
