@@ -300,7 +300,7 @@ services:
 
     init:
       - name: init-permissions
-        image: busybox
+        image: alpine
         command: ["sh", "-c", "chown 1000:1000 /app/docs && chown 1000:1000 /app/repos"]
         volumeMounts:
           - mountPath: /app/docs
