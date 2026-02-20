@@ -1,0 +1,32 @@
+THIRD-PARTY NOTICES FOR: postgresql
+======================================================================
+
+This file satisfies the attribution obligations of the open-source licenses
+used by third-party software bundled in, or deployed by, the postgresql
+Helm chart:
+
+  - Apache 2.0 §4(d): upstream NOTICE file content is reproduced below.
+  - MIT / ISC / Blue Oak: copyright notices are reproduced below.
+  - BSD-2/3-Clause / EDL-1.0: copyright notices are reproduced below.
+  - EPL-1.0 / EPL-2.0: full license text + copyright + source URL included.
+    (For dual-licensed components we elect EPL-1.0 over LGPL-2.1 / MPL-2.0.)
+
+See LICENSES-THIRD-PARTY.md for the complete dependency list, license types,
+and links to the full license texts.
+
+Generated: 2026-02-20T15:12:52Z
+======================================================================
+
+
+======================================================================
+PostgreSQL License Copyright Notice
+======================================================================
+
+
+----------------------------------------------------------------------
+COPYRIGHT: PostgreSQL (PostgreSQL License (BSD-like))
+Source: https://raw.githubusercontent.com/postgres/postgres/master/COPYRIGHT
+----------------------------------------------------------------------
+Portions Copyright (c) 1996-2026, PostgreSQL Global Development Group
+Portions Copyright (c) 1994, The Regents of the University of California
+is hereby granted, provided that the above copyright notice and this
