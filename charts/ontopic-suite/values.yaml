@@ -23,7 +23,9 @@ ingress:
   # secretName: ontopic-studio-tls
   # annotations: {}
 
-#imagePullSecrets: [{ "name": "regcred" }]
+imagePullSecrets:
+  - name: regcred
+
 nameOverride: ""
 fullnameOverride: ""
 
