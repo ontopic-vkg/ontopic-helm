@@ -2,5 +2,5 @@ apiVersion: v2
 name: postgresql
 description: A minimal PostgreSQL chart using the official postgres image
 type: application
-version: 0.1.0
+version: 1.0.0
 appVersion: "18.2.0"

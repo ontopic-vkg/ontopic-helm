@@ -1,9 +1,9 @@
 dependencies:
 - name: ontopic-server
   repository: file://../ontopic-server
-  version: 0.1.3
+  version: 2026.1.0
 - name: postgresql
   repository: file://../postgresql
-  version: 0.1.0
-digest: sha256:17b61f9c7be64058efda1badb8f9a660d9d4bcb180e5b94a3d5fcb55cb883603
-generated: "2026-02-16T14:42:10.818745825+01:00"
+  version: 1.0.0
+digest: sha256:c39e7330cd569a321fe43ebdcdde50c8bba9cff84fb0fe168ddca42fa4563016
+generated: "2026-02-23T14:34:22.300367972+01:00"
