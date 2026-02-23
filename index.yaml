@@ -34,6 +34,16 @@ entries:
   ontopic-server:
   - apiVersion: v2
     appVersion: v2026.1.0
+    created: "2026-02-23T13:38:22.395211528Z"
+    description: A Helm chart for Kubernetes
+    digest: 8de89dc63ccc346fff41f45a428a1f91b912b675448d85dfb9f6b6cc3d8b71ee
+    name: ontopic-server
+    type: application
+    urls:
+    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-server-2026.1.0/ontopic-server-2026.1.0.tgz
+    version: 2026.1.0
+  - apiVersion: v2
+    appVersion: v2026.1.0
     created: "2026-02-23T13:17:19.913046996Z"
     description: A Helm chart for Kubernetes
     digest: f11222a85324ffa23b3f36caae4e84ee0a34cbb50e8aad510446ef81db92e9c6
@@ -76,6 +86,26 @@ entries:
   ontopic-suite:
   - apiVersion: v2
     appVersion: v2026.1.0
+    created: "2026-02-23T13:38:22.565497864Z"
+    dependencies:
+    - condition: ontopic-server.enabled
+      name: ontopic-server
+      repository: file://../ontopic-server
+      version: 2026.1.0
+    - alias: db
+      condition: db.deployedInCluster
+      name: postgresql
+      repository: file://../postgresql
+      version: 1.0.0
+    description: A Helm chart for Kubernetes
+    digest: 89c669d48e76962f6fc07a68383955b05cdaf96e683d8216c97e07ccb20373da
+    name: ontopic-suite
+    type: application
+    urls:
+    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-suite-2026.1.0/ontopic-suite-2026.1.0.tgz
+    version: 2026.1.0
+  - apiVersion: v2
+    appVersion: v2026.1.0
     created: "2026-02-23T13:17:20.094999417Z"
     dependencies:
     - condition: ontopic-server.enabled
@@ -97,6 +127,16 @@ entries:
   postgresql:
   - apiVersion: v2
     appVersion: 18.2.0
+    created: "2026-02-23T13:38:22.696900248Z"
+    description: A minimal PostgreSQL chart using the official postgres image
+    digest: 1da0c99c28183113f165701117a64787e4a5d555c49a74e7e044aeac435685ae
+    name: postgresql
+    type: application
+    urls:
+    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/postgresql-1.0.0/postgresql-1.0.0.tgz
+    version: 1.0.0
+  - apiVersion: v2
+    appVersion: 18.2.0
     created: "2026-02-23T13:17:20.240995709Z"
     description: A minimal PostgreSQL chart using the official postgres image
     digest: 1c44894955e64d528f1637effab2e4ac2b3b17180ab94b6b1bb5a87a316bb5d0
@@ -105,4 +145,4 @@ entries:
     urls:
     - https://github.com/ontopic-vkg/ontopic-helm/releases/download/postgresql-0.1.0/postgresql-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-23T13:17:20.241020386Z"
+generated: "2026-02-23T13:38:22.696925575Z"
