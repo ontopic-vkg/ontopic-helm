@@ -42,16 +42,6 @@ entries:
     urls:
     - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-server-2026.1.0/ontopic-server-2026.1.0.tgz
     version: 2026.1.0
-  - apiVersion: v2
-    appVersion: v2026.1.0
-    created: "2026-02-23T13:17:19.913046996Z"
-    description: A Helm chart for Kubernetes
-    digest: f11222a85324ffa23b3f36caae4e84ee0a34cbb50e8aad510446ef81db92e9c6
-    name: ontopic-server
-    type: application
-    urls:
-    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-server-0.1.3/ontopic-server-0.1.3.tgz
-    version: 0.1.3
   ontopic-studio:
   - apiVersion: v2
     appVersion: v2024.1.2
@@ -104,26 +94,6 @@ entries:
     urls:
     - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-suite-2026.1.0/ontopic-suite-2026.1.0.tgz
     version: 2026.1.0
-  - apiVersion: v2
-    appVersion: v2026.1.0
-    created: "2026-02-23T13:17:20.094999417Z"
-    dependencies:
-    - condition: ontopic-server.enabled
-      name: ontopic-server
-      repository: file://../ontopic-server
-      version: 0.1.3
-    - alias: db
-      condition: db.deployedInCluster
-      name: postgresql
-      repository: file://../postgresql
-      version: 0.1.0
-    description: A Helm chart for Kubernetes
-    digest: 0719fa335580ef4bf830e5f04b0695e8489c6687df82f21c80bde6d4b5b4994b
-    name: ontopic-suite
-    type: application
-    urls:
-    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-suite-0.1.4/ontopic-suite-0.1.4.tgz
-    version: 0.1.4
   postgresql:
   - apiVersion: v2
     appVersion: 18.2.0
@@ -135,14 +105,4 @@ entries:
     urls:
     - https://github.com/ontopic-vkg/ontopic-helm/releases/download/postgresql-1.0.0/postgresql-1.0.0.tgz
     version: 1.0.0
-  - apiVersion: v2
-    appVersion: 18.2.0
-    created: "2026-02-23T13:17:20.240995709Z"
-    description: A minimal PostgreSQL chart using the official postgres image
-    digest: 1c44894955e64d528f1637effab2e4ac2b3b17180ab94b6b1bb5a87a316bb5d0
-    name: postgresql
-    type: application
-    urls:
-    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/postgresql-0.1.0/postgresql-0.1.0.tgz
-    version: 0.1.0
 generated: "2026-02-23T13:38:22.696925575Z"
