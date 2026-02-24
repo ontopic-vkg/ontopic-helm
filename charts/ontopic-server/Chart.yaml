@@ -1,6 +1,6 @@
 apiVersion: v2
 name: ontopic-server
-description: A Helm chart for Kubernetes
+description: Helm chart for the Ontopic Server component of Ontopic Suite
 
 # A chart can be either an 'application' or a 'library' chart.
 #
