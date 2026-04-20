@@ -113,6 +113,75 @@ tolerations: []
 affinity: {}
 
 services:
+  ##--- AI server
+  ai-server:
+    image:
+      repository: ai-server
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: "helm-v2026.1.0"
+
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 8002
+      initialDelaySeconds: 20
+      periodSeconds: 10
+
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 8002
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+    init:
+      - name: init-ai-server-permissions
+        image: alpine
+        command: ["sh", "-c", "chown 1000:1000 /app/llm_logs"]
+        volumeMounts:
+          - mountPath: /app/llm_logs
+            name: ai-server-logs
+
+    envConfigMapName: ai-server-config
+
+    env:
+      APP_PORT: 8002
+      LOG_LEVEL: INFO
+      STORE_SERVICE_HOST: localhost
+      STORE_SERVICE_PORT: 3000
+      LLM_LOG_DIRECTORY: /app/llm_logs
+      RESOURCES_DIR: /app/resources
+
+    volumes:
+      - volumeName: ai-server-logs
+        existingClaim: ""
+        mountPath: /app/llm_logs
+        subPath: ""
+        storageClass: ""
+        accessModes:
+          - ReadWriteOnce
+        size: 1Gi
+        annotations: {}
+        labels: {}
+        selector: {}
+        dataSource: {}
+
+    llmProvider:
+      mode: real
+      disableProviderCache: false
+      proxyBaseUrl:
+      llmModels: # comma separated list of available models
+
+    optionalSecrets:
+      openai-api-key:
+        mountPath: /run/secrets/openai-api-key
+        envVars:
+          OPENAI_API_KEY_FILE: /run/secrets/openai-api-key/openai-api-key
+      anthropic-api-key:
+        mountPath: /run/secrets/anthropic-api-key
+        envVars:
+          ANTHROPIC_API_KEY_FILE: /run/secrets/anthropic-api-key/anthropic-api-key
+
   ##--- Angular frontend
   angular-frontend:
     image:

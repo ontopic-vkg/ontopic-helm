@@ -19,6 +19,21 @@ data:
 {{- $oidcEnv := include "ontopic-suite.identity-service-oidc-env" $oidcConfig | fromJson }}
 {{- $env = merge $env $oidcEnv }}
 {{- end }}
+{{- /* For ai-server: expand structured llmProvider config into env vars */ -}}
+{{- if and (eq $name "ai-server") .llmProvider }}
+{{- if .llmProvider.mode }}
+{{- $_ := set $env "LLM_MODE" .llmProvider.mode }}
+{{- end }}
+{{- if .llmProvider.disableProviderCache }}
+{{- $_ := set $env "LLM_DISABLE_NATIVE_CACHE" .llmProvider.disableProviderCache }}
+{{- end }}
+{{- if .llmProvider.proxyBaseUrl }}
+{{- $_ := set $env "LLM_BASE_URL" .llmProvider.proxyBaseUrl }}
+{{- end }}
+{{- if .llmProvider.llmModels }}
+{{- $_ := set $env "LLM_MODELS" .llmProvider.llmModels }}
+{{- end }}
+{{- end }}
 {{- /* Merge env vars from conditionalSecrets based on condition */ -}}
 {{- if .conditionalSecrets }}
 {{- range $secretName, $config := .conditionalSecrets }}
