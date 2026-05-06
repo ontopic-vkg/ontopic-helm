@@ -1,7 +1,7 @@
 dependencies:
 - name: ontopic-server
   repository: file://../ontopic-server
-  version: 2026.1.0
+  version: 2026.1.1
 - name: postgresql
   repository: file://../postgresql
   version: 1.0.0
