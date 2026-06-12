@@ -33,6 +33,16 @@ entries:
     version: 0.1.0
   ontopic-server:
   - apiVersion: v2
+    appVersion: v2026.1.2
+    created: "2026-06-12T13:49:50.439882028Z"
+    description: Helm chart for the Ontopic Server component of Ontopic Suite
+    digest: 75284c63f9f6b425b8130223b6eba85167939efc69abb9694244acc06dc298b6
+    name: ontopic-server
+    type: application
+    urls:
+    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-server-2026.1.2/ontopic-server-2026.1.2.tgz
+    version: 2026.1.2
+  - apiVersion: v2
     appVersion: v2026.1.1
     created: "2026-05-06T13:58:41.718694431Z"
     description: Helm chart for the Ontopic Server component of Ontopic Suite
@@ -85,6 +95,26 @@ entries:
     version: 0.1.0
   ontopic-suite:
   - apiVersion: v2
+    appVersion: v2026.1.2
+    created: "2026-06-12T13:49:50.708682534Z"
+    dependencies:
+    - condition: ontopic-server.enabled
+      name: ontopic-server
+      repository: file://../ontopic-server
+      version: 2026.1.2
+    - alias: db
+      condition: db.deployedInCluster
+      name: postgresql
+      repository: file://../postgresql
+      version: 1.0.0
+    description: Main Helm chart for Ontopic Suite
+    digest: 8fcc28789cf69dfe41f3698e7402a7ebcc3fa9470cb6373021dc3aed1218df7a
+    name: ontopic-suite
+    type: application
+    urls:
+    - https://github.com/ontopic-vkg/ontopic-helm/releases/download/ontopic-suite-2026.1.2/ontopic-suite-2026.1.2.tgz
+    version: 2026.1.2
+  - apiVersion: v2
     appVersion: v2026.1.1
     created: "2026-05-06T13:58:41.899430131Z"
     dependencies:
@@ -135,4 +165,4 @@ entries:
     urls:
     - https://github.com/ontopic-vkg/ontopic-helm/releases/download/postgresql-1.0.0/postgresql-1.0.0.tgz
     version: 1.0.0
-generated: "2026-05-06T13:58:41.899509238Z"
+generated: "2026-06-12T13:49:50.70869954Z"
