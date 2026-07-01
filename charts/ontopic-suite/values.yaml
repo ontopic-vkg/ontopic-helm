@@ -390,6 +390,8 @@ services:
       type: ClusterIP
       port: 80
       targetPort: 8083
+      # Annotations to add to the service (e.g. Azure Internal Load Balancer)
+      annotations: {}
 
     ingress:
       enabled: true

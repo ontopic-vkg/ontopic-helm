@@ -1,6 +1,6 @@
 {{- range $name, $values := .Values.services }}
 {{- with $values }}
-{{- if and .service .ingress }}
+{{- if and .service .ingress .ingress.enabled }}
 ---
 {{ $fullName := printf "%s-%s" (include "ontopic-suite.name" $) .service.name -}}
 {{ $svcPort := .service.port -}}

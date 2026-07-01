@@ -8,6 +8,10 @@ metadata:
   name: "{{ include "ontopic-suite.name" $ }}-{{ .service.name }}"
   labels:
     {{- include "ontopic-suite.labels" $ | nindent 4 }}
+  {{- with .service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .service.type }}
   ports:
