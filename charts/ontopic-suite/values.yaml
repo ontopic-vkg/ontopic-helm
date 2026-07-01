@@ -13,7 +13,7 @@ replicaCount: 1
 
 image:
   repository: nginx
-  # Overrides the image tag whose default is the chart appVersion.
+  # Overrides the image tag whose default is helm-<chart appVersion>.
   tag: ""
 
 ingress:
@@ -117,8 +117,8 @@ services:
   angular-frontend:
     image:
       repository: studio
-      # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2026.1.0"
+      # Overrides the image tag whose default is helm-<chart appVersion>.
+      tag: ""
 
     livenessProbe:
       httpGet:
@@ -141,8 +141,8 @@ services:
   identity-service:
     image:
       repository: identity-service
-      # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2026.1.0"
+      # Overrides the image tag whose default is helm-<chart appVersion>.
+      tag: ""
 
     args:
       - "--session.enable=true"
@@ -247,8 +247,8 @@ services:
   process-server:
     image:
       repository: process-server
-      # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2026.1.0"
+      # Overrides the image tag whose default is helm-<chart appVersion>.
+      tag: ""
 
     livenessProbe:
       httpGet:
@@ -287,8 +287,8 @@ services:
   store-server:
     image:
       repository: store-server
-      # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2026.1.0"
+      # Overrides the image tag whose default is helm-<chart appVersion>.
+      tag: ""
 
     livenessProbe:
       httpGet:
@@ -372,8 +372,8 @@ services:
   web:
     image:
       repository: nginx
-      # Overrides the image tag whose default is the chart appVersion.
-      tag: "helm-v2026.1.0"
+      # Overrides the image tag whose default is helm-<chart appVersion>.
+      tag: ""
 
     livenessProbe:
       httpGet:

@@ -7,8 +7,8 @@ replicaCount: 1
 
 image:
   repository: ontopic-server
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "helm-v2026.1.1"
+  # Overrides the image tag whose default is helm-<chart appVersion>.
+  tag: ""
 
 imagePullSecrets:
   - name: regcred

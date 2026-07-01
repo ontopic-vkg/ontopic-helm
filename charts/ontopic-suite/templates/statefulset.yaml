@@ -41,7 +41,7 @@ spec:
         - name: {{ $name }}
           securityContext:
             {{- toYaml .securityContext | nindent 12 }}
-          image: "{{ $.Values.global.registry }}/{{ .image.repository }}:{{ .image.tag | default $.Chart.AppVersion }}"
+          image: "{{ $.Values.global.registry }}/{{ .image.repository }}:{{ .image.tag | default (printf "helm-%s" $.Chart.AppVersion) }}"
           imagePullPolicy: {{ .image.pullPolicy | default $.Values.global.imagePullPolicy }}
           {{- if eq $name "process-server" }}
           {{- $ontopicServer := index $.Values "ontopic-server" -}}
