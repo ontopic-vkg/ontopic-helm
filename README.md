@@ -2,4 +2,4 @@
 
 OntopicHelm Charts repository.
 
-To install Ontopic Suite, please visit [the official documentation](https://docs.ontopic.ai/suite/install/kubernetes).
+These charts are now discontinued. See metaphactory's charts instead: https://github.com/metaphacts/metaphactory-kubernetes-helm-charts
